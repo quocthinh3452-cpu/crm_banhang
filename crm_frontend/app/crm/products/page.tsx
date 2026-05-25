@@ -12,20 +12,20 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
-// Import API và Types
 import { productApi } from '../../../modules/product/api/product.api';
 import { productTypeApi } from '../../../modules/product/api/productType.api';
 import { getProductsUseCase } from '../../../modules/product/useCases/getProductsUseCase';
 import { Product, ProductFilters } from '../../../modules/product/types/product.type';
 import { ProductTypeResponse } from '../../../modules/product/types/productType.type';
 
-// 1. Định nghĩa Schema Validation bằng Zod cho Sản phẩm
+// 1. Schema
 const productSchema = z.object({
     productCode: z.string().min(1, 'Mã sản phẩm không được để trống'),
     name: z.string().min(2, 'Tên sản phẩm phải có ít nhất 2 ký tự'),
     description: z.string().optional(),
     typeId: z.coerce.number().min(1, 'Vui lòng chọn loại sản phẩm'),
     price: z.coerce.number().min(0, 'Giá tiền không hợp lệ (phải >= 0)'),
+    image: z.any().optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -35,7 +35,6 @@ export default function ProductsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
-    // BỔ SUNG: State để lưu thông báo thành công và lỗi
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -54,12 +53,10 @@ export default function ProductsPage() {
         sortDir: 'desc'
     });
 
-    // 2. Setup React Hook Form
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
-        resolver: zodResolver(productSchema),
-    });
+    resolver: zodResolver(productSchema),
+});
 
-    // BỔ SUNG: Tự động ẩn thông báo sau 3 giây
     useEffect(() => {
         if (successMsg || errorMsg) {
             const timer = setTimeout(() => {
@@ -70,7 +67,6 @@ export default function ProductsPage() {
         }
     }, [successMsg, errorMsg]);
 
-    // 3. Fetch Data
     const fetchData = async () => {
         setIsLoading(true);
         try {
@@ -94,10 +90,15 @@ export default function ProductsPage() {
         fetchData();
     }, [filters]);
 
-    // 4. Xử lý mở Modal Thêm/Sửa
     const handleOpenAdd = () => {
         setEditingProduct(null);
-        reset({ productCode: '', name: '', description: '', price: 0, typeId: 0 }); // Reset form rỗng
+        reset({
+            productCode: '',
+            name: '',
+            description: '',
+            price: 0,
+            typeId: 0
+        });
         setIsModalOpen(true);
     };
 
@@ -113,26 +114,39 @@ export default function ProductsPage() {
         setIsModalOpen(true);
     };
 
-    // 5. Submit Form (Thêm hoặc Cập nhật)
     const onSubmit = async (data: ProductFormValues) => {
         setIsSaving(true);
-        setErrorMsg(null); // Reset lỗi cũ
-        setSuccessMsg(null); // Reset thông báo thành công cũ
-        
+        setErrorMsg(null);
+        setSuccessMsg(null);
+
         try {
-            const payload = data as any;
+            const formData = new FormData();
+
+            const requestData = {
+                productCode: data.productCode,
+                name: data.name,
+                description: data.description || '',
+                typeId: data.typeId,
+                price: data.price,
+            };
+
+            // BỔ SUNG: Thêm 'data.json' làm tên file giả lập để Tomcat parse mượt mà hơn
+            formData.append('data', new Blob([JSON.stringify(requestData)], { type: 'application/json' }), 'data.json');
+
+            if (data.image && data.image.length > 0) {
+                formData.append('file', data.image[0]);
+            }
 
             if (editingProduct) {
-                await productApi.updateProduct(editingProduct.id, payload);
-                setSuccessMsg("Cập nhật sản phẩm thành công!"); // Bổ sung thông báo
+                await productApi.updateProduct(editingProduct.id, formData);
+                setSuccessMsg("Cập nhật sản phẩm thành công!");
             } else {
-                await productApi.createProduct(payload);
-                setSuccessMsg("Thêm sản phẩm mới thành công!"); // Bổ sung thông báo
+                await productApi.createProduct(formData);
+                setSuccessMsg("Thêm sản phẩm mới thành công!");
             }
             setIsModalOpen(false);
-            fetchData(); // Tải lại danh sách
+            fetchData();
         } catch (error: any) {
-            // CẬP NHẬT: Xóa alert, dùng state để hiển thị lỗi từ backend
             const backendError = error.response?.data;
             setErrorMsg(typeof backendError === 'string' ? backendError : 'Có lỗi xảy ra khi lưu dữ liệu!');
             console.error(error);
@@ -141,17 +155,15 @@ export default function ProductsPage() {
         }
     };
 
-    // 6. Xử lý Xóa
     const handleDelete = async (id: number) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?')) {
             setErrorMsg(null);
             setSuccessMsg(null);
             try {
                 await productApi.deleteProduct(id);
-                setSuccessMsg("Xóa sản phẩm thành công!"); // Bổ sung thông báo
+                setSuccessMsg("Xóa sản phẩm thành công!");
                 fetchData();
             } catch (error: any) {
-                // CẬP NHẬT: Xóa alert, hiển thị lỗi
                 const backendError = error.response?.data;
                 setErrorMsg(typeof backendError === 'string' ? backendError : 'Lỗi khi xóa sản phẩm.');
             }
@@ -160,7 +172,6 @@ export default function ProductsPage() {
 
     return (
         <div className="space-y-6">
-            {/* Header Area */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">Quản lý Sản phẩm</h1>
@@ -183,63 +194,85 @@ export default function ProductsPage() {
                 </div>
             </div>
 
-            {/* BỔ SUNG: Khu vực hiển thị thông báo Success / Error */}
             {successMsg && (
                 <div className="p-4 rounded-lg bg-green-50 border border-green-200 text-green-700 flex items-center transition-all duration-300">
                     <span className="font-medium">{successMsg}</span>
                 </div>
             )}
-            
+
             {errorMsg && (
                 <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-center transition-all duration-300">
                     <span className="font-medium">{errorMsg}</span>
                 </div>
             )}
 
-            {/* Main Content: Table */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[800px]">
+                    <table className="w-full text-left border-collapse min-w-[1200px]">
                         <thead className="bg-gray-50 border-b">
                             <tr>
+                                <th className="p-4 font-semibold text-gray-600">Hình ảnh</th>
                                 <th className="p-4 font-semibold text-gray-600">Mã SP</th>
-                                <th className="p-4 font-semibold text-gray-600">Sản phẩm</th>
+                                <th className="p-4 font-semibold text-gray-600">Tên sản phẩm</th>
+                                <th className="p-4 font-semibold text-gray-600">Mô tả</th>
                                 <th className="p-4 font-semibold text-gray-600">Loại sản phẩm</th>
                                 <th className="p-4 font-semibold text-gray-600">Giá bán</th>
+                                <th className="p-4 font-semibold text-gray-600">Ngày tạo</th>
                                 <th className="p-4 font-semibold text-gray-600 text-center">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
                             {isLoading ? (
-                                // Skeleton Loader
                                 [1, 2, 3, 4, 5].map((i) => (
                                     <tr key={i} className="border-b">
+                                        <td className="p-4"><Skeleton className="h-12 w-12 rounded" /></td>
                                         <td className="p-4"><Skeleton className="h-4 w-20" /></td>
-                                        <td className="p-4">
-                                            <Skeleton className="h-4 w-40 mb-2" />
-                                            <Skeleton className="h-3 w-24" />
-                                        </td>
+                                        <td className="p-4"><Skeleton className="h-4 w-32" /></td>
+                                        <td className="p-4"><Skeleton className="h-4 w-40" /></td>
                                         <td className="p-4"><Skeleton className="h-6 w-24 rounded-full" /></td>
                                         <td className="p-4"><Skeleton className="h-4 w-24" /></td>
+                                        <td className="p-4"><Skeleton className="h-4 w-28" /></td>
                                         <td className="p-4"><Skeleton className="h-8 w-24 mx-auto" /></td>
                                     </tr>
                                 ))
                             ) : products.length > 0 ? (
                                 products.map((item) => (
                                     <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors">
-                                        <td className="p-4 font-mono text-sm text-gray-600">{item.productCode}</td>
                                         <td className="p-4">
-                                            <div className="font-medium text-gray-900">{item.name}</div>
-                                            <div className="text-xs text-gray-500 max-w-[200px] truncate">{item.description}</div>
+                                            {item.imageUrl ? (
+                                                <img
+                                                    src={`http://localhost:8080${item.imageUrl}`}
+                                                    alt={item.name}
+                                                    className="w-12 h-12 object-cover rounded border border-gray-200 shadow-sm"
+                                                />
+                                            ) : (
+                                                <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center text-gray-400 text-xs">
+                                                    Trống
+                                                </div>
+                                            )}
                                         </td>
+
+                                        <td className="p-4 font-mono text-sm text-gray-600">{item.productCode}</td>
+                                        <td className="p-4 font-medium text-gray-900">{item.name}</td>
+
+                                        <td className="p-4 text-sm text-gray-600 max-w-[200px] truncate">
+                                            {item.description || <span className="text-gray-400 italic">Không có mô tả</span>}
+                                        </td>
+
                                         <td className="p-4">
                                             <span className="px-3 py-1 text-xs bg-sky-50 text-sky-700 border border-sky-100 rounded-full font-medium">
                                                 {item.typeName || 'Chưa phân loại'}
                                             </span>
                                         </td>
+
                                         <td className="p-4 text-emerald-600 font-semibold">
                                             {formatCurrency(item.price)}
                                         </td>
+
+                                        <td className="p-4 text-sm text-gray-500">
+                                            {item.createdAt ? formatDateTime(item.createdAt) : '---'}
+                                        </td>
+
                                         <td className="p-4">
                                             <div className="flex justify-center gap-2">
                                                 <Button variant="outline" className="text-xs px-3 h-8" onClick={() => handleOpenEdit(item)}>Sửa</Button>
@@ -250,7 +283,7 @@ export default function ProductsPage() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="p-10 text-center text-gray-500">
+                                    <td colSpan={8} className="p-10 text-center text-gray-500">
                                         Không tìm thấy sản phẩm nào
                                     </td>
                                 </tr>
@@ -260,7 +293,6 @@ export default function ProductsPage() {
                 </div>
             </div>
 
-            {/* Pagination */}
             {!isLoading && (
                 <Pagination
                     currentPage={currentPage}
@@ -269,7 +301,6 @@ export default function ProductsPage() {
                 />
             )}
 
-            {/* Modal Thêm/Sửa Sản phẩm */}
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -317,6 +348,26 @@ export default function ProductsPage() {
                             {...register('description')}
                             error={errors.description?.message}
                         />
+                    </div>
+
+                    <div className="col-span-1 md:col-span-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Hình ảnh sản phẩm (Tùy chọn)
+                        </label>
+                        <input
+                            // BỔ SUNG: Ép React reset input file khi đóng mở form
+                            key={isModalOpen ? 'open' : 'closed'}
+                            type="file"
+                            accept="image/*"
+                            {...register('image')}
+                            className="block w-full text-sm text-gray-500 
+                                       file:mr-4 file:py-2 file:px-4 
+                                       file:rounded-md file:border-0 
+                                       file:text-sm file:font-semibold 
+                                       file:bg-sky-100 file:text-sky-700 
+                                       hover:file:bg-sky-200 cursor-pointer"
+                        />
+                        <p className="text-xs text-gray-400 mt-2">Định dạng hỗ trợ: JPG, PNG, GIF. Kích thước tối đa 5MB.</p>
                     </div>
 
                     <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">

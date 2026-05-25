@@ -7,6 +7,7 @@ import org.example.crm_be.module.product.application.dto.output.ProductTypeRespo
 import org.example.crm_be.module.product.application.usecase.ICreateProductType;
 import org.example.crm_be.module.product.application.usecase.IDeleteProductType;
 import org.example.crm_be.module.product.application.usecase.IGetAllProductTypes;
+import org.example.crm_be.module.product.application.usecase.IUpdateProductType;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class ProductTypeRestController {
     private final IGetAllProductTypes getAllProductTypes;
     private final ICreateProductType createProductType;
     private final IDeleteProductType deleteProductType;
+    private final IUpdateProductType updateProductType;
 
 
     // 1. Lấy danh sách tất cả danh mục
@@ -61,6 +63,22 @@ public class ProductTypeRestController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Đã xảy ra lỗi hệ thống khi xóa!");
+        }
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProductType(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody ProductTypeReqest request) {
+        try {
+            ProductTypeResponse response = updateProductType.execute(id, request);
+            return ResponseEntity.ok(response); // Trả về 200 OK kèm dữ liệu đã sửa
+
+        } catch (RuntimeException e) {
+            // Trả về 400 Bad Request nếu bị lỗi logic (trùng tên, không tìm thấy, ...)
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Đã xảy ra lỗi hệ thống khi cập nhật!");
         }
     }
 }

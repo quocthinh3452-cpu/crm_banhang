@@ -35,27 +35,19 @@ public class ProductMapper {
      * Chuyển từ Domain Entity sang Response DTO (để trả về cho Client)
      */
     public ProductResponse toResponse(Product entity) {
-        // Logic mapping từ Entity sang Response DTO
         if (entity == null) return null;
-
-        // Chuyển LocalDateTime sang String định dạng đẹp
-        String formattedDateCreated = entity.getCreatedAt() != null
-                ? entity.getCreatedAt().format(FORMATTER)
-                : null;
-        String formattedDateUpdate = entity.getUpdatedAt() != null
-                ? entity.getUpdatedAt().format(FORMATTER)
-                : null;
 
         return new ProductResponse(
                 entity.getId(),
                 entity.getProductCode(),
                 entity.getName(),
                 entity.getTypeName(),
+                entity.getTypeId(),
                 entity.getPrice(),
                 entity.getImageUrl(),
                 entity.getDescription(),
-                formattedDateCreated,
-                formattedDateUpdate,
+                entity.getCreatedAt(), // Truyền thẳng kiểu LocalDateTime
+                entity.getUpdatedAt(), // Truyền thẳng kiểu LocalDateTime
                 entity.getIsDeleted()
         );
     }
@@ -79,6 +71,7 @@ public class ProductMapper {
         Product domain = new Product();
         domain.setId(db.getId());
         domain.setProductCode(db.getProductCode());
+        domain.setTypeId(db.getTypeId());
         if (db.getProductType() != null) {
             domain.setTypeName(db.getProductType().getTypeName());
         } else {

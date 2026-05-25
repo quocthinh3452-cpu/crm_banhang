@@ -3,6 +3,7 @@ package org.example.crm_be.module.product.application.interactor;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.crm_be.module.product.application.dto.input.ProductRequest;
+import org.example.crm_be.module.product.application.dto.output.ProductResponse;
 import org.example.crm_be.module.product.application.mapper.ProductMapper;
 import org.example.crm_be.module.product.application.usecase.IUpdateProduct;
 import org.example.crm_be.module.product.domain.entity.Product;
@@ -21,7 +22,7 @@ public class UpdateProductImpl implements IUpdateProduct {
 
     @Override
     @Transactional
-    public void execute(Long id, ProductRequest request, String fileName) {
+    public ProductResponse execute(Long id, ProductRequest request, String fileName) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm với ID: " + id));
 
@@ -34,6 +35,7 @@ public class UpdateProductImpl implements IUpdateProduct {
         if (!product.getProductCode().equalsIgnoreCase(request.getProductCode())) {
             productValidator.validateUniqueness(request.getProductCode());
         }
+
         // 3. Cập nhật dữ liệu
         productMapper.updateEntityFromRequest(request, product);
 
@@ -42,7 +44,10 @@ public class UpdateProductImpl implements IUpdateProduct {
             product.setImageUrl(fileName);
         }
 
-        // 5. Lưu xuống Database
-        productRepository.save(product);
+        // 5. Lưu xuống Database (Hứng lại kết quả sau khi lưu)
+        Product savedProduct = productRepository.save(product);
+
+        // 6. TRẢ VỀ KẾT QUẢ (Bổ sung thêm dòng này)
+        return productMapper.toResponse(savedProduct);
     }
 }

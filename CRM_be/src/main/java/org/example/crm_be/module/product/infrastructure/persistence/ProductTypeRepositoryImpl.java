@@ -53,5 +53,10 @@ public class ProductTypeRepositoryImpl implements ProductTypeRepository {
     public void deleteById(Long id) {
         jpaRepository.deleteById(id); // Gọi hàm có sẵn của JpaRepository
     }
-
+    @Override
+    public Optional<ProductType> findByTypeName(String typeName) {
+        // Gọi từ jpaRepository và map ngược về Domain Entity
+        return jpaRepository.findByTypeName(typeName)
+                .map(dbMapper::toDomain); // Chú ý: dùng đúng tên hàm map của bạn (mapToDomain hay toDomain)
+    }
 }

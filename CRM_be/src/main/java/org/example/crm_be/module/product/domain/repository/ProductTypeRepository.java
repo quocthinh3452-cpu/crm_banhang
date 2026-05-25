@@ -13,4 +13,5 @@ public interface ProductTypeRepository {
     List<ProductType> findAll();
     Optional<ProductType> findById(Long id);
     void deleteById(Long id);
+    Optional<ProductType> findByTypeName(String typeName);
 }

@@ -27,16 +27,20 @@ public class CreateProductImpl implements ICreateProduct {
     @Transactional
     public ProductResponse execute(ProductRequest request, String fileName) {
 
-        // 1. KIỂM TRA XÓA MỀM VÀ PHỤC HỒI
+        // 1. Kiểm tra tồn tại
         if (checkProductSoftDeleted.execute(request.getProductCode())) {
-            // Giả định hàm restoreProduct của bạn nhận vào productCode
-            // Nếu hàm của bạn nhận vào ID, bạn cần viết thêm 1 hàm tìm ID dựa trên Mã trước nhé.
-            ProductResponse restoredProduct = restoreProduct.execute(request.getProductCode());
+            Product existingProduct = productRepository.findByProductCode(request.getProductCode())
+                    .orElseThrow();
 
-            // Trả về luôn sản phẩm đã phục hồi, thoát khỏi luồng Create
-            return restoredProduct;
+            // Phục hồi trước
+            restoreProduct.execute(existingProduct.getProductCode());
+
+            // Cập nhật lại các thông tin mới từ request vào sản phẩm vừa hồi sinh
+            productMapper.updateEntityFromRequest(request, existingProduct);
+            if (fileName != null) existingProduct.setImageUrl(fileName);
+
+            return productMapper.toResponse(productRepository.save(existingProduct));
         }
-
         // 2. Nếu không bị xóa mềm, tiếp tục chặn các trường hợp trùng mã đang Active
         productValidator.validateUniqueness(request.getProductCode());
 

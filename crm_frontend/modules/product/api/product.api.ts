@@ -32,16 +32,24 @@ export const productApi = {
     return axiosClient.delete(`/product-types/${id}`);
   },
 
-  createProduct: async (data: ProductRequest): Promise<void> => {
-    return axiosClient.post('/products', data);
-  },
+createProduct: (formData: FormData) => {
+        return axiosClient.post('/products', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+    },
 
   getProductById: async (id: number): Promise<Product> => {
     return axiosClient.get(`/products/${id}`);
   },
 
   // Cập nhật sản phẩm
-  updateProduct: async (id: number, data: ProductRequest): Promise<void> => {
-    return axiosClient.put(`/products/${id}`, data);
-  }
+  updateProduct: (id: number, formData: FormData) => {
+        return axiosClient.put(`/products/${id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+    }
 };

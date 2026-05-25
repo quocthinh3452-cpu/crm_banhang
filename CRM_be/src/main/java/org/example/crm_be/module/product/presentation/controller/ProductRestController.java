@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ public class ProductRestController {
     private final IRestoreProduct restoreProduct; // Thêm Use Case phục hồi
     private final ProductMapper productMapper;
     private final IUpdateProduct updateProduct;
-
+    private final IUploadService uploadService;
 
     // 1. LẤY DANH SÁCH (Hỗ trợ Phân trang, Lọc, Tìm kiếm)
     @GetMapping
@@ -57,15 +58,15 @@ public class ProductRestController {
         return ResponseEntity.ok(data); // HTTP 200 OK
     }
 
-    // 2. LẤY CHI TIẾT SẢN PHẨM
-//    @GetMapping("/{id}")
-//    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
-//        // Đã sửa: Map Domain Entity sang DTO (ProductResponse) để tránh rò rỉ dữ liệu lõi
-//        return findProductById.execute(id)
-//                .map(productMapper::toResponse)
-//                .map(ResponseEntity::ok) // HTTP 200 OK
-//                .orElse(ResponseEntity.notFound().build()); // HTTP 404 Not Found
-//    }
+ //    2. LẤY CHI TIẾT SẢN PHẨM
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+        // Đã sửa: Map Domain Entity sang DTO (ProductResponse) để tránh rò rỉ dữ liệu lõi
+        return findProductById.execute(id)
+                .map(productMapper::toResponse)
+                .map(ResponseEntity::ok) // HTTP 200 OK
+                .orElse(ResponseEntity.notFound().build()); // HTTP 404 Not Found
+    }
 
     // 3. KIỂM TRA MÃ SẢN PHẨM
 //    @GetMapping("/check-code")
@@ -76,28 +77,43 @@ public class ProductRestController {
 
     // 4. THÊM MỚI SẢN PHẨM
     @PostMapping
-    public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
+    public ResponseEntity<ProductResponse> createProduct(
+            @RequestPart("data") ProductRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
 
-            // Gọi Use Case thêm mới
+        String imageUrl = null; // Đổi tên cho rõ nghĩa
 
-            ProductResponse newProduct = createProduct.execute(request, request.getImageUrl());
+        if (file != null && !file.isEmpty()) {
+            // Lấy đường dẫn từ service trả về
+            imageUrl = uploadService.saveFile(file);
+        }
 
-        // Trả về HTTP 201 Created cho nghiệp vụ tạo mới thành công
-        return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
+        // Truyền imageUrl xuống thay vì truyền null hoặc tên file thô
+        ProductResponse response = createProduct.execute(request, imageUrl);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     // 5. CẬP NHẬT SẢN PHẨM
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> update(@PathVariable Long id,
-                                                  @Valid @RequestBody ProductRequest request) {
-        // Gọi Use Case cập nhật
-        updateProduct.execute(id, request, request.getImageUrl());
+    public ResponseEntity<ProductResponse> updateProduct(
+            @PathVariable("id") Long id,
+            @RequestPart("data") ProductRequest request, // Nhận cục JSON
+            // QUAN TRỌNG: required = false vì khi cập nhật, người dùng có thể KHÔNG chọn ảnh mới
+            @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        // Lấy lại dữ liệu sau khi cập nhật để trả về cho Frontend hiển thị ngay lập tức
-        return findProductById.execute(id)
-                .map(productMapper::toResponse)
-                .map(ResponseEntity::ok) // HTTP 200 OK
-                .orElse(ResponseEntity.notFound().build());
+        String filePath = null;
+
+        // Kiểm tra xem người dùng có upload ảnh mới không
+        if (file != null && !file.isEmpty()) {
+            // Giao file cho UploadService lưu và lấy về đường dẫn chuỗi (VD: /uploads/abc.jpg)
+            filePath = uploadService.saveFile(file);
+        }
+
+        // Truyền filePath (kiểu String) xuống Interactor/UseCase thay vì MultipartFile
+        ProductResponse response = updateProduct.execute(id, request, filePath);
+
+        return ResponseEntity.ok(response);
     }
 
     // 6. XÓA SẢN PHẨM (Soft Delete)
