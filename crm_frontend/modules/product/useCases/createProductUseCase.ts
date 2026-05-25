@@ -38,8 +38,11 @@ export const createProductUseCase = async (data: ProductRequest): Promise<void> 
       description: data.description?.trim() || ''
     };
 
+    const formData = new FormData();
+    formData.append('data', new Blob([JSON.stringify(sanitizedData)], { type: 'application/json' }), 'data.json');
+
     // 3. GỌI TẦNG API
-    await productApi.createProduct(sanitizedData);
+    await productApi.createProduct(formData);
 
   } catch (error: any) {
     // 4. XỬ LÝ LỖI TRẢ VỀ TỪ BACKEND

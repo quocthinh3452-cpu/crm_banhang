@@ -77,43 +77,51 @@ public class ProductRestController {
 
     // 4. THÊM MỚI SẢN PHẨM
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(
+    public ResponseEntity<?> createProduct(
             @RequestPart("data") ProductRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        String imageUrl = null; // Đổi tên cho rõ nghĩa
+        try {
+            String imageUrl = null; // Đổi tên cho rõ nghĩa
 
-        if (file != null && !file.isEmpty()) {
-            // Lấy đường dẫn từ service trả về
-            imageUrl = uploadService.saveFile(file);
+            if (file != null && !file.isEmpty()) {
+                // Lấy đường dẫn từ service trả về
+                imageUrl = uploadService.saveFile(file);
+            }
+
+            // Truyền imageUrl xuống thay vì truyền null hoặc tên file thô
+            ProductResponse response = createProduct.execute(request, imageUrl);
+
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        // Truyền imageUrl xuống thay vì truyền null hoặc tên file thô
-        ProductResponse response = createProduct.execute(request, imageUrl);
-
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     // 5. CẬP NHẬT SẢN PHẨM
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(
+    public ResponseEntity<?> updateProduct(
             @PathVariable("id") Long id,
             @RequestPart("data") ProductRequest request, // Nhận cục JSON
             // QUAN TRỌNG: required = false vì khi cập nhật, người dùng có thể KHÔNG chọn ảnh mới
             @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        String filePath = null;
+        try {
+            String filePath = null;
 
-        // Kiểm tra xem người dùng có upload ảnh mới không
-        if (file != null && !file.isEmpty()) {
-            // Giao file cho UploadService lưu và lấy về đường dẫn chuỗi (VD: /uploads/abc.jpg)
-            filePath = uploadService.saveFile(file);
+            // Kiểm tra xem người dùng có upload ảnh mới không
+            if (file != null && !file.isEmpty()) {
+                // Giao file cho UploadService lưu và lấy về đường dẫn chuỗi (VD: /uploads/abc.jpg)
+                filePath = uploadService.saveFile(file);
+            }
+
+            // Truyền filePath (kiểu String) xuống Interactor/UseCase thay vì MultipartFile
+            ProductResponse response = updateProduct.execute(id, request, filePath);
+
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        // Truyền filePath (kiểu String) xuống Interactor/UseCase thay vì MultipartFile
-        ProductResponse response = updateProduct.execute(id, request, filePath);
-
-        return ResponseEntity.ok(response);
     }
 
     // 6. XÓA SẢN PHẨM (Soft Delete)

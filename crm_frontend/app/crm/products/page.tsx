@@ -41,6 +41,7 @@ export default function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [types, setTypes] = useState<ProductTypeResponse[]>([]);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
@@ -49,11 +50,11 @@ export default function ProductsPage() {
         size: 5,
         keyword: '',
         typeId: undefined,
-        sortField: 'id',
+        sortField: 'createdAt',
         sortDir: 'desc'
     });
 
-    const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    const { register, handleSubmit, formState: { errors }, reset, setError } = useForm({
     resolver: zodResolver(productSchema),
 });
 
@@ -148,7 +149,30 @@ export default function ProductsPage() {
             fetchData();
         } catch (error: any) {
             const backendError = error.response?.data;
-            setErrorMsg(typeof backendError === 'string' ? backendError : 'Có lỗi xảy ra khi lưu dữ liệu!');
+            let msg = 'Có lỗi xảy ra khi lưu dữ liệu!';
+            if (typeof backendError === 'string') {
+                msg = backendError;
+            } else if (backendError && typeof backendError.message === 'string') {
+                msg = backendError.message;
+            } else if (error.message) {
+                msg = error.message;
+            }
+
+            // Hiển thị lỗi trực tiếp tại ô nhập liệu nếu trùng mã
+            const lowerMsg = msg.toLowerCase();
+            if (
+                lowerMsg.includes("đã tồn tại") || 
+                lowerMsg.includes("duplicate") || 
+                lowerMsg.includes("already exists") || 
+                lowerMsg.includes("trùng")
+            ) {
+                setError("productCode", {
+                    type: "manual",
+                    message: "Mã đã tồn tại vui lòng chọn mã khác"
+                });
+            } else {
+                setErrorMsg(msg);
+            }
             console.error(error);
         } finally {
             setIsSaving(false);
@@ -172,25 +196,118 @@ export default function ProductsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">Quản lý Sản phẩm</h1>
                     <p className="text-sm text-gray-500">Quản lý kho hàng, phân loại và giá bán</p>
                 </div>
-                <div className="flex gap-2">
+                <Button onClick={handleOpenAdd}>
+                    + Thêm sản phẩm
+                </Button>
+            </div>
+
+            {/* Filter & Search Bar */}
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
+                {/* Search Box */}
+                <div className="relative w-full md:w-80">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </span>
+                    <input
+                        type="text"
+                        placeholder="Tìm theo mã hoặc tên sản phẩm..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                setFilters({ ...filters, keyword: searchTerm, page: 1 });
+                            }
+                        }}
+                        className="w-full pl-10 pr-10 py-2 bg-gray-50 border border-gray-200 text-sm rounded-lg outline-none focus:bg-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all text-gray-700 placeholder-gray-400"
+                    />
+                    {searchTerm && (
+                        <button
+                            onClick={() => {
+                                setSearchTerm('');
+                                setFilters({ ...filters, keyword: '', page: 1 });
+                            }}
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                        >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    )}
+                </div>
+
+                {/* Sort and Category Filters */}
+                <div className="flex flex-wrap gap-2 w-full md:w-auto justify-end">
                     <select
                         value={filters.typeId || ''}
                         onChange={(e) => setFilters({ ...filters, typeId: e.target.value ? Number(e.target.value) : undefined, page: 1 })}
-                        className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-48 cursor-pointer"
+                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-40 cursor-pointer transition-colors"
                     >
                         <option value="">Tất cả danh mục</option>
                         {types.map(t => (
                             <option key={t.id} value={t.id}>{t.typeName}</option>
                         ))}
                     </select>
-                    <Button onClick={handleOpenAdd}>
-                        + Thêm sản phẩm
-                    </Button>
+
+                    {/* Sắp xếp theo Giá */}
+                    <select
+                        value={filters.sortField === 'price' ? filters.sortDir : ''}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                                setFilters({ ...filters, sortField: 'price', sortDir: val, page: 1 });
+                            } else {
+                                setFilters({ ...filters, sortField: 'createdAt', sortDir: 'desc', page: 1 });
+                            }
+                        }}
+                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-36 cursor-pointer transition-colors"
+                    >
+                        <option value="">Sắp xếp: Giá</option>
+                        <option value="asc">Giá: Thấp đến Cao</option>
+                        <option value="desc">Giá: Cao đến Thấp</option>
+                    </select>
+
+                    {/* Sắp xếp theo Ngày tạo */}
+                    <select
+                        value={filters.sortField === 'createdAt' ? filters.sortDir : ''}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                                setFilters({ ...filters, sortField: 'createdAt', sortDir: val, page: 1 });
+                            } else {
+                                setFilters({ ...filters, sortField: 'createdAt', sortDir: 'desc', page: 1 });
+                            }
+                        }}
+                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-40 cursor-pointer transition-colors"
+                    >
+                        <option value="">Sắp xếp: Ngày tạo</option>
+                        <option value="desc">Ngày tạo: Mới nhất</option>
+                        <option value="asc">Ngày tạo: Cũ nhất</option>
+                    </select>
+
+                    {/* Sắp xếp theo Ngày cập nhật */}
+                    <select
+                        value={filters.sortField === 'updatedAt' ? filters.sortDir : ''}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                                setFilters({ ...filters, sortField: 'updatedAt', sortDir: val, page: 1 });
+                            } else {
+                                setFilters({ ...filters, sortField: 'createdAt', sortDir: 'desc', page: 1 });
+                            }
+                        }}
+                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-44 cursor-pointer transition-colors"
+                    >
+                        <option value="">Sắp xếp: Ngày cập nhật</option>
+                        <option value="desc">Cập nhật: Mới nhất</option>
+                        <option value="asc">Cập nhật: Cũ nhất</option>
+                    </select>
                 </div>
             </div>
 
@@ -218,6 +335,7 @@ export default function ProductsPage() {
                                 <th className="p-4 font-semibold text-gray-600">Loại sản phẩm</th>
                                 <th className="p-4 font-semibold text-gray-600">Giá bán</th>
                                 <th className="p-4 font-semibold text-gray-600">Ngày tạo</th>
+                                <th className="p-4 font-semibold text-gray-600">Ngày cập nhật</th>
                                 <th className="p-4 font-semibold text-gray-600 text-center">Thao tác</th>
                             </tr>
                         </thead>
@@ -231,6 +349,7 @@ export default function ProductsPage() {
                                         <td className="p-4"><Skeleton className="h-4 w-40" /></td>
                                         <td className="p-4"><Skeleton className="h-6 w-24 rounded-full" /></td>
                                         <td className="p-4"><Skeleton className="h-4 w-24" /></td>
+                                        <td className="p-4"><Skeleton className="h-4 w-28" /></td>
                                         <td className="p-4"><Skeleton className="h-4 w-28" /></td>
                                         <td className="p-4"><Skeleton className="h-8 w-24 mx-auto" /></td>
                                     </tr>
@@ -273,6 +392,10 @@ export default function ProductsPage() {
                                             {item.createdAt ? formatDateTime(item.createdAt) : '---'}
                                         </td>
 
+                                        <td className="p-4 text-sm text-gray-500">
+                                            {item.updatedAt ? formatDateTime(item.updatedAt) : '---'}
+                                        </td>
+
                                         <td className="p-4">
                                             <div className="flex justify-center gap-2">
                                                 <Button variant="outline" className="text-xs px-3 h-8" onClick={() => handleOpenEdit(item)}>Sửa</Button>
@@ -283,7 +406,7 @@ export default function ProductsPage() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={8} className="p-10 text-center text-gray-500">
+                                    <td colSpan={9} className="p-10 text-center text-gray-500">
                                         Không tìm thấy sản phẩm nào
                                     </td>
                                 </tr>
@@ -326,7 +449,9 @@ export default function ProductsPage() {
                             label="Loại sản phẩm"
                             options={[
                                 { label: '-- Chọn loại SP --', value: '' },
-                                ...types.map(t => ({ label: t.typeName, value: String(t.id) }))
+                                ...types
+                                    .filter(t => t.isActive === 1 || t.id === editingProduct?.typeId)
+                                    .map(t => ({ label: t.typeName, value: String(t.id) }))
                             ]}
                             {...register('typeId')}
                             error={errors.typeId?.message}

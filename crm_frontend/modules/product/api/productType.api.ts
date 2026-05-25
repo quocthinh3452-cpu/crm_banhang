@@ -18,5 +18,10 @@ export const productTypeApi = {
   // 3. Xóa danh mục
   delete: async (id: number): Promise<void> => {
     return axiosClient.delete(`/product-types/${id}`);
+  },
+
+  // 4. Cập nhật danh mục
+  update: async (id: number, data: ProductTypeRequest): Promise<ProductTypeResponse> => {
+    return axiosClient.put(`/product-types/${id}`, data);
   }
 };
