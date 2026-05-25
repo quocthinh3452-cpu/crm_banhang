@@ -11,7 +11,8 @@ import {
   Settings,
   LogOut,
   ChevronRight,
-  ChevronDown // 2. Thêm icon mũi tên thả xuống
+  ChevronDown, // 2. Thêm icon mũi tên thả xuống
+  FileText
 } from 'lucide-react';
 
 const menuItems = [
@@ -26,6 +27,7 @@ const menuItems = [
       { name: 'Loại sản phẩm', path: '/crm/product-types' },
     ]
   },
+  { name: 'Tài liệu', path: '/crm/documents', icon: FileText },
   { name: 'Báo cáo', path: '/reports', icon: BarChart3 },
   { name: 'Cài đặt', path: '/settings', icon: Settings },
 ];

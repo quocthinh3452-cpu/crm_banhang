@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface DocumentRepository {
     Document save(Document document);
     Optional<Document> findById(Long id);
+    Optional<Document> findByName(String name);
     List<Document> findAll();
     void deleteById(Long id);
 }

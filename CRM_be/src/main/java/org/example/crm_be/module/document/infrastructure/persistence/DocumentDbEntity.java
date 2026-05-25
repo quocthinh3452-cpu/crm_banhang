@@ -44,4 +44,7 @@ public class DocumentDbEntity {
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime    createdAt;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Integer isDeleted;
 }
