@@ -1,0 +1,167 @@
+PROJECT STRUCTURE - CRM Frontend
+================================
+
+ROOT: c:\Users\ADMIN\Desktop\TASK_QLKH\crm_banhang\crm_frontend
+
+PROJECT LAYOUT:
+===============
+
+├── app/
+│   ├── globals.css                          # Global styles (dark theme)
+│   ├── layout.tsx                           # Root layout with Sidebar + ToastProvider
+│   ├── page.tsx                             # Home page
+│   └── crm/
+│       └── customers/
+│           └── page.tsx                     # ✨ NEW: Main customers module page
+│
+├── modules/
+│   └── customers/                           # ✨ NEW: Customers business module
+│       ├── index.ts                         # ✨ NEW: Barrel exports
+│       ├── README.md                        # ✨ NEW: Architecture guide
+│       ├── QUICKSTART.md                    # ✨ NEW: Quick start guide
+│       ├── ARCHITECTURE.md                  # ✨ NEW: Deep architecture docs
+│       │
+│       ├── domain/                          # ✨ NEW: Business logic layer
+│       │   ├── types.ts                     # ✨ NEW: Customer entity & types
+│       │   ├── constants.ts                 # ✨ NEW: Business constants
+│       │   └── validation.ts                # ✨ NEW: Zod schemas
+│       │
+│       ├── data/                            # ✨ NEW: Data access layer
+│       │   ├── customerApi.ts               # ✨ NEW: HTTP API service (ready for backend)
+│       │   └── customerRepository.ts        # ✨ NEW: Repository with mock data + CRUD
+│       │
+│       └── presentation/                    # ✨ NEW: UI layer
+│           ├── hooks/
+│           │   ├── index.ts                 # ✨ NEW: Barrel export
+│           │   └── useCustomers.ts          # ✨ NEW: Custom React hook (state management)
+│           └── components/
+│               ├── index.ts                 # ✨ NEW: Barrel export
+│               ├── CustomerTable.tsx        # ✨ NEW: Data table component
+│               ├── CustomerForm.tsx         # ✨ NEW: Add/Edit form component
+│               ├── CustomerFilters.tsx      # ✨ NEW: Search & filter component
+│               └── CustomerDetailModal.tsx  # ✨ NEW: Modal wrapper component
+│
+├── shared/
+│   ├── api/
+│   │   └── axiosClient.ts                   # HTTP client
+│   ├── components/
+│   │   ├── Sidebar.tsx                      # Left sidebar navigation
+│   │   ├── Toast.tsx                        # Toast provider
+│   │   ├── form/
+│   │   │   ├── TextInput.tsx                # ✨ UPDATED: Dark theme
+│   │   │   └── SelectBox.tsx                # ✨ UPDATED: Dark theme
+│   │   └── ui/
+│   │       ├── Button.tsx                   # ✨ UPDATED: Dark theme + variants
+│   │       ├── Loading.tsx                  # Loading component
+│   │       ├── Modal.tsx                    # ✨ UPDATED: Dark theme
+│   │       ├── Pagination.tsx               # ✨ UPDATED: Dark theme
+│   │       └── Skeleton.tsx                 # Loading skeleton
+│   ├── hooks/
+│   │   ├── useClickOutside.ts               # Click outside detection
+│   │   └── useDebounce.ts                   # Debounce hook
+│   └── utils/
+│       └── formatters.ts                    # Date/currency formatters
+│
+├── public/                                   # Static assets
+├── package.json                              # Dependencies (react-hook-form, zod, lucide-react, etc.)
+├── tsconfig.json                             # TypeScript config
+├── next.config.ts                           # Next.js config
+├── tailwind.config.js                       # TailwindCSS config
+├── postcss.config.mjs                       # PostCSS config
+└── CUSTOMERS_MODULE_SUMMARY.md              # ✨ NEW: Summary of implementation
+
+KEY FEATURES IMPLEMENTED
+=========================
+
+✅ Customers Module (Clean Architecture)
+  - Domain layer: Types, constants, validation
+  - Data layer: Mock repository + API ready
+  - Presentation: Components + custom hook
+
+✅ Features
+  - View customers in table
+  - Add new customer (modal form)
+  - Edit customer
+  - Delete customer (single + bulk)
+  - Search by name/email
+  - Filter by type and status
+  - Pagination
+  - Form validation (Zod)
+  - Error handling (toast)
+  - Loading states
+  - Responsive design
+  - Dark CRM theme
+
+✅ Technology Stack
+  - Next.js 16.2.6 (App Router)
+  - React 19.2.4
+  - TypeScript 5
+  - TailwindCSS 4
+  - React Hook Form
+  - Zod (validation)
+  - Lucide React (icons)
+  - Axios (HTTP)
+  - React Hot Toast
+
+DESIGN SYSTEM
+=============
+
+Dark CRM Theme:
+- Background: slate-900
+- Surface: slate-800
+- Text Primary: slate-100
+- Text Secondary: slate-300
+- Border: slate-700
+- Accent: blue-600
+
+MOCK DATA
+=========
+
+5 sample customers included for testing:
+1. Nguyễn Văn A - VIP (50M)
+2. Trần Thị B - Tiềm năng (12M)
+3. Lê Minh C - Thường xuyên (5M)
+4. Phạm Hòa D - Mới (2M)
+5. Đặng Xuân E - VIP, inactive (100M)
+
+NEXT STEPS
+==========
+
+1. Backend Integration
+   - Implement API endpoints matching customerApi.ts
+   - Update customerRepository.ts to call real API
+   - Components remain unchanged
+
+2. Additional Features
+   - Customer detail view
+   - Export to CSV
+   - Advanced reporting
+   - User permissions
+
+3. Performance
+   - Server-side pagination
+   - API caching
+   - Query optimization
+
+IMPORTANT NOTES
+===============
+
+✅ Clean Architecture: Domain → Data → Presentation
+✅ Separation of Concerns: Business logic isolated from UI
+✅ Type-Safe: Full TypeScript + Zod validation
+✅ Responsive: Mobile, tablet, desktop support
+✅ Dark Theme: All components use slate/blue palette
+✅ No Changes to Sidebar/Layout: Module is self-contained
+✅ Mock Data Ready: Fully functional without backend
+
+DOCUMENTATION
+==============
+
+- README.md: Architecture overview & feature guide
+- QUICKSTART.md: Quick reference for developers
+- ARCHITECTURE.md: Deep dive into design patterns
+- CUSTOMERS_MODULE_SUMMARY.md: This summary
+
+---
+Generated: 2024-05-21
+Version: 1.0
