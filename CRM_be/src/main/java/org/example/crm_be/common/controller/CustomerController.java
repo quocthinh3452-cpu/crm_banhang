@@ -6,9 +6,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+
 @RequestMapping("/api/customers")
 @CrossOrigin(origins = "*")
+@RestController("commonCustomerController")
 public class CustomerController {
 
     private final CustomerJpaRepository customerJpaRepository;

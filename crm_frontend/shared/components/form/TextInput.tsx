@@ -5,8 +5,6 @@ import React, { forwardRef } from 'react';
 interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string; // Nhận message lỗi từ Zod
-  label?: string;
-  error?: string;
   hint?: string;
 }
 

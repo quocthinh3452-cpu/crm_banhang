@@ -1,6 +1,7 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 interface Option {
   label: string;
@@ -15,7 +16,7 @@ interface SelectBoxProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 export const SelectBox = forwardRef<HTMLSelectElement, SelectBoxProps>(
-  ({ label, options, error, className = '', id, ...props }, ref) => {
+  ({ label, options, error, hint, className = '', id, children, ...props }, ref) => {
     const selectId = id || props.name;
 
     return (

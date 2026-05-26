@@ -366,7 +366,7 @@ export default function CustomerForm({
             type="submit"
             variant="primary"
             size="md"
-            loading={isSubmitting || loading}
+            isLoading={isSubmitting || loading}
             title="Enter"
           >
             {isEditMode

@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.example.crm_be.module.customers.application.dto.input.UpdateCustomerInput;
 import org.example.crm_be.module.customers.application.usecase.UpdateCustomerUseCase;
-@RestController
+
 @RequestMapping("/api/customers")
 @RequiredArgsConstructor
-
+@RestController("moduleCustomerController")
 public class CustomerController {
 
     private final CreateCustomerUseCase createCustomerUseCase;
