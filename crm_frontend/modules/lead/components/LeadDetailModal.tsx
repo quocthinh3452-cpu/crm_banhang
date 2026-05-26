@@ -12,6 +12,7 @@ interface LeadDetailModalProps {
 
 export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClose, lead }) => {
   const [showSensitiveData, setShowSensitiveData] = useState(false);
+
   const [provinces, setProvinces] = useState<LookupItem[]>([]);
   const [sources, setSources] = useState<LookupItem[]>([]);
   const [salesGroups, setSalesGroups] = useState<LookupItem[]>([]);
@@ -22,20 +23,11 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
   const [newNote, setNewNote] = useState('');
   const [submittingLog, setSubmittingLog] = useState(false);
 
+  // STATE DÀNH CHO VIỆC SỬA LOG
   const [editingLogId, setEditingLogId] = useState<number | null>(null);
   const [editActionType, setEditActionType] = useState('CALL');
   const [editNote, setEditNote] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
-
-  // BOX THÔNG BÁO (NOTIFICATION BOX)
-  const [notifyBox, setNotifyBox] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const showNotify = (message: string, type: 'success' | 'error') => {
-    setNotifyBox({ message, type });
-    setTimeout(() => setNotifyBox(null), 3000); 
-  };
-
-  // BOX XÁC NHẬN XÓA (CONFIRM BOX)
-  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
@@ -43,8 +35,6 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
       setNewNote('');
       setActionType('CALL');
       setEditingLogId(null);
-      setConfirmDeleteId(null);
-      setNotifyBox(null);
     } else {
       lookupApi.getProvinces().then(setProvinces).catch(() => setProvinces([]));
       lookupApi.getSources().then(setSources).catch(() => setSources([]));
@@ -59,7 +49,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
       const data = await leadApi.getLeadLogs(lead.id);
       setLogs(data || []);
     } catch (error) {
-      console.error("Không thể lấy lịch sử:", error);
+      console.error("Không thể lấy lịch sử tương tác:", error);
     } finally {
       setLoadingLogs(false);
     }
@@ -100,51 +90,55 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
     return item ? item.name : 'Chưa cập nhật';
   };
 
+  // --- HÀM THÊM MỚI LOG ---
   const handleAddLog = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!lead.id || !newNote.trim()) return;
+
     setSubmittingLog(true);
     try {
       await leadApi.createLeadLog(lead.id, { action: actionType, note: newNote.trim() });
       setNewNote('');
       loadLogs();
-      showNotify('Ghi nhận lịch sử thành công!', 'success');
     } catch (error) {
-      showNotify('Không lưu được dữ liệu!', 'error');
+      console.error("Lỗi khi lưu vết tương tác:", error);
     } finally {
       setSubmittingLog(false);
     }
   };
 
-  const executeDeleteLog = async (logId: number) => {
+  // --- HÀM XÓA LOG ---
+  const handleDeleteLog = async (logId: number) => {
     if (!lead.id) return;
+    if (!window.confirm('Bạn có chắc chắn muốn xóa lịch sử tương tác này không?')) return;
+    
     try {
       await leadApi.deleteLeadLog(lead.id, logId);
-      setConfirmDeleteId(null);
-      loadLogs();
-      showNotify('Đã xóa ghi chú thành công!', 'success');
+      loadLogs(); // Load lại bảng sau khi xóa
     } catch (error) {
-      showNotify('Lỗi khi xóa ghi chú!', 'error');
+      console.error("Lỗi khi xóa log:", error);
+      alert("Lỗi khi xóa! Vui lòng thử lại.");
     }
   };
 
+  // --- HÀM MỞ FORM SỬA LOG ---
   const handleStartEdit = (log: LeadLog) => {
     setEditingLogId(log.id!);
     setEditActionType((log.action || 'CALL').toUpperCase());
     setEditNote(log.note);
-    setConfirmDeleteId(null);
   };
 
+  // --- HÀM LƯU LẠI SAU KHI SỬA ---
   const handleSaveEdit = async (logId: number) => {
     if (!lead.id || !editNote.trim()) return;
     setSavingEdit(true);
     try {
       await leadApi.updateLeadLog(lead.id, logId, { action: editActionType, note: editNote.trim() });
-      setEditingLogId(null);
-      loadLogs();
-      showNotify('Cập nhật thành công!', 'success');
+      setEditingLogId(null); // Tắt form sửa
+      loadLogs(); // Load lại data mới
     } catch (error) {
-      showNotify('Cập nhật thất bại!', 'error');
+      console.error("Lỗi khi cập nhật log:", error);
+      alert("Lỗi khi cập nhật! Vui lòng thử lại.");
     } finally {
       setSavingEdit(false);
     }
@@ -162,19 +156,13 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Chi tiết Khách hàng tiềm năng" maxWidth="max-w-6xl">
-      <div className="flex flex-col max-h-[85vh] relative">
+      <div className="flex flex-col max-h-[85vh]">
         
-        {/* COMPONENT THÔNG BÁO KẾT QUẢ (TOAST BOX) */}
-        {notifyBox && (
-          <div className={`absolute top-4 right-4 z-50 px-4 py-2 rounded-md shadow-lg font-medium text-sm transition-all animate-bounce ${notifyBox.type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-red-100 text-red-800 border border-red-200'}`}>
-            {notifyBox.type === 'success' ? '✅ ' : '❌ '} {notifyBox.message}
-          </div>
-        )}
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto pr-2 pb-4 items-start">
           
-          {/* CỘT TRÁI */}
+          {/* CỘT TRÁI (Giữ nguyên) */}
           <div className="lg:col-span-7 space-y-5">
+            {/* Thẻ 1 */}
             <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
               <h3 className="font-semibold text-gray-800 text-base border-b border-gray-100 pb-3 mb-4 flex items-center gap-2">👤 Thông tin cơ bản</h3>
               <div className="grid grid-cols-2 gap-y-4 gap-x-4 text-sm">
@@ -188,6 +176,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
               </div>
             </div>
 
+            {/* Thẻ 2 */}
             <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
               <h3 className="font-semibold text-gray-800 text-base border-b border-gray-100 pb-3 mb-4 flex items-center gap-2">💼 Thông tin nghiệp vụ</h3>
               <div className="grid grid-cols-2 gap-y-4 gap-x-4 text-sm">
@@ -198,6 +187,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
               </div>
             </div>
 
+            {/* Thẻ 3 */}
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
               <div className="flex justify-between items-center border-b border-gray-200 pb-3 mb-4">
                 <h3 className="font-semibold text-gray-800 text-base">🔐 Thông tin định danh</h3>
@@ -214,7 +204,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
           <div className="lg:col-span-5 bg-gray-50 border border-gray-200 rounded-xl p-5 flex flex-col h-full min-h-[500px]">
             <h3 className="font-semibold text-gray-800 text-base border-b border-gray-200 pb-3 mb-4 flex items-center gap-2">📜 Lịch sử tương tác</h3>
 
-            <form onSubmit={handleAddLog} className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm mb-6 shrink-0 relative z-10">
+            <form onSubmit={handleAddLog} className="bg-white p-4 border border-gray-200 rounded-lg shadow-sm mb-6 shrink-0">
               <div className="flex gap-3 items-center mb-3">
                 <span className="text-sm text-gray-600 font-medium whitespace-nowrap">Hình thức:</span>
                 <select value={actionType} onChange={(e) => setActionType(e.target.value)} className="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
@@ -230,7 +220,8 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
               </div>
             </form>
 
-            <div className="flex-1 overflow-y-auto pr-2 relative z-0">
+            {/* Danh sách Timeline */}
+            <div className="flex-1 overflow-y-auto pr-2">
               {loadingLogs ? (
                 <div className="text-center text-sm text-gray-500 py-8">Đang tải lịch sử...</div>
               ) : logs.length === 0 ? (
@@ -241,8 +232,9 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
                     <div key={log.id} className="relative pl-6">
                       <div className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-white border-2 border-blue-500" />
                       
-                      {/* TRƯỜNG HỢP 1: ĐANG SỬA */}
+                      {/* KHỐI HIỂN THỊ LOG (Có hiệu ứng Hover hiện nút) */}
                       {editingLogId === log.id ? (
+                        // Giao diện khi bấm vào nút Sửa
                         <div className="bg-blue-50 p-4 border border-blue-200 rounded-lg shadow-sm">
                           <select value={editActionType} onChange={(e) => setEditActionType(e.target.value)} className="w-full border border-gray-300 rounded-md px-3 py-1.5 text-sm outline-none focus:border-blue-500 mb-2">
                             <option value="CALL">📞 Gọi điện</option>
@@ -252,29 +244,21 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
                           </select>
                           <textarea value={editNote} onChange={(e) => setEditNote(e.target.value)} rows={3} className="w-full text-sm p-3 border border-gray-300 rounded-md outline-none focus:border-blue-500 resize-none mb-2" required />
                           <div className="flex justify-end gap-2">
-                            <button onClick={() => setEditingLogId(null)} className="text-gray-500 hover:text-gray-700 text-xs font-medium px-3 py-1 bg-white border rounded">Hủy</button>
+                            <button onClick={() => setEditingLogId(null)} className="text-gray-500 hover:text-gray-700 text-xs font-medium px-3 py-1">Hủy</button>
                             <button onClick={() => handleSaveEdit(log.id!)} disabled={savingEdit} className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-4 py-1.5 rounded disabled:bg-gray-400">{savingEdit ? 'Đang lưu...' : 'Lưu lại'}</button>
                           </div>
                         </div>
-                      
-                      /* TRƯỜNG HỢP 2: BOX XÁC NHẬN XÓA */
-                      ) : confirmDeleteId === log.id ? (
-                        <div className="bg-red-50 p-4 border border-red-200 rounded-lg shadow-sm flex flex-col items-center justify-center text-center">
-                          <p className="text-red-700 font-medium text-sm mb-3">⚠️ Bạn có chắc chắn muốn xóa ghi chú này?</p>
-                          <div className="flex gap-3">
-                            <button onClick={() => setConfirmDeleteId(null)} className="px-4 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">Không xóa</button>
-                            <button onClick={() => executeDeleteLog(log.id!)} className="px-4 py-1.5 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 shadow-sm">Xóa ngay</button>
-                          </div>
-                        </div>
-
-                      /* TRƯỜNG HỢP 3: HIỂN THỊ BÌNH THƯỜNG */
                       ) : (
-                        <div className="group bg-white p-4 border border-gray-100 rounded-lg shadow-sm hover:border-blue-200 transition-all relative">
-                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-white p-1 rounded-md shadow-sm border border-gray-100">
-                            <button onClick={() => handleStartEdit(log)} className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="Sửa">✏️</button>
-                            <button onClick={() => setConfirmDeleteId(log.id!)} className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded" title="Xóa">🗑️</button>
+                        // Giao diện hiển thị bình thường (nhóm class 'group' để bắt sự kiện hover)
+                        <div className="group bg-white p-4 border border-gray-100 rounded-lg shadow-sm hover:shadow-md transition-all relative">
+                          
+                          {/* Nút Sửa / Xóa ẩn đi, chỉ hiện khi hover */}
+                          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 bg-white pl-2">
+                            <button onClick={() => handleStartEdit(log)} className="text-gray-400 hover:text-blue-600" title="Sửa">✏️</button>
+                            <button onClick={() => handleDeleteLog(log.id!)} className="text-gray-400 hover:text-red-600" title="Xóa">🗑️</button>
                           </div>
-                          <div className="flex justify-between items-start mb-2 pr-14">
+
+                          <div className="flex justify-between items-start mb-2 pr-12">
                             <span className="inline-flex items-center gap-1.5 font-semibold text-gray-800 text-sm">
                               {getActionDisplay(log.action).icon} {getActionDisplay(log.action).text}
                             </span>
