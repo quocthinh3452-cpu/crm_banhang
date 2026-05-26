@@ -6,14 +6,15 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  maxWidth?: string;// thêm prop để tùy chỉnh max-width của modal, mặc định là "max-w-2xl"
 }
 
-export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children ,maxWidth = "max-w-2xl"}) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative">
+      <div className={`bg-white rounded-lg shadow-xl w-full ${maxWidth} relative flex flex-col`}>
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-black">
           &times;
         </button>

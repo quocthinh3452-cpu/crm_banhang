@@ -15,6 +15,7 @@ D:.
 |       encodings.xml
 |       jarRepositories.xml
 |       misc.xml
+|       vcs.xml
 |       workspace.xml
 |       
 +---.mvn
@@ -32,8 +33,64 @@ D:.
 |   |   |               +---common
 |   |   |               |   +---config
 |   |   |               |   +---exception
+|   |   |               |   |       ResourceNotFoundException.java
+|   |   |               |   |       
 |   |   |               |   \---utils
 |   |   |               \---module
+|   |   |                   +---lead
+|   |   |                   |   +---application
+|   |   |                   |   |   +---dto
+|   |   |                   |   |   |   +---input
+|   |   |                   |   |   |   |       LeadCreateInput.java
+|   |   |                   |   |   |   |       LeadInteractionInput.java
+|   |   |                   |   |   |   |       LeadSearchRequest.java
+|   |   |                   |   |   |   |       LeadUpdateInput.java
+|   |   |                   |   |   |   |       
+|   |   |                   |   |   |   \---output
+|   |   |                   |   |   |           LeadInteractionOutput.java
+|   |   |                   |   |   |           LeadOutput.java
+|   |   |                   |   |   |           
+|   |   |                   |   |   +---interactor
+|   |   |                   |   |   |       LeadInteractor.java
+|   |   |                   |   |   |       
+|   |   |                   |   |   +---mapper
+|   |   |                   |   |   |       LeadApplicationMapper.java
+|   |   |                   |   |   |       
+|   |   |                   |   |   \---usecase
+|   |   |                   |   |           LeadUseCase.java
+|   |   |                   |   |           
+|   |   |                   |   +---domain
+|   |   |                   |   |   +---entity
+|   |   |                   |   |   |       InteractionType.java
+|   |   |                   |   |   |       Lead.java
+|   |   |                   |   |   |       LeadInteraction.java
+|   |   |                   |   |   |       LeadStatus.java
+|   |   |                   |   |   |       LeadStatusConverter.java
+|   |   |                   |   |   |       
+|   |   |                   |   |   \---repository
+|   |   |                   |   |           LeadInteractionRepository.java
+|   |   |                   |   |           LeadRepository.java
+|   |   |                   |   |           LeadSearchCriteria.java
+|   |   |                   |   |           
+|   |   |                   |   +---infrastructure
+|   |   |                   |   |   +---aa
+|   |   |                   |   |   \---persistence
+|   |   |                   |   |       |   LeadInteractionRepositoryImpl.java
+|   |   |                   |   |       |   LeadRepositoryImpl.java
+|   |   |                   |   |       |   SpringDataLeadInteractionRepository.java
+|   |   |                   |   |       |   SpringDataLeadRepository.java
+|   |   |                   |   |       |   
+|   |   |                   |   |       +---entity
+|   |   |                   |   |       |       LeadDbEntity.java
+|   |   |                   |   |       |       LeadInteractionDbEntity.java
+|   |   |                   |   |       |       
+|   |   |                   |   |       \---mapper
+|   |   |                   |   |               LeadPersistenceMapper.java
+|   |   |                   |   |               
+|   |   |                   |   \---presentation
+|   |   |                   |       \---controller
+|   |   |                   |               LeadController.java
+|   |   |                   |               
 |   |   |                   \---mau
 |   |   |                       +---application
 |   |   |                       |   +---dto
@@ -69,25 +126,67 @@ D:.
     |               |   CrmBeApplication.class
     |               |   
     |               +---common
-    |               |   +---config
-    |               |   +---exception
-    |               |   \---utils
+    |               |   \---exception
+    |               |           ResourceNotFoundException.class
+    |               |           
     |               \---module
-    |                   \---mau
+    |                   \---lead
     |                       +---application
     |                       |   +---dto
     |                       |   |   +---input
+    |                       |   |   |       LeadCreateInput.class
+    |                       |   |   |       LeadInteractionInput.class
+    |                       |   |   |       LeadSearchRequest.class
+    |                       |   |   |       LeadUpdateInput.class
+    |                       |   |   |       
     |                       |   |   \---output
+    |                       |   |           LeadInteractionOutput.class
+    |                       |   |           LeadOutput.class
+    |                       |   |           
     |                       |   +---interactor
+    |                       |   |       LeadInteractor.class
+    |                       |   |       
     |                       |   +---mapper
+    |                       |   |       LeadApplicationMapper.class
+    |                       |   |       
     |                       |   \---usecase
+    |                       |           LeadUseCase.class
+    |                       |           
     |                       +---domain
     |                       |   +---entity
+    |                       |   |       InteractionType.class
+    |                       |   |       Lead$LeadBuilder.class
+    |                       |   |       Lead.class
+    |                       |   |       LeadInteraction$LeadInteractionBuilder.class
+    |                       |   |       LeadInteraction.class
+    |                       |   |       LeadStatus.class
+    |                       |   |       LeadStatusConverter.class
+    |                       |   |       
     |                       |   \---repository
+    |                       |           LeadInteractionRepository.class
+    |                       |           LeadRepository.class
+    |                       |           LeadSearchCriteria.class
+    |                       |           
     |                       +---infrastructure
     |                       |   \---persistence
+    |                       |       |   LeadInteractionRepositoryImpl.class
+    |                       |       |   LeadRepositoryImpl.class
+    |                       |       |   SpringDataLeadInteractionRepository.class
+    |                       |       |   SpringDataLeadRepository.class
+    |                       |       |   
+    |                       |       +---entity
+    |                       |       |       LeadDbEntity$LeadDbEntityBuilder.class
+    |                       |       |       LeadDbEntity.class
+    |                       |       |       LeadInteractionDbEntity$LeadInteractionDbEntityBuilder.class
+    |                       |       |       LeadInteractionDbEntity.class
+    |                       |       |       
+    |                       |       \---mapper
+    |                       |               LeadPersistenceMapper.class
+    |                       |               
     |                       \---presentation
     |                           \---controller
+    |                                   LeadController.class
+    |                                   
     +---generated-sources
     |   \---annotations
     +---generated-test-sources

@@ -47,6 +47,7 @@ D:.
 |   +---dev
 |   |   |   build-manifest.json
 |   |   |   fallback-build-manifest.json
+|   |   |   lock
 |   |   |   package.json
 |   |   |   prerender-manifest.json
 |   |   |   routes-manifest.json
@@ -71,6 +72,7 @@ D:.
 |   |   |           
 |   |   +---cache
 |   |   |   |   .rscinfo
+|   |   |   |   chrome-devtools-workspace-uuid
 |   |   |   |   next-devtools-config.json
 |   |   |   |   
 |   |   |   \---turbopack
@@ -107,77 +109,389 @@ D:.
 |   |   |               00000050.meta
 |   |   |               00000051.meta
 |   |   |               00000053.meta
-|   |   |               00000054.sst
-|   |   |               00000055.meta
-|   |   |               00000056.del
-|   |   |               00000057.sst
-|   |   |               00000058.sst
-|   |   |               00000059.sst
-|   |   |               00000060.sst
-|   |   |               00000061.sst
 |   |   |               00000062.sst
 |   |   |               00000063.sst
 |   |   |               00000064.sst
 |   |   |               00000065.meta
 |   |   |               00000066.meta
-|   |   |               00000067.meta
 |   |   |               00000068.meta
-|   |   |               00000069.sst
 |   |   |               00000070.sst
 |   |   |               00000071.sst
 |   |   |               00000072.sst
 |   |   |               00000073.meta
 |   |   |               00000074.meta
-|   |   |               00000075.meta
 |   |   |               00000076.meta
-|   |   |               00000077.sst
 |   |   |               00000078.sst
 |   |   |               00000079.sst
 |   |   |               00000080.sst
 |   |   |               00000081.meta
 |   |   |               00000082.meta
-|   |   |               00000083.meta
 |   |   |               00000084.meta
-|   |   |               00000085.sst
 |   |   |               00000086.sst
 |   |   |               00000087.sst
 |   |   |               00000088.sst
 |   |   |               00000089.meta
 |   |   |               00000090.meta
-|   |   |               00000091.meta
 |   |   |               00000092.meta
-|   |   |               00000093.sst
 |   |   |               00000094.sst
 |   |   |               00000095.sst
 |   |   |               00000096.meta
 |   |   |               00000097.meta
-|   |   |               00000098.meta
-|   |   |               00000099.sst
 |   |   |               00000100.sst
 |   |   |               00000101.sst
 |   |   |               00000102.meta
 |   |   |               00000103.meta
-|   |   |               00000104.meta
-|   |   |               00000105.sst
 |   |   |               00000106.sst
 |   |   |               00000107.sst
 |   |   |               00000108.sst
 |   |   |               00000109.meta
-|   |   |               00000110.meta
 |   |   |               00000111.meta
 |   |   |               00000112.meta
 |   |   |               00000113.sst
-|   |   |               00000114.sst
 |   |   |               00000115.sst
 |   |   |               00000116.meta
-|   |   |               00000117.meta
 |   |   |               00000118.meta
 |   |   |               00000119.sst
-|   |   |               00000120.sst
 |   |   |               00000121.sst
-|   |   |               00000122.meta
 |   |   |               00000123.meta
 |   |   |               00000124.meta
+|   |   |               00000126.sst
+|   |   |               00000127.sst
+|   |   |               00000128.sst
+|   |   |               00000129.meta
+|   |   |               00000130.meta
+|   |   |               00000132.meta
+|   |   |               00000133.sst
+|   |   |               00000135.sst
+|   |   |               00000136.meta
+|   |   |               00000138.meta
+|   |   |               00000139.sst
+|   |   |               00000141.sst
+|   |   |               00000142.meta
+|   |   |               00000143.meta
+|   |   |               00000149.sst
+|   |   |               00000150.sst
+|   |   |               00000151.sst
+|   |   |               00000152.meta
+|   |   |               00000154.meta
+|   |   |               00000155.meta
+|   |   |               00000160.sst
+|   |   |               00000162.sst
+|   |   |               00000163.meta
+|   |   |               00000164.meta
+|   |   |               00000166.sst
+|   |   |               00000168.sst
+|   |   |               00000169.meta
+|   |   |               00000170.meta
+|   |   |               00000172.sst
+|   |   |               00000174.sst
+|   |   |               00000175.meta
+|   |   |               00000176.meta
+|   |   |               00000178.sst
+|   |   |               00000180.sst
+|   |   |               00000181.meta
+|   |   |               00000183.meta
+|   |   |               00000184.sst
+|   |   |               00000186.sst
+|   |   |               00000187.meta
+|   |   |               00000188.meta
+|   |   |               00000191.sst
+|   |   |               00000192.sst
+|   |   |               00000193.meta
+|   |   |               00000194.meta
+|   |   |               00000196.sst
+|   |   |               00000198.sst
+|   |   |               00000199.meta
+|   |   |               00000201.meta
+|   |   |               00000203.sst
+|   |   |               00000204.sst
+|   |   |               00000205.meta
+|   |   |               00000206.meta
+|   |   |               00000212.sst
+|   |   |               00000213.sst
+|   |   |               00000214.sst
+|   |   |               00000215.meta
+|   |   |               00000216.meta
+|   |   |               00000218.meta
+|   |   |               00000220.sst
+|   |   |               00000221.sst
+|   |   |               00000222.meta
+|   |   |               00000224.meta
+|   |   |               00000225.sst
+|   |   |               00000227.sst
+|   |   |               00000228.meta
+|   |   |               00000230.meta
+|   |   |               00000231.sst
+|   |   |               00000233.sst
+|   |   |               00000234.meta
+|   |   |               00000236.meta
+|   |   |               00000238.sst
+|   |   |               00000239.sst
+|   |   |               00000240.meta
+|   |   |               00000242.meta
+|   |   |               00000243.sst
+|   |   |               00000245.sst
+|   |   |               00000246.meta
+|   |   |               00000247.meta
+|   |   |               00000249.sst
+|   |   |               00000251.sst
+|   |   |               00000252.meta
+|   |   |               00000254.meta
+|   |   |               00000255.sst
+|   |   |               00000257.sst
+|   |   |               00000258.sst
+|   |   |               00000259.meta
+|   |   |               00000261.meta
+|   |   |               00000262.meta
+|   |   |               00000263.sst
+|   |   |               00000265.sst
+|   |   |               00000266.meta
+|   |   |               00000267.meta
+|   |   |               00000270.sst
+|   |   |               00000271.sst
+|   |   |               00000272.sst
+|   |   |               00000273.meta
+|   |   |               00000274.meta
+|   |   |               00000276.meta
+|   |   |               00000277.sst
+|   |   |               00000278.sst
+|   |   |               00000279.meta
+|   |   |               00000281.sst
+|   |   |               00000282.sst
+|   |   |               00000283.sst
+|   |   |               00000284.meta
+|   |   |               00000285.meta
+|   |   |               00000286.meta
+|   |   |               00000287.sst
+|   |   |               00000288.sst
+|   |   |               00000289.sst
+|   |   |               00000290.meta
+|   |   |               00000291.meta
+|   |   |               00000292.meta
+|   |   |               00000293.sst
+|   |   |               00000294.sst
+|   |   |               00000295.sst
+|   |   |               00000296.meta
+|   |   |               00000297.meta
+|   |   |               00000298.meta
+|   |   |               00000299.sst
+|   |   |               00000300.sst
+|   |   |               00000301.sst
+|   |   |               00000302.sst
+|   |   |               00000303.meta
+|   |   |               00000304.meta
+|   |   |               00000305.meta
+|   |   |               00000306.meta
+|   |   |               00000307.sst
+|   |   |               00000308.sst
+|   |   |               00000309.sst
+|   |   |               00000310.meta
+|   |   |               00000311.meta
+|   |   |               00000312.meta
+|   |   |               00000313.sst
+|   |   |               00000314.sst
+|   |   |               00000315.sst
+|   |   |               00000316.meta
+|   |   |               00000317.meta
+|   |   |               00000318.meta
+|   |   |               00000319.sst
+|   |   |               00000320.sst
+|   |   |               00000321.sst
+|   |   |               00000322.meta
+|   |   |               00000323.meta
+|   |   |               00000324.meta
+|   |   |               00000325.sst
+|   |   |               00000326.sst
+|   |   |               00000327.sst
+|   |   |               00000328.meta
+|   |   |               00000329.meta
+|   |   |               00000330.meta
+|   |   |               00000331.sst
+|   |   |               00000332.sst
+|   |   |               00000333.sst
+|   |   |               00000334.sst
+|   |   |               00000335.meta
+|   |   |               00000336.meta
+|   |   |               00000337.meta
+|   |   |               00000338.meta
+|   |   |               00000339.sst
+|   |   |               00000340.sst
+|   |   |               00000341.sst
+|   |   |               00000342.meta
+|   |   |               00000343.meta
+|   |   |               00000344.meta
+|   |   |               00000345.sst
+|   |   |               00000346.sst
+|   |   |               00000347.sst
+|   |   |               00000348.meta
+|   |   |               00000349.meta
+|   |   |               00000350.meta
+|   |   |               00000351.sst
+|   |   |               00000352.sst
+|   |   |               00000353.sst
+|   |   |               00000354.meta
+|   |   |               00000355.meta
+|   |   |               00000356.meta
+|   |   |               00000357.sst
+|   |   |               00000358.sst
+|   |   |               00000359.sst
+|   |   |               00000360.meta
+|   |   |               00000361.meta
+|   |   |               00000362.meta
+|   |   |               00000363.sst
+|   |   |               00000364.sst
+|   |   |               00000365.sst
+|   |   |               00000366.meta
+|   |   |               00000367.meta
+|   |   |               00000368.meta
+|   |   |               00000369.sst
+|   |   |               00000370.sst
+|   |   |               00000371.sst
+|   |   |               00000372.meta
+|   |   |               00000373.meta
+|   |   |               00000374.meta
+|   |   |               00000375.sst
+|   |   |               00000376.sst
+|   |   |               00000377.sst
+|   |   |               00000378.meta
+|   |   |               00000379.meta
+|   |   |               00000380.meta
+|   |   |               00000381.sst
+|   |   |               00000382.sst
+|   |   |               00000383.sst
+|   |   |               00000384.meta
+|   |   |               00000385.meta
+|   |   |               00000386.meta
+|   |   |               00000387.sst
+|   |   |               00000388.sst
+|   |   |               00000389.sst
+|   |   |               00000390.meta
+|   |   |               00000391.meta
+|   |   |               00000392.meta
+|   |   |               00000393.sst
+|   |   |               00000394.sst
+|   |   |               00000395.sst
+|   |   |               00000396.meta
+|   |   |               00000397.meta
+|   |   |               00000398.meta
+|   |   |               00000399.sst
+|   |   |               00000400.sst
+|   |   |               00000401.sst
+|   |   |               00000402.meta
+|   |   |               00000403.meta
+|   |   |               00000404.meta
+|   |   |               00000405.sst
+|   |   |               00000406.sst
+|   |   |               00000407.sst
+|   |   |               00000408.meta
+|   |   |               00000409.meta
+|   |   |               00000410.meta
+|   |   |               00000411.sst
+|   |   |               00000412.sst
+|   |   |               00000413.sst
+|   |   |               00000414.sst
+|   |   |               00000415.meta
+|   |   |               00000416.meta
+|   |   |               00000417.meta
+|   |   |               00000418.meta
+|   |   |               00000419.sst
+|   |   |               00000420.sst
+|   |   |               00000421.sst
+|   |   |               00000422.meta
+|   |   |               00000423.meta
+|   |   |               00000424.meta
+|   |   |               00000425.sst
+|   |   |               00000426.sst
+|   |   |               00000427.sst
+|   |   |               00000428.meta
+|   |   |               00000429.meta
+|   |   |               00000430.meta
+|   |   |               00000431.sst
+|   |   |               00000432.sst
+|   |   |               00000433.sst
+|   |   |               00000434.meta
+|   |   |               00000435.meta
+|   |   |               00000436.meta
+|   |   |               00000437.sst
+|   |   |               00000438.sst
+|   |   |               00000439.sst
+|   |   |               00000440.sst
+|   |   |               00000441.meta
+|   |   |               00000442.meta
+|   |   |               00000443.meta
+|   |   |               00000444.meta
+|   |   |               00000445.sst
+|   |   |               00000446.sst
+|   |   |               00000447.sst
+|   |   |               00000448.meta
+|   |   |               00000449.meta
+|   |   |               00000450.meta
+|   |   |               00000451.sst
+|   |   |               00000452.sst
+|   |   |               00000453.sst
+|   |   |               00000454.meta
+|   |   |               00000455.meta
+|   |   |               00000456.meta
+|   |   |               00000457.sst
+|   |   |               00000458.sst
+|   |   |               00000459.sst
+|   |   |               00000460.sst
+|   |   |               00000461.meta
+|   |   |               00000462.meta
+|   |   |               00000463.meta
+|   |   |               00000464.meta
+|   |   |               00000465.sst
+|   |   |               00000466.sst
+|   |   |               00000467.sst
+|   |   |               00000468.meta
+|   |   |               00000469.meta
+|   |   |               00000470.meta
+|   |   |               00000471.sst
+|   |   |               00000472.sst
+|   |   |               00000473.sst
+|   |   |               00000474.meta
+|   |   |               00000475.meta
+|   |   |               00000476.meta
+|   |   |               00000477.sst
+|   |   |               00000478.sst
+|   |   |               00000479.sst
+|   |   |               00000480.meta
+|   |   |               00000481.meta
+|   |   |               00000482.meta
+|   |   |               00000483.sst
+|   |   |               00000484.sst
+|   |   |               00000485.sst
+|   |   |               00000486.sst
+|   |   |               00000487.meta
+|   |   |               00000488.meta
+|   |   |               00000489.meta
+|   |   |               00000490.meta
+|   |   |               00000491.sst
+|   |   |               00000492.sst
+|   |   |               00000493.sst
+|   |   |               00000494.meta
+|   |   |               00000495.meta
+|   |   |               00000496.meta
+|   |   |               00000497.sst
+|   |   |               00000498.sst
+|   |   |               00000499.sst
+|   |   |               00000500.meta
+|   |   |               00000501.meta
+|   |   |               00000502.meta
+|   |   |               00000503.sst
+|   |   |               00000504.sst
+|   |   |               00000505.sst
+|   |   |               00000506.sst
+|   |   |               00000507.meta
+|   |   |               00000508.meta
+|   |   |               00000509.meta
+|   |   |               00000510.meta
+|   |   |               00000511.sst
+|   |   |               00000512.sst
+|   |   |               00000513.sst
+|   |   |               00000514.meta
+|   |   |               00000515.meta
+|   |   |               00000516.meta
 |   |   |               CURRENT
 |   |   |               LOG
 |   |   |               
@@ -201,7 +515,19 @@ D:.
 |   |   |   |   |   page_client-reference-manifest.js
 |   |   |   |   |   
 |   |   |   |   +---crm
-|   |   |   |   |   \---customers
+|   |   |   |   |   +---customers
+|   |   |   |   |   |   |   page.js
+|   |   |   |   |   |   |   page.js.map
+|   |   |   |   |   |   |   page_client-reference-manifest.js
+|   |   |   |   |   |   |   
+|   |   |   |   |   |   \---page
+|   |   |   |   |   |           app-paths-manifest.json
+|   |   |   |   |   |           build-manifest.json
+|   |   |   |   |   |           next-font-manifest.json
+|   |   |   |   |   |           react-loadable-manifest.json
+|   |   |   |   |   |           server-reference-manifest.json
+|   |   |   |   |   |           
+|   |   |   |   |   \---lead
 |   |   |   |   |       |   page.js
 |   |   |   |   |       |   page.js.map
 |   |   |   |   |       |   page_client-reference-manifest.js
@@ -213,25 +539,43 @@ D:.
 |   |   |   |   |               react-loadable-manifest.json
 |   |   |   |   |               server-reference-manifest.json
 |   |   |   |   |               
-|   |   |   |   \---page
-|   |   |   |           app-paths-manifest.json
-|   |   |   |           build-manifest.json
-|   |   |   |           next-font-manifest.json
-|   |   |   |           react-loadable-manifest.json
-|   |   |   |           server-reference-manifest.json
-|   |   |   |           
+|   |   |   |   +---page
+|   |   |   |   |       app-paths-manifest.json
+|   |   |   |   |       build-manifest.json
+|   |   |   |   |       next-font-manifest.json
+|   |   |   |   |       react-loadable-manifest.json
+|   |   |   |   |       server-reference-manifest.json
+|   |   |   |   |       
+|   |   |   |   \---_not-found
+|   |   |   |       |   page.js
+|   |   |   |       |   page.js.map
+|   |   |   |       |   page_client-reference-manifest.js
+|   |   |   |       |   
+|   |   |   |       \---page
+|   |   |   |               app-paths-manifest.json
+|   |   |   |               build-manifest.json
+|   |   |   |               next-font-manifest.json
+|   |   |   |               react-loadable-manifest.json
+|   |   |   |               server-reference-manifest.json
+|   |   |   |               
 |   |   |   +---chunks
 |   |   |   |   \---ssr
 |   |   |   |           node_modules_01ed9g5._.js
 |   |   |   |           node_modules_01ed9g5._.js.map
 |   |   |   |           node_modules_03xnizw._.js
 |   |   |   |           node_modules_03xnizw._.js.map
+|   |   |   |           node_modules_06.t_u_._.js
+|   |   |   |           node_modules_06.t_u_._.js.map
 |   |   |   |           node_modules_09w7yel._.js
 |   |   |   |           node_modules_09w7yel._.js.map
+|   |   |   |           node_modules_0bc9luu._.js
+|   |   |   |           node_modules_0bc9luu._.js.map
 |   |   |   |           node_modules_0cdjqjt._.js
 |   |   |   |           node_modules_0cdjqjt._.js.map
 |   |   |   |           node_modules_0dqv-v4._.js
 |   |   |   |           node_modules_0dqv-v4._.js.map
+|   |   |   |           node_modules_0l3.ozv._.js
+|   |   |   |           node_modules_0l3.ozv._.js.map
 |   |   |   |           node_modules_0qjar3o._.js
 |   |   |   |           node_modules_0qjar3o._.js.map
 |   |   |   |           node_modules_0ungvoo._.js
@@ -242,10 +586,18 @@ D:.
 |   |   |   |           node_modules_0y.982d._.js.map
 |   |   |   |           node_modules_129w7gn._.js
 |   |   |   |           node_modules_129w7gn._.js.map
+|   |   |   |           node_modules_12v944-._.js
+|   |   |   |           node_modules_12v944-._.js.map
+|   |   |   |           node_modules_13-0qix._.js
+|   |   |   |           node_modules_13-0qix._.js.map
 |   |   |   |           node_modules_@swc_helpers_cjs__interop_require_wildcard_cjs_0gn4jlg._.js
 |   |   |   |           node_modules_@swc_helpers_cjs__interop_require_wildcard_cjs_0gn4jlg._.js.map
+|   |   |   |           node_modules_axios_lib_119ldv5._.js
+|   |   |   |           node_modules_axios_lib_119ldv5._.js.map
 |   |   |   |           node_modules_lucide-react_dist_cjs_lucide-react_1349z1..js
 |   |   |   |           node_modules_lucide-react_dist_cjs_lucide-react_1349z1..js.map
+|   |   |   |           node_modules_mime-db_0fhoo3b._.js
+|   |   |   |           node_modules_mime-db_0fhoo3b._.js.map
 |   |   |   |           node_modules_next_12i4inu._.js
 |   |   |   |           node_modules_next_12i4inu._.js.map
 |   |   |   |           node_modules_next_dist_0evsmf2._.js
@@ -272,6 +624,8 @@ D:.
 |   |   |   |           node_modules_next_dist_server_route-modules_app-page_0f6k0sl._.js.map
 |   |   |   |           node_modules_next_navigation_08-xh1..js
 |   |   |   |           node_modules_next_navigation_08-xh1..js.map
+|   |   |   |           node_modules_zod_v4_0d0y91d._.js
+|   |   |   |           node_modules_zod_v4_0d0y91d._.js.map
 |   |   |   |           [externals]_next_dist_shared_lib_no-fallback-error_external_0fgm~bn.js
 |   |   |   |           [externals]_next_dist_shared_lib_no-fallback-error_external_0fgm~bn.js.map
 |   |   |   |           [externals]__0.o~_~l._.js
@@ -280,14 +634,22 @@ D:.
 |   |   |   |           [externals]__0n13xf4._.js.map
 |   |   |   |           [root-of-the-server]__01eqota._.js
 |   |   |   |           [root-of-the-server]__01eqota._.js.map
+|   |   |   |           [root-of-the-server]__0954f-e._.js
+|   |   |   |           [root-of-the-server]__0954f-e._.js.map
 |   |   |   |           [root-of-the-server]__0b5f3ul._.js
 |   |   |   |           [root-of-the-server]__0b5f3ul._.js.map
+|   |   |   |           [root-of-the-server]__0hxemi4._.js
+|   |   |   |           [root-of-the-server]__0hxemi4._.js.map
 |   |   |   |           [root-of-the-server]__0je5zm2._.js
 |   |   |   |           [root-of-the-server]__0je5zm2._.js.map
 |   |   |   |           [root-of-the-server]__0mk2ops._.js
 |   |   |   |           [root-of-the-server]__0mk2ops._.js.map
 |   |   |   |           [root-of-the-server]__0mqa~1k._.js
 |   |   |   |           [root-of-the-server]__0mqa~1k._.js.map
+|   |   |   |           [root-of-the-server]__0n07-8r._.js
+|   |   |   |           [root-of-the-server]__0n07-8r._.js.map
+|   |   |   |           [root-of-the-server]__0wy6oc2._.js
+|   |   |   |           [root-of-the-server]__0wy6oc2._.js.map
 |   |   |   |           [turbopack]_runtime.js
 |   |   |   |           [turbopack]_runtime.js.map
 |   |   |   |           _0g~5o85._.js
@@ -296,10 +658,16 @@ D:.
 |   |   |   |           _0ll8hn8._.js.map
 |   |   |   |           _0r2bkj~._.js
 |   |   |   |           _0r2bkj~._.js.map
+|   |   |   |           _0tf~l7q._.js
+|   |   |   |           _0tf~l7q._.js.map
 |   |   |   |           _next-internal_server_app_crm_customers_page_actions_06oz4~j.js
 |   |   |   |           _next-internal_server_app_crm_customers_page_actions_06oz4~j.js.map
+|   |   |   |           _next-internal_server_app_crm_lead_page_actions_0wa5i4p.js
+|   |   |   |           _next-internal_server_app_crm_lead_page_actions_0wa5i4p.js.map
 |   |   |   |           _next-internal_server_app_page_actions_09-gtaw.js
 |   |   |   |           _next-internal_server_app_page_actions_09-gtaw.js.map
+|   |   |   |           _next-internal_server_app__not-found_page_actions_0eq97pa.js
+|   |   |   |           _next-internal_server_app__not-found_page_actions_0eq97pa.js.map
 |   |   |   |           
 |   |   |   \---pages
 |   |   |       |   _app.js
@@ -334,6 +702,7 @@ D:.
 |   |   |   |   |   app_crm_customers_page_tsx_0j2jkfm._.js
 |   |   |   |   |   app_crm_customers_page_tsx_0rox8p5._.js
 |   |   |   |   |   app_crm_customers_page_tsx_0yx0v7a._.js
+|   |   |   |   |   app_crm_lead_page_tsx_0yx0v7a._.js
 |   |   |   |   |   app_globals_0jn8.0u.css
 |   |   |   |   |   app_globals_0jn8.0u.css.map
 |   |   |   |   |   app_layout_tsx_004glpo._.js
@@ -343,10 +712,16 @@ D:.
 |   |   |   |   |   app_page_tsx_0yx0v7a._.js
 |   |   |   |   |   node_modules_007uu_c._.js
 |   |   |   |   |   node_modules_007uu_c._.js.map
+|   |   |   |   |   node_modules_09fnq-y._.js
+|   |   |   |   |   node_modules_09fnq-y._.js.map
 |   |   |   |   |   node_modules_0lx093h._.js
 |   |   |   |   |   node_modules_0lx093h._.js.map
 |   |   |   |   |   node_modules_0m9aakp._.js
 |   |   |   |   |   node_modules_0m9aakp._.js.map
+|   |   |   |   |   node_modules_0pneilo._.js
+|   |   |   |   |   node_modules_0pneilo._.js.map
+|   |   |   |   |   node_modules_0u0v-xp._.js
+|   |   |   |   |   node_modules_0u0v-xp._.js.map
 |   |   |   |   |   node_modules_0zm4mu5._.js
 |   |   |   |   |   node_modules_0zm4mu5._.js.map
 |   |   |   |   |   node_modules_@swc_helpers_cjs_0-4ujiy._.js
@@ -421,6 +796,10 @@ D:.
 |   |   |   |   |   [turbopack]_browser_dev_hmr-client_hmr-client_ts_10z625~._.js.map
 |   |   |   |   |   _0.yudzb._.js
 |   |   |   |   |   _0.yudzb._.js.map
+|   |   |   |   |   _09tnhhv._.js
+|   |   |   |   |   _09tnhhv._.js.map
+|   |   |   |   |   _0o-1zdc._.js
+|   |   |   |   |   _0o-1zdc._.js.map
 |   |   |   |   |   _0p44nws._.js.map
 |   |   |   |   |   _0rqeker._.js
 |   |   |   |   |   
@@ -463,7 +842,20 @@ D:.
 |   |   |   |   page_client-reference-manifest.js
 |   |   |   |   
 |   |   |   +---crm
-|   |   |   |   \---customers
+|   |   |   |   +---customers
+|   |   |   |   |   |   page.js
+|   |   |   |   |   |   page.js.map
+|   |   |   |   |   |   page.js.nft.json
+|   |   |   |   |   |   page_client-reference-manifest.js
+|   |   |   |   |   |   
+|   |   |   |   |   \---page
+|   |   |   |   |           app-paths-manifest.json
+|   |   |   |   |           build-manifest.json
+|   |   |   |   |           next-font-manifest.json
+|   |   |   |   |           react-loadable-manifest.json
+|   |   |   |   |           server-reference-manifest.json
+|   |   |   |   |           
+|   |   |   |   \---lead
 |   |   |   |       |   page.js
 |   |   |   |       |   page.js.map
 |   |   |   |       |   page.js.nft.json
@@ -535,12 +927,14 @@ D:.
 |   |               node_modules_05l396c._.js.map
 |   |               node_modules_09w7yel._.js
 |   |               node_modules_09w7yel._.js.map
-|   |               node_modules_0x1_ce~._.js
-|   |               node_modules_0x1_ce~._.js.map
 |   |               node_modules_@swc_helpers_cjs__interop_require_default_cjs_11~q6fv._.js
 |   |               node_modules_@swc_helpers_cjs__interop_require_default_cjs_11~q6fv._.js.map
-|   |               node_modules_next_dist_0qoh8ry._.js
-|   |               node_modules_next_dist_0qoh8ry._.js.map
+|   |               node_modules_next_dist_0h9llsw._.js
+|   |               node_modules_next_dist_0h9llsw._.js.map
+|   |               node_modules_next_dist_0ppctuh._.js
+|   |               node_modules_next_dist_0ppctuh._.js.map
+|   |               node_modules_next_dist_0xd_0os._.js
+|   |               node_modules_next_dist_0xd_0os._.js.map
 |   |               node_modules_next_dist_client_components_0inhx6q._.js
 |   |               node_modules_next_dist_client_components_0inhx6q._.js.map
 |   |               node_modules_next_dist_client_components_builtin_forbidden_0ghu-f7.js
@@ -553,32 +947,46 @@ D:.
 |   |               node_modules_next_dist_esm_build_templates_app-page_002l7yi.js.map
 |   |               node_modules_next_dist_esm_build_templates_app-page_02suzhc.js
 |   |               node_modules_next_dist_esm_build_templates_app-page_02suzhc.js.map
+|   |               node_modules_next_dist_esm_build_templates_app-page_062re35.js
+|   |               node_modules_next_dist_esm_build_templates_app-page_062re35.js.map
 |   |               node_modules_next_dist_esm_build_templates_app-page_0837muz.js
 |   |               node_modules_next_dist_esm_build_templates_app-page_0837muz.js.map
 |   |               node_modules_next_dist_esm_build_templates_app-page_0nsg22r.js
 |   |               node_modules_next_dist_esm_build_templates_app-page_0nsg22r.js.map
-|   |               [root-of-the-server]__0.kd7dh._.js
-|   |               [root-of-the-server]__0.kd7dh._.js.map
+|   |               shared_components_ui_0mt8zn7._.js
+|   |               shared_components_ui_0mt8zn7._.js.map
+|   |               shared_components_ui_11p7tgh._.js
+|   |               shared_components_ui_11p7tgh._.js.map
+|   |               [externals]__09sl..7._.js
+|   |               [externals]__09sl..7._.js.map
 |   |               [root-of-the-server]__02hi65f._.js
 |   |               [root-of-the-server]__02hi65f._.js.map
-|   |               [root-of-the-server]__06so9v3._.js
-|   |               [root-of-the-server]__06so9v3._.js.map
-|   |               [root-of-the-server]__098zro9._.js
-|   |               [root-of-the-server]__098zro9._.js.map
+|   |               [root-of-the-server]__02me4fh._.js
+|   |               [root-of-the-server]__02me4fh._.js.map
+|   |               [root-of-the-server]__039gm66._.js
+|   |               [root-of-the-server]__039gm66._.js.map
+|   |               [root-of-the-server]__03nnsh6._.js
+|   |               [root-of-the-server]__03nnsh6._.js.map
+|   |               [root-of-the-server]__0hxemi4._.js
+|   |               [root-of-the-server]__0hxemi4._.js.map
+|   |               [root-of-the-server]__0iet8s7._.js
+|   |               [root-of-the-server]__0iet8s7._.js.map
 |   |               [root-of-the-server]__0mk2ops._.js
 |   |               [root-of-the-server]__0mk2ops._.js.map
 |   |               [root-of-the-server]__0ocwx_d._.js
 |   |               [root-of-the-server]__0ocwx_d._.js.map
-|   |               [root-of-the-server]__0tp-hho._.js
-|   |               [root-of-the-server]__0tp-hho._.js.map
 |   |               [root-of-the-server]__0x~-im0._.js
 |   |               [root-of-the-server]__0x~-im0._.js.map
 |   |               [turbopack]_runtime.js
 |   |               [turbopack]_runtime.js.map
-|   |               _0bk_a.s._.js
-|   |               _0bk_a.s._.js.map
+|   |               _0g9._gp._.js
+|   |               _0g9._gp._.js.map
+|   |               _13squum._.js
+|   |               _13squum._.js.map
 |   |               _next-internal_server_app_crm_customers_page_actions_06oz4~j.js
 |   |               _next-internal_server_app_crm_customers_page_actions_06oz4~j.js.map
+|   |               _next-internal_server_app_crm_lead_page_actions_0wa5i4p.js
+|   |               _next-internal_server_app_crm_lead_page_actions_0wa5i4p.js.map
 |   |               _next-internal_server_app_page_actions_09-gtaw.js
 |   |               _next-internal_server_app_page_actions_09-gtaw.js.map
 |   |               _next-internal_server_app__global-error_page_actions_0k77kol.js
@@ -588,31 +996,37 @@ D:.
 |   |               
 |   +---static
 |   |   +---chunks
-|   |   |       03vcybz4ldxd4.js
+|   |   |       0.ft9uqlzh6.7.js
+|   |   |       01xlw8hd842-c.js
+|   |   |       033g87j5nlof8.js
 |   |   |       03~yq9q893hmn.js
-|   |   |       07mne3zcixcz2.js
-|   |   |       0d3tkj33oycf2.js
-|   |   |       0fsi8lw5utejl.js
-|   |   |       0rmycqp3n0v1z.js
-|   |   |       0ursk~c~2p0vl.js
-|   |   |       0x8kdpzb79ten.js
-|   |   |       0_5iwltda5aas.css
+|   |   |       07ltuow4kdn24.js
+|   |   |       0cbft~vhoamc-.js
+|   |   |       0d3shmwh5_nmn.js
+|   |   |       0nlx0ojy4g7f4.js
+|   |   |       0sh0dexwubp1b.css
+|   |   |       0~6pi17p4g3wz.js
 |   |   |       10u3y4bw1ayzs.js
-|   |   |       turbopack-14t1r~.kq2cr8.js
+|   |   |       14fog-1e_z35b.js
+|   |   |       16joj-w8x5b8c.js
+|   |   |       turbopack-0a0j4y2w1r4gb.js
 |   |   |       
-|   |   +---media
-|   |   |       favicon.0x3dzn~oxb6tn.ico
+|   |   +---gSSSKjH_Vfd69o7Rc-Qhq
+|   |   |       _buildManifest.js
+|   |   |       _clientMiddlewareManifest.js
+|   |   |       _ssgManifest.js
 |   |   |       
-|   |   \---SaR-vjGQkW7cFsgsjspHZ
-|   |           _buildManifest.js
-|   |           _clientMiddlewareManifest.js
-|   |           _ssgManifest.js
+|   |   \---media
+|   |           favicon.0x3dzn~oxb6tn.ico
 |   |           
 |   \---types
 |           cache-life.d.ts
 |           routes.d.ts
 |           validator.ts
 |           
++---.vscode
+|       launch.json
+|       
 +---app
 |   |   favicon.ico
 |   |   globals.css
@@ -620,10 +1034,22 @@ D:.
 |   |   page.tsx
 |   |   
 |   \---crm
-|       \---customers
+|       +---customers
+|       |       page.tsx
+|       |       
+|       \---lead
 |               page.tsx
 |               
 +---modules
+|   +---lead
+|   |   +---components
+|   |   |       LeadFormModal.tsx
+|   |   |       LeadTable.tsx
+|   |   |       
+|   |   +---hooks
+|   |   \---services
+|   |           leadApi.ts
+|   |           
 |   \---module_vidu
 |       |   types.ts
 |       |   

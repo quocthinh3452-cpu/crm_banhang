@@ -17,7 +17,7 @@ import {
 const menuItems = [
   { name: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard },
   { name: 'Khách hàng', path: '/crm/customers', icon: Users },
-  { name: 'Bán hàng', path: '/sales', icon: ShoppingCart },
+  { name: 'Lead-KH tiềm năng', path: '/crm/lead', icon: ShoppingCart },
   { name: 'Báo cáo', path: '/reports', icon: BarChart3 },
   { name: 'Cài đặt', path: '/settings', icon: Settings },
 ];

@@ -1,0 +1,17 @@
+package org.example.crm_be.module.lead.application.dto.input;
+
+import org.example.crm_be.module.lead.domain.entity.LeadStatus;
+import lombok.Data;
+
+@Data
+public class LeadSearchRequest {
+    private String keyword;
+    private Integer provinceId;
+    private Integer salesGroupId;
+    private Integer sourceId;
+    private String phone;
+    private LeadStatus status;
+    
+    private Integer page;
+    private Integer size;
+}
