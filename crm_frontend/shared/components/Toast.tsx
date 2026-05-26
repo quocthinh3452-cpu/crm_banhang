@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode } from 'react';
+import toast from 'react-hot-toast';
 
 // Simple Toast Context
 const ToastContext = createContext({
@@ -11,8 +12,6 @@ export const useToast = () => useContext(ToastContext);
 
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const showToast = (message: string, type: 'success' | 'error') => {
-    // Simple implementation: use alert for now
-    alert(`${type}: ${message}`);
   };
 
   return (

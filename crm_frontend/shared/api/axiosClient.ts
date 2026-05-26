@@ -1,10 +1,9 @@
 // src/shared/api/axiosClient.ts
 import axios from 'axios';
-import toast from 'react-hot-toast'; 
+// Giả sử bạn có thư viện toast (như react-toastify hoặc react-hot-toast)
+import toast from 'react-hot-toast';
 
 const axiosClient = axios.create({
-  // Nếu có biến môi trường thì dùng, nếu không có (hoặc trống) thì tự động gọi sang Spring Boot Port 8080
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,7 +11,7 @@ const axiosClient = axios.create({
 
 // Interceptor gắn Token
 axiosClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token'); 
+  const token = localStorage.getItem('token');
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -29,6 +28,7 @@ axiosClient.interceptors.response.use(
 
     if (status === 401) {
       toast.error('Phiên đăng nhập hết hạn!');
+      // Chuyển hướng về trang login hoặc logout user
     } else if (status === 403) {
       toast.error('Bạn không có quyền thực hiện thao tác này!');
     } else {

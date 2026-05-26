@@ -109,47 +109,70 @@ D:.
 |   |   |               00000050.meta
 |   |   |               00000051.meta
 |   |   |               00000053.meta
+|   |   |               00000054.sst
+|   |   |               00000055.meta
+|   |   |               00000056.del
+|   |   |               00000057.sst
+|   |   |               00000058.sst
+|   |   |               00000059.sst
+|   |   |               00000060.sst
+|   |   |               00000061.sst
 |   |   |               00000062.sst
 |   |   |               00000063.sst
 |   |   |               00000064.sst
 |   |   |               00000065.meta
 |   |   |               00000066.meta
+|   |   |               00000067.meta
 |   |   |               00000068.meta
+|   |   |               00000069.sst
 |   |   |               00000070.sst
 |   |   |               00000071.sst
 |   |   |               00000072.sst
 |   |   |               00000073.meta
 |   |   |               00000074.meta
+|   |   |               00000075.meta
 |   |   |               00000076.meta
+|   |   |               00000077.sst
 |   |   |               00000078.sst
 |   |   |               00000079.sst
 |   |   |               00000080.sst
 |   |   |               00000081.meta
 |   |   |               00000082.meta
+|   |   |               00000083.meta
 |   |   |               00000084.meta
+|   |   |               00000085.sst
 |   |   |               00000086.sst
 |   |   |               00000087.sst
 |   |   |               00000088.sst
 |   |   |               00000089.meta
 |   |   |               00000090.meta
+|   |   |               00000091.meta
 |   |   |               00000092.meta
+|   |   |               00000093.sst
 |   |   |               00000094.sst
 |   |   |               00000095.sst
 |   |   |               00000096.meta
 |   |   |               00000097.meta
+|   |   |               00000098.meta
+|   |   |               00000099.sst
 |   |   |               00000100.sst
 |   |   |               00000101.sst
 |   |   |               00000102.meta
 |   |   |               00000103.meta
+|   |   |               00000104.meta
+|   |   |               00000105.sst
 |   |   |               00000106.sst
 |   |   |               00000107.sst
 |   |   |               00000108.sst
 |   |   |               00000109.meta
+|   |   |               00000110.meta
 |   |   |               00000111.meta
 |   |   |               00000112.meta
 |   |   |               00000113.sst
+|   |   |               00000114.sst
 |   |   |               00000115.sst
 |   |   |               00000116.meta
+|   |   |               00000117.meta
 |   |   |               00000118.meta
 |   |   |               00000119.sst
 |   |   |               00000121.sst
@@ -515,19 +538,6 @@ D:.
 |   |   |   |   |   page_client-reference-manifest.js
 |   |   |   |   |   
 |   |   |   |   +---crm
-|   |   |   |   |   +---customers
-|   |   |   |   |   |   |   page.js
-|   |   |   |   |   |   |   page.js.map
-|   |   |   |   |   |   |   page_client-reference-manifest.js
-|   |   |   |   |   |   |   
-|   |   |   |   |   |   \---page
-|   |   |   |   |   |           app-paths-manifest.json
-|   |   |   |   |   |           build-manifest.json
-|   |   |   |   |   |           next-font-manifest.json
-|   |   |   |   |   |           react-loadable-manifest.json
-|   |   |   |   |   |           server-reference-manifest.json
-|   |   |   |   |   |           
-|   |   |   |   |   \---lead
 |   |   |   |   |       |   page.js
 |   |   |   |   |       |   page.js.map
 |   |   |   |   |       |   page_client-reference-manifest.js
@@ -538,18 +548,6 @@ D:.
 |   |   |   |   |               next-font-manifest.json
 |   |   |   |   |               react-loadable-manifest.json
 |   |   |   |   |               server-reference-manifest.json
-|   |   |   |   |               
-|   |   |   |   +---page
-|   |   |   |   |       app-paths-manifest.json
-|   |   |   |   |       build-manifest.json
-|   |   |   |   |       next-font-manifest.json
-|   |   |   |   |       react-loadable-manifest.json
-|   |   |   |   |       server-reference-manifest.json
-|   |   |   |   |       
-|   |   |   |   \---_not-found
-|   |   |   |       |   page.js
-|   |   |   |       |   page.js.map
-|   |   |   |       |   page_client-reference-manifest.js
 |   |   |   |       |   
 |   |   |   |       \---page
 |   |   |   |               app-paths-manifest.json
@@ -668,7 +666,7 @@ D:.
 |   |   |   |           _next-internal_server_app_page_actions_09-gtaw.js.map
 |   |   |   |           _next-internal_server_app__not-found_page_actions_0eq97pa.js
 |   |   |   |           _next-internal_server_app__not-found_page_actions_0eq97pa.js.map
-|   |   |   |           
+|   |   |   |
 |   |   |   \---pages
 |   |   |       |   _app.js
 |   |   |       |   _app.js.map
@@ -842,20 +840,6 @@ D:.
 |   |   |   |   page_client-reference-manifest.js
 |   |   |   |   
 |   |   |   +---crm
-|   |   |   |   +---customers
-|   |   |   |   |   |   page.js
-|   |   |   |   |   |   page.js.map
-|   |   |   |   |   |   page.js.nft.json
-|   |   |   |   |   |   page_client-reference-manifest.js
-|   |   |   |   |   |   
-|   |   |   |   |   \---page
-|   |   |   |   |           app-paths-manifest.json
-|   |   |   |   |           build-manifest.json
-|   |   |   |   |           next-font-manifest.json
-|   |   |   |   |           react-loadable-manifest.json
-|   |   |   |   |           server-reference-manifest.json
-|   |   |   |   |           
-|   |   |   |   \---lead
 |   |   |   |       |   page.js
 |   |   |   |       |   page.js.map
 |   |   |   |       |   page.js.nft.json
@@ -927,14 +911,10 @@ D:.
 |   |               node_modules_05l396c._.js.map
 |   |               node_modules_09w7yel._.js
 |   |               node_modules_09w7yel._.js.map
+|   |               node_modules_0x1_ce~._.js
+|   |               node_modules_0x1_ce~._.js.map
 |   |               node_modules_@swc_helpers_cjs__interop_require_default_cjs_11~q6fv._.js
 |   |               node_modules_@swc_helpers_cjs__interop_require_default_cjs_11~q6fv._.js.map
-|   |               node_modules_next_dist_0h9llsw._.js
-|   |               node_modules_next_dist_0h9llsw._.js.map
-|   |               node_modules_next_dist_0ppctuh._.js
-|   |               node_modules_next_dist_0ppctuh._.js.map
-|   |               node_modules_next_dist_0xd_0os._.js
-|   |               node_modules_next_dist_0xd_0os._.js.map
 |   |               node_modules_next_dist_client_components_0inhx6q._.js
 |   |               node_modules_next_dist_client_components_0inhx6q._.js.map
 |   |               node_modules_next_dist_client_components_builtin_forbidden_0ghu-f7.js
@@ -953,36 +933,18 @@ D:.
 |   |               node_modules_next_dist_esm_build_templates_app-page_0837muz.js.map
 |   |               node_modules_next_dist_esm_build_templates_app-page_0nsg22r.js
 |   |               node_modules_next_dist_esm_build_templates_app-page_0nsg22r.js.map
-|   |               shared_components_ui_0mt8zn7._.js
-|   |               shared_components_ui_0mt8zn7._.js.map
-|   |               shared_components_ui_11p7tgh._.js
-|   |               shared_components_ui_11p7tgh._.js.map
-|   |               [externals]__09sl..7._.js
-|   |               [externals]__09sl..7._.js.map
 |   |               [root-of-the-server]__02hi65f._.js
 |   |               [root-of-the-server]__02hi65f._.js.map
-|   |               [root-of-the-server]__02me4fh._.js
-|   |               [root-of-the-server]__02me4fh._.js.map
-|   |               [root-of-the-server]__039gm66._.js
-|   |               [root-of-the-server]__039gm66._.js.map
-|   |               [root-of-the-server]__03nnsh6._.js
-|   |               [root-of-the-server]__03nnsh6._.js.map
-|   |               [root-of-the-server]__0hxemi4._.js
-|   |               [root-of-the-server]__0hxemi4._.js.map
-|   |               [root-of-the-server]__0iet8s7._.js
-|   |               [root-of-the-server]__0iet8s7._.js.map
 |   |               [root-of-the-server]__0mk2ops._.js
 |   |               [root-of-the-server]__0mk2ops._.js.map
 |   |               [root-of-the-server]__0ocwx_d._.js
 |   |               [root-of-the-server]__0ocwx_d._.js.map
+|   |               [root-of-the-server]__0tp-hho._.js
+|   |               [root-of-the-server]__0tp-hho._.js.map
 |   |               [root-of-the-server]__0x~-im0._.js
 |   |               [root-of-the-server]__0x~-im0._.js.map
 |   |               [turbopack]_runtime.js
 |   |               [turbopack]_runtime.js.map
-|   |               _0g9._gp._.js
-|   |               _0g9._gp._.js.map
-|   |               _13squum._.js
-|   |               _13squum._.js.map
 |   |               _next-internal_server_app_crm_customers_page_actions_06oz4~j.js
 |   |               _next-internal_server_app_crm_customers_page_actions_06oz4~j.js.map
 |   |               _next-internal_server_app_crm_lead_page_actions_0wa5i4p.js
@@ -996,28 +958,10 @@ D:.
 |   |               
 |   +---static
 |   |   +---chunks
-|   |   |       0.ft9uqlzh6.7.js
-|   |   |       01xlw8hd842-c.js
-|   |   |       033g87j5nlof8.js
 |   |   |       03~yq9q893hmn.js
-|   |   |       07ltuow4kdn24.js
-|   |   |       0cbft~vhoamc-.js
-|   |   |       0d3shmwh5_nmn.js
-|   |   |       0nlx0ojy4g7f4.js
-|   |   |       0sh0dexwubp1b.css
-|   |   |       0~6pi17p4g3wz.js
 |   |   |       10u3y4bw1ayzs.js
-|   |   |       14fog-1e_z35b.js
-|   |   |       16joj-w8x5b8c.js
-|   |   |       turbopack-0a0j4y2w1r4gb.js
 |   |   |       
-|   |   +---gSSSKjH_Vfd69o7Rc-Qhq
-|   |   |       _buildManifest.js
-|   |   |       _clientMiddlewareManifest.js
-|   |   |       _ssgManifest.js
 |   |   |       
-|   |   \---media
-|   |           favicon.0x3dzn~oxb6tn.ico
 |   |           
 |   \---types
 |           cache-life.d.ts
@@ -1026,7 +970,7 @@ D:.
 |           
 +---.vscode
 |       launch.json
-|       
+|
 +---app
 |   |   favicon.ico
 |   |   globals.css
@@ -1034,10 +978,6 @@ D:.
 |   |   page.tsx
 |   |   
 |   \---crm
-|       +---customers
-|       |       page.tsx
-|       |       
-|       \---lead
 |               page.tsx
 |               
 +---modules
@@ -1045,11 +985,11 @@ D:.
 |   |   +---components
 |   |   |       LeadFormModal.tsx
 |   |   |       LeadTable.tsx
-|   |   |       
+|   |   |
 |   |   +---hooks
 |   |   \---services
 |   |           leadApi.ts
-|   |           
+|   |
 |   \---module_vidu
 |       |   types.ts
 |       |   

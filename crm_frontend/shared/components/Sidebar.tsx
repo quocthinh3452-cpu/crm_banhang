@@ -1,8 +1,7 @@
 'use client';
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation'; 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, 
   Users, 
@@ -10,34 +9,102 @@ import {
   BarChart3, 
   Settings,
   LogOut,
-  ChevronRight
+  FileText,
+  ChevronRight // Đã thêm icon này vì code bên dưới có gọi
 } from 'lucide-react';
-
-// 1. Tách cấu hình menu ra một mảng riêng để dễ quản lý và phân quyền sau này
-const menuItems = [
-  { name: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard },
-  { name: 'Khách hàng', path: '/crm/customers', icon: Users },
-  { name: 'Lead-KH tiềm năng', path: '/crm/lead', icon: ShoppingCart },
-  { name: 'Báo cáo', path: '/reports', icon: BarChart3 },
-  { name: 'Cài đặt', path: '/settings', icon: Settings },
-];
+import { toast } from 'react-hot-toast';
 
 const Sidebar = () => {
-  // Lấy đường dẫn hiện tại để xử lý trạng thái Active
   const pathname = usePathname();
+  const router = useRouter();
 
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    const session = localStorage.getItem('crm_user_session');
+    if (session) {
+      try {
+        setCurrentUser(JSON.parse(session));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [pathname]);
+
+  if (pathname === '/login') return null;
+
+  const handleToggleSubmenu = (menuName: string) => {
+    setOpenSubmenu(openSubmenu === menuName ? null : menuName);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('crm_user_session');
+    toast.success('Đăng xuất thành công!');
+    router.push('/login');
+  };
+
+  const getFilteredMenuItems = () => {
+    if (!currentUser) return [];
+
+    if (currentUser.role === 'admin') {
+      return [
+        { name: 'Quản lý người dùng', path: '/crm/users', icon: Users }
+      ];
+    }
+
+    const perms = currentUser.permissions ? currentUser.permissions.split(',') : [];
+    const items = [];
+
+    items.push({ name: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard });
+
+    if (perms.includes('CUSTOMERS_VIEW')) {
+      items.push({ name: 'Khách hàng', path: '/crm/customers', icon: Users });
+    }
+
+    const showProducts = perms.includes('PRODUCTS_VIEW');
+    const showProductTypes = perms.includes('PRODUCT_TYPES_VIEW');
+    if (showProducts || showProductTypes) {
+      const productChildren = [];
+      if (showProducts) {
+        productChildren.push({ name: 'Danh sách sản phẩm', path: '/crm/products' });
+      }
+      if (showProductTypes) {
+        productChildren.push({ name: 'Loại sản phẩm', path: '/crm/product-types' });
+      }
+      items.push({
+        name: 'Sản phẩm',
+        path: '/crm/products',
+        icon: ShoppingCart,
+        children: productChildren
+      });
+    }
+
+    if (perms.includes('DOCUMENTS_VIEW')) {
+      items.push({ name: 'Tài liệu', path: '/crm/documents', icon: FileText });
+    }
+
+    if (currentUser.role === 'manager') {
+      items.push({ name: 'Báo cáo', path: '/reports', icon: BarChart3 });
+      items.push({ name: 'Cài đặt', path: '/settings', icon: Settings });
+    }
+
+    return items;
+  };
+
+  const menuItems = getFilteredMenuItems();
+
+  // ĐÃ FIX: Bao bọc toàn bộ bằng thẻ <aside> và cân bằng lại các thẻ HTML bị thiếu
   return (
-    <aside className="w-64 h-screen bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 font-sans">
+    <aside className="w-64 bg-slate-900 h-screen flex flex-col">
       
       {/* --- Phần Logo --- */}
-      <div className="h-16 flex items-center px-6 border-b border-slate-800">
-        <Link href="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <span className="text-white text-lg font-bold">C</span>
-          </div>
-          <span className="font-bold text-xl text-white tracking-wide">CRM System</span>
-        </Link>
-      </div>
+      <Link href="/dashboard" className="h-16 flex items-center px-6 border-b border-slate-800 gap-3 cursor-pointer hover:bg-slate-800/50 transition-colors">
+        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/30">
+          <span className="text-white text-lg font-bold">C</span>
+        </div>
+        <span className="font-bold text-xl text-white tracking-wide">CRM System</span>
+      </Link>
 
       {/* --- Phần Menu Navigation --- */}
       <div className="flex-1 overflow-y-auto py-6 px-4 custom-scrollbar">
@@ -45,19 +112,19 @@ const Sidebar = () => {
           Menu chính
         </div>
         <ul className="space-y-1.5">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            // Kiểm tra xem URL hiện tại có khớp với menu này không
+          {menuItems.map((item, index) => {
+            const Icon = item.icon || LayoutDashboard; // Fallback icon
             const isActive = pathname === item.path || pathname?.startsWith(item.path + '/');
+            const isOpen = openSubmenu === item.name || isActive;
 
             return (
-              <li key={item.path}>
+              <li key={index}> {/* ĐÃ FIX: Thêm thẻ <li> */}
                 <Link 
                   href={item.path}
                   className={`flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group ${
                     isActive 
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-900/20' 
-                      : 'hover:bg-slate-800 hover:text-slate-100'
+                      : 'hover:bg-slate-800 hover:text-slate-100 text-slate-300'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -65,7 +132,6 @@ const Sidebar = () => {
                     <span className="font-medium text-sm">{item.name}</span>
                   </div>
                   
-                  {/* Dấu mũi tên nhỏ xuất hiện khi active hoặc hover */}
                   {(isActive || pathname !== item.path) && (
                     <ChevronRight className={`w-4 h-4 opacity-0 -translate-x-2 transition-all duration-200 ${isActive ? 'opacity-100 translate-x-0' : 'group-hover:opacity-100 group-hover:translate-x-0 text-slate-500'}`} />
                   )}
@@ -78,17 +144,23 @@ const Sidebar = () => {
 
       {/* --- Phần Footer (Thông tin user / Đăng xuất) --- */}
       <div className="p-4 border-t border-slate-800">
-        <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-lg bg-slate-800/50">
-          <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center text-sm font-bold text-white">
-            AD
+        {currentUser && (
+          <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-lg bg-slate-800/50">
+            <div className="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center text-white font-bold">
+               {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-sm font-medium text-white truncate">{currentUser?.name || 'Tài khoản'}</p>
+              <p className="text-xs text-slate-400 truncate">{currentUser?.role || 'Nhân viên'}</p>
+            </div>
           </div>
-          <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-medium text-white truncate">Admin User</p>
-            <p className="text-xs text-slate-400 truncate">admin@company.com</p>
-          </div>
-        </div>
+        )}
         
-        <button className="flex items-center gap-3 px-3 py-2 w-full rounded-lg text-slate-400 hover:bg-slate-800 hover:text-red-400 transition-colors group">
+        {/* ĐÃ FIX: Thêm thẻ <button> */}
+        <button 
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-red-400 transition-all duration-200 group"
+        >
           <LogOut className="w-5 h-5 group-hover:text-red-400 transition-colors" />
           <span className="font-medium text-sm">Đăng xuất</span>
         </button>
