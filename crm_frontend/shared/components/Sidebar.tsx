@@ -3,18 +3,29 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, 
   Users, 
   FileText,
   FileSignature,
   ShoppingCart,
-  BarChart3, 
+  ShoppingCart,
+  BarChart3,
   Settings,
   LogOut,
   ChevronRight
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+
+// 1. Tách cấu hình menu ra một mảng riêng để dễ quản lý và phân quyền sau này
+const menuItems = [
+  { name: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard },
+  { name: 'Khách hàng', path: '/crm/customers', icon: Users },
+  { name: 'Bán hàng', path: '/sales', icon: ShoppingCart },
+  { name: 'Báo cáo', path: '/reports', icon: BarChart3 },
+  { name: 'Cài đặt', path: '/settings', icon: Settings },
+];
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -22,7 +33,7 @@ const Sidebar = () => {
 
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  
+
   // State xử lý lỗi giao diện nhấp nháy (Hydration) đặc trưng của Next.js
   const [isMounted, setIsMounted] = useState(false);
 
@@ -72,10 +83,10 @@ const Sidebar = () => {
     }
 
     // Đã bổ sung các chức năng mới từ mảng khai báo cũ của bạn
-    if (perms.includes('QUOTES_VIEW')) { 
+    if (perms.includes('QUOTES_VIEW')) {
       items.push({ name: 'Quản lý báo giá', path: '/crm/quotes', icon: FileText });
     }
-    if (perms.includes('CONTRACTS_VIEW')) { 
+    if (perms.includes('CONTRACTS_VIEW')) {
       items.push({ name: 'Quản lý hợp đồng', path: '/crm/contracts', icon: FileSignature });
     }
 
@@ -135,11 +146,11 @@ const Sidebar = () => {
         </div>
         <ul className="space-y-1.5">
           {finalMenuItems.map((item, index) => {
-            const Icon = item.icon || LayoutDashboard; 
+            const Icon = item.icon || LayoutDashboard;
             const isActive = pathname === item.path || pathname?.startsWith(item.path + '/');
 
             return (
-              <li key={index}> 
+              <li key={index}>
                 <Link
                   href={item.path}
                   className={`flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group ${

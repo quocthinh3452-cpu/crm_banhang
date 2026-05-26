@@ -5,10 +5,13 @@ import React, { forwardRef } from 'react';
 interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string; // Nhận message lỗi từ Zod
+  label?: string;
+  error?: string;
+  hint?: string;
 }
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ label, error, className = '', id, ...props }, ref) => {
+  ({ label, error, hint, className = '', id, ...props }, ref) => {
     const inputId = id || props.name;
 
     return (

@@ -1,16 +1,14 @@
-// src/shared/api/axiosClient.ts
 import axios from 'axios';
 // Giả sử bạn có thư viện toast (như react-toastify hoặc react-hot-toast)
 import toast from 'react-hot-toast';
 
 const axiosClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: 'http://localhost:8081/api',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Interceptor gắn Token
 axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token && config.headers) {

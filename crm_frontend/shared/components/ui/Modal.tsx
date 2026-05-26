@@ -1,5 +1,15 @@
 // src/shared/components/ui/Modal.tsx
-import React from 'react';
+
+
+/**
+ * Modal Component
+ * Overlay modal with backdrop
+ */
+
+'use client';
+
+import React, { useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface ModalProps {
   isOpen: boolean;
@@ -12,15 +22,42 @@ interface ModalProps {
   customPadding?: string;
 }
 
+
 export const Modal: React.FC<ModalProps> = ({
-  isOpen,
-  onClose,
-  title = '',
-  children,
-  size = 'md',
-  showDefaultHeader = true,
-  customPadding = 'p-6'
-}) => {
+                                                isOpen,
+                                                onClose,
+                                                title = '',
+                                                children,
+                                                size = 'md',
+                                                showDefaultHeader = true,
+                                                customPadding = 'p-6'}) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const sizeClasses = {
@@ -32,18 +69,30 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/30 backdrop-blur-sm p-4">
-      <div className={`bg-white rounded-lg shadow-xl w-full ${sizeClasses[size]} ${customPadding} relative max-h-[90vh] overflow-y-auto`}>
-        {showDefaultHeader && (
-          <>
-            <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-black text-2xl font-bold leading-none">
-              &times;
-            </button>
-            <h2 className="text-xl font-semibold mb-4">{title}</h2>
-          </>
-        )}
-        <div>{children}</div>
-      </div>
-    </div>
+    <AnimatePresence>
+      {isOpen ? (
+        <motion.div
+          className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-black/65 px-4 py-6 backdrop-blur-sm"
+          onClick={handleBackdropClick}
+          role="dialog"
+          aria-modal="true"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+        >
+          <motion.div
+            className="w-full max-w-[1200px]"
+            onClick={(event) => event.stopPropagation()}
+            initial={{ opacity: 0, y: 18, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 18, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            {children}
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 };

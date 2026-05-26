@@ -7,12 +7,14 @@ interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  disabled?: boolean;
 }
 
 export const Pagination: React.FC<PaginationProps> = ({ 
   currentPage, 
   totalPages, 
-  onPageChange 
+  onPageChange,
+  disabled = false,
 }) => {
   // Hàm xử lý logic hiển thị số trang với dấu ba chấm (...)
   const getPageNumbers = () => {
@@ -27,11 +29,12 @@ export const Pagination: React.FC<PaginationProps> = ({
       // Nếu đang ở những trang đầu
       if (currentPage <= 3) {
         pages.push(1, 2, 3, 4, '...', totalPages);
-      } 
+      } else if (currentPage >= totalPages - 2) {
+      }
       // Nếu đang ở những trang cuối
       else if (currentPage >= totalPages - 2) {
         pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-      } 
+      }
       // Nếu đang ở giữa
       else {
         pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
@@ -97,6 +100,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         aria-label="Trang sau"
       >
         <ChevronRight className="w-5 h-5" />
+        <ChevronRight size={20} />
       </button>
     </div>
   );
