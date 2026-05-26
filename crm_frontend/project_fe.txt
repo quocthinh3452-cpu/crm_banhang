@@ -175,7 +175,9 @@ D:.
 |   |   |               00000117.meta
 |   |   |               00000118.meta
 |   |   |               00000119.sst
+|   |   |               00000120.sst
 |   |   |               00000121.sst
+|   |   |               00000122.meta
 |   |   |               00000123.meta
 |   |   |               00000124.meta
 |   |   |               00000126.sst
@@ -538,6 +540,7 @@ D:.
 |   |   |   |   |   page_client-reference-manifest.js
 |   |   |   |   |   
 |   |   |   |   +---crm
+|   |   |   |   |   \---customers
 |   |   |   |   |       |   page.js
 |   |   |   |   |       |   page.js.map
 |   |   |   |   |       |   page_client-reference-manifest.js
@@ -548,14 +551,14 @@ D:.
 |   |   |   |   |               next-font-manifest.json
 |   |   |   |   |               react-loadable-manifest.json
 |   |   |   |   |               server-reference-manifest.json
-|   |   |   |       |   
-|   |   |   |       \---page
-|   |   |   |               app-paths-manifest.json
-|   |   |   |               build-manifest.json
-|   |   |   |               next-font-manifest.json
-|   |   |   |               react-loadable-manifest.json
-|   |   |   |               server-reference-manifest.json
-|   |   |   |               
+|   |   |   |   |
+|   |   |   |   \---page
+|   |   |   |           app-paths-manifest.json
+|   |   |   |           build-manifest.json
+|   |   |   |           next-font-manifest.json
+|   |   |   |           react-loadable-manifest.json
+|   |   |   |           server-reference-manifest.json
+|   |   |   |
 |   |   |   +---chunks
 |   |   |   |   \---ssr
 |   |   |   |           node_modules_01ed9g5._.js
@@ -664,8 +667,6 @@ D:.
 |   |   |   |           _next-internal_server_app_crm_lead_page_actions_0wa5i4p.js.map
 |   |   |   |           _next-internal_server_app_page_actions_09-gtaw.js
 |   |   |   |           _next-internal_server_app_page_actions_09-gtaw.js.map
-|   |   |   |           _next-internal_server_app__not-found_page_actions_0eq97pa.js
-|   |   |   |           _next-internal_server_app__not-found_page_actions_0eq97pa.js.map
 |   |   |   |
 |   |   |   \---pages
 |   |   |       |   _app.js
@@ -840,6 +841,7 @@ D:.
 |   |   |   |   page_client-reference-manifest.js
 |   |   |   |   
 |   |   |   +---crm
+|   |   |   |   \---customers
 |   |   |   |       |   page.js
 |   |   |   |       |   page.js.map
 |   |   |   |       |   page.js.nft.json
@@ -915,6 +917,8 @@ D:.
 |   |               node_modules_0x1_ce~._.js.map
 |   |               node_modules_@swc_helpers_cjs__interop_require_default_cjs_11~q6fv._.js
 |   |               node_modules_@swc_helpers_cjs__interop_require_default_cjs_11~q6fv._.js.map
+|   |               node_modules_next_dist_0qoh8ry._.js
+|   |               node_modules_next_dist_0qoh8ry._.js.map
 |   |               node_modules_next_dist_client_components_0inhx6q._.js
 |   |               node_modules_next_dist_client_components_0inhx6q._.js.map
 |   |               node_modules_next_dist_client_components_builtin_forbidden_0ghu-f7.js
@@ -933,8 +937,14 @@ D:.
 |   |               node_modules_next_dist_esm_build_templates_app-page_0837muz.js.map
 |   |               node_modules_next_dist_esm_build_templates_app-page_0nsg22r.js
 |   |               node_modules_next_dist_esm_build_templates_app-page_0nsg22r.js.map
+|   |               [root-of-the-server]__0.kd7dh._.js
+|   |               [root-of-the-server]__0.kd7dh._.js.map
 |   |               [root-of-the-server]__02hi65f._.js
 |   |               [root-of-the-server]__02hi65f._.js.map
+|   |               [root-of-the-server]__06so9v3._.js
+|   |               [root-of-the-server]__06so9v3._.js.map
+|   |               [root-of-the-server]__098zro9._.js
+|   |               [root-of-the-server]__098zro9._.js.map
 |   |               [root-of-the-server]__0mk2ops._.js
 |   |               [root-of-the-server]__0mk2ops._.js.map
 |   |               [root-of-the-server]__0ocwx_d._.js
@@ -945,6 +955,8 @@ D:.
 |   |               [root-of-the-server]__0x~-im0._.js.map
 |   |               [turbopack]_runtime.js
 |   |               [turbopack]_runtime.js.map
+|   |               _0bk_a.s._.js
+|   |               _0bk_a.s._.js.map
 |   |               _next-internal_server_app_crm_customers_page_actions_06oz4~j.js
 |   |               _next-internal_server_app_crm_customers_page_actions_06oz4~j.js.map
 |   |               _next-internal_server_app_crm_lead_page_actions_0wa5i4p.js
@@ -958,11 +970,26 @@ D:.
 |   |               
 |   +---static
 |   |   +---chunks
+|   |   |       03vcybz4ldxd4.js
 |   |   |       03~yq9q893hmn.js
+|   |   |       07mne3zcixcz2.js
+|   |   |       0d3tkj33oycf2.js
+|   |   |       0fsi8lw5utejl.js
+|   |   |       0rmycqp3n0v1z.js
+|   |   |       0ursk~c~2p0vl.js
+|   |   |       0x8kdpzb79ten.js
+|   |   |       0_5iwltda5aas.css
 |   |   |       10u3y4bw1ayzs.js
-|   |   |       
-|   |   |       
-|   |           
+|   |   |       turbopack-14t1r~.kq2cr8.js
+|   |   |
+|   |   +---media
+|   |   |       favicon.0x3dzn~oxb6tn.ico
+|   |   |
+|   |   \---SaR-vjGQkW7cFsgsjspHZ
+|   |           _buildManifest.js
+|   |           _clientMiddlewareManifest.js
+|   |           _ssgManifest.js
+|   |
 |   \---types
 |           cache-life.d.ts
 |           routes.d.ts
@@ -978,6 +1005,7 @@ D:.
 |   |   page.tsx
 |   |   
 |   \---crm
+|       \---customers
 |               page.tsx
 |               
 +---modules

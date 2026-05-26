@@ -12,6 +12,8 @@ export const useToast = () => useContext(ToastContext);
 
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const showToast = (message: string, type: 'success' | 'error') => {
+    // Simple implementation: use alert for now
+    alert(`${type}: ${message}`);
   };
 
   return (
