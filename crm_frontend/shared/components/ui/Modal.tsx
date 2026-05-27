@@ -12,6 +12,7 @@ interface ModalProps {
   showDefaultHeader?: boolean;
   customPadding?: string;
   maxWidth?: string;
+  className?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -21,7 +22,9 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   size = 'md',
   showDefaultHeader = true,
-  customPadding = 'p-6'
+  customPadding = 'p-6',
+  maxWidth = '',
+  className = ''
 }) => {
   
   // Xử lý scroll body
@@ -71,7 +74,7 @@ export const Modal: React.FC<ModalProps> = ({
         >
           <motion.div
             // SỬ DỤNG sizeClasses TẠI ĐÂY thay vì hardcode 1200px
-            className={`w-full ${sizeClasses[size]} bg-white rounded-xl shadow-xl overflow-hidden ${customPadding}`}
+            className={`w-full ${maxWidth || sizeClasses[size]} bg-white rounded-xl shadow-xl overflow-hidden ${customPadding} ${className}`}
             onClick={(e) => e.stopPropagation()}
             initial={{ opacity: 0, y: 18, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

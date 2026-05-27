@@ -226,7 +226,7 @@ export default function ContractModal({ contract, onClose, onSaved }: ContractMo
       isOpen={true}
       onClose={onClose}
       title={isEditMode && contract && contract.id > 0 ? `Cập nhật trạng thái hợp đồng #${formData.contractNumber}` : 'Tạo Hợp đồng mới'}
-      size="xl"
+      maxWidth="max-w-3xl"
     >
       {isLoadingCatalogs ? (
         <div className="py-12 flex flex-col justify-center items-center gap-3">
@@ -234,124 +234,126 @@ export default function ContractModal({ contract, onClose, onSaved }: ContractMo
           <span className="text-gray-500 text-sm">Đang tải danh mục...</span>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
-            
-            {/* Chọn Báo giá nguồn - Tự động điền dữ liệu */}
-            <div className="md:col-span-2">
-              <SelectBox
-                label="Báo giá nguồn liên kết (Tự động điền Khách hàng & Giá trị)"
-                name="quoteId"
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          <div className="space-y-6 overflow-y-auto max-h-[58vh] pr-2 pb-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+              
+              {/* Chọn Báo giá nguồn - Tự động điền dữ liệu */}
+              <div className="md:col-span-2">
+                <SelectBox
+                  label="Báo giá nguồn liên kết (Tự động điền Khách hàng & Giá trị)"
+                  name="quoteId"
+                  disabled={isEditMode}
+                  value={formData.quoteId}
+                  onChange={handleQuoteChange}
+                  options={quoteOptions}
+                />
+              </div>
+
+              <TextInput
+                label="Số hợp đồng"
+                name="contractNumber"
+                required
                 disabled={isEditMode}
-                value={formData.quoteId}
-                onChange={handleQuoteChange}
-                options={quoteOptions}
-              />
-            </div>
-
-            <TextInput
-              label="Số hợp đồng"
-              name="contractNumber"
-              required
-              disabled={isEditMode}
-              placeholder="Ví dụ: HĐ-2026-001"
-              value={formData.contractNumber}
-              onChange={handleChange}
-            />
-
-            <SelectBox
-              label="Khách hàng"
-              name="customerId"
-              required
-              disabled={isEditMode}
-              value={formData.customerId}
-              onChange={handleChange}
-              options={customerOptions}
-            />
-
-            <TextInput
-              label="Giá trị hợp đồng (VND)"
-              name="value"
-              type="number"
-              required
-              disabled={isEditMode}
-              placeholder="Nhập số tiền hợp đồng..."
-              value={formData.value}
-              onChange={handleChange}
-            />
-
-            <SelectBox
-              label="Người quản lý hợp đồng"
-              name="managerId"
-              disabled={isEditMode}
-              value={formData.managerId}
-              onChange={handleChange}
-              options={managerOptions}
-            />
-
-            <TextInput
-              label="Ngày ký hợp đồng"
-              name="signDate"
-              type="date"
-              disabled={isEditMode}
-              value={formData.signDate}
-              onChange={handleChange}
-            />
-
-            <TextInput
-              label="Ngày hết hạn"
-              name="expiryDate"
-              type="date"
-              disabled={isEditMode}
-              value={formData.expiryDate}
-              onChange={handleChange}
-            />
-
-            <TextInput
-              label="Mã mẫu hợp đồng (Template ID)"
-              name="templateId"
-              type="number"
-              disabled={isEditMode}
-              placeholder="Nhập ID mẫu hợp đồng (nếu có)..."
-              value={formData.templateId}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="space-y-4">
-            <SelectBox
-              label="Trạng thái hợp đồng"
-              name="status"
-              required
-              value={formData.status}
-              onChange={handleChange}
-              options={statusOptions}
-            />
-
-            <div className="space-y-1">
-              <label htmlFor="note" className="block text-sm font-medium text-gray-700">
-                Ghi chú / Điều khoản
-              </label>
-              <textarea
-                id="note"
-                name="note"
-                rows={3}
-                disabled={isEditMode}
-                placeholder="Nhập các điều khoản hoặc ghi chú bổ sung..."
-                value={formData.note}
+                placeholder="Ví dụ: HĐ-2026-001"
+                value={formData.contractNumber}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors bg-white text-sm"
+              />
+
+              <SelectBox
+                label="Khách hàng"
+                name="customerId"
+                required
+                disabled={isEditMode}
+                value={formData.customerId}
+                onChange={handleChange}
+                options={customerOptions}
+              />
+
+              <TextInput
+                label="Giá trị hợp đồng (VND)"
+                name="value"
+                type="number"
+                required
+                disabled={isEditMode}
+                placeholder="Nhập số tiền hợp đồng..."
+                value={formData.value}
+                onChange={handleChange}
+              />
+
+              <SelectBox
+                label="Người quản lý hợp đồng"
+                name="managerId"
+                disabled={isEditMode}
+                value={formData.managerId}
+                onChange={handleChange}
+                options={managerOptions}
+              />
+
+              <TextInput
+                label="Ngày ký hợp đồng"
+                name="signDate"
+                type="date"
+                disabled={isEditMode}
+                value={formData.signDate}
+                onChange={handleChange}
+              />
+
+              <TextInput
+                label="Ngày hết hạn"
+                name="expiryDate"
+                type="date"
+                disabled={isEditMode}
+                value={formData.expiryDate}
+                onChange={handleChange}
+              />
+
+              <TextInput
+                label="Mã mẫu hợp đồng (Template ID)"
+                name="templateId"
+                type="number"
+                disabled={isEditMode}
+                placeholder="Nhập ID mẫu hợp đồng (nếu có)..."
+                value={formData.templateId}
+                onChange={handleChange}
               />
             </div>
 
-            {isEditMode && (
-              <p className="text-[11px] text-amber-600 font-medium italic">
-                * Lưu ý: Trong chế độ cập nhật, bạn chỉ được phép thay đổi trạng thái hợp đồng (`active`, `expired`, `cancelled`) để đảm bảo tính toàn vẹn của hồ sơ hợp đồng pháp lý.
-              </p>
-            )}
+            <div className="space-y-4">
+              <SelectBox
+                label="Trạng thái hợp đồng"
+                name="status"
+                required
+                value={formData.status}
+                onChange={handleChange}
+                options={statusOptions}
+              />
+
+              <div className="space-y-1">
+                <label htmlFor="note" className="block text-sm font-medium text-gray-700">
+                  Ghi chú / Điều khoản
+                </label>
+                <textarea
+                  id="note"
+                  name="note"
+                  rows={3}
+                  disabled={isEditMode}
+                  placeholder="Nhập các điều khoản hoặc ghi chú bổ sung..."
+                  value={formData.note}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors bg-white text-sm"
+                />
+              </div>
+
+              {isEditMode && (
+                <p className="text-[11px] text-amber-600 font-medium italic">
+                  * Lưu ý: Trong chế độ cập nhật, bạn chỉ được phép thay đổi trạng thái hợp đồng (`active`, `expired`, `cancelled`) để đảm bảo tính toàn vẹn của hồ sơ hợp đồng pháp lý.
+                </p>
+              )}
+            </div>
           </div>
 
-          <div className="flex justify-end space-x-3 border-t border-gray-200 pt-5">
+          <div className="flex justify-end space-x-3 border-t border-gray-200 pt-5 mt-4">
             <Button
               type="button"
               variant="secondary"

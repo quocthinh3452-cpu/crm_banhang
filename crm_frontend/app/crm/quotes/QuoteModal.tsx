@@ -253,167 +253,169 @@ export default function QuoteModal({ quoteId, onClose, onSaved }: QuoteModalProp
           <span className="text-gray-500 text-sm">Đang tải danh mục...</span>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 1. Thông tin chung */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
-            <TextInput 
-              label="Mã báo giá" 
-              name="quoteNumber" 
-              required 
-              placeholder="Ví dụ: BG-2026-001"
-              value={formData.quoteNumber} 
-              onChange={handleChange} 
-            />
-            
-            <SelectBox 
-              label="Khách hàng" 
-              name="customerId" 
-              required 
-              value={formData.customerId} 
-              onChange={handleChange} 
-              options={customerOptions}
-            />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-6 overflow-y-auto max-h-[58vh] pr-2 pb-2">
+            {/* 1. Thông tin chung */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+              <TextInput 
+                label="Mã báo giá" 
+                name="quoteNumber" 
+                required 
+                placeholder="Ví dụ: BG-2026-001"
+                value={formData.quoteNumber} 
+                onChange={handleChange} 
+              />
+              
+              <SelectBox 
+                label="Khách hàng" 
+                name="customerId" 
+                required 
+                value={formData.customerId} 
+                onChange={handleChange} 
+                options={customerOptions}
+              />
 
-            <TextInput 
-              label="Ngày lập" 
-              name="quoteDate" 
-              type="date"
-              required 
-              value={formData.quoteDate} 
-              onChange={handleChange} 
-            />
+              <TextInput 
+                label="Ngày lập" 
+                name="quoteDate" 
+                type="date"
+                required 
+                value={formData.quoteDate} 
+                onChange={handleChange} 
+              />
 
-            <TextInput 
-              label="Ngày hết hạn" 
-              name="validUntil" 
-              type="date"
-              required 
-              value={formData.validUntil} 
-              onChange={handleChange} 
-            />
-          </div>
-
-          {/* 2. Chi tiết mặt hàng */}
-          <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-            <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/70">
-              <h4 className="font-semibold text-gray-700 text-sm">Chi tiết mặt hàng</h4>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={handleAddItem} 
-                className="text-xs py-1.5 h-8 flex items-center gap-1.5 border border-blue-500 text-blue-600 hover:bg-blue-50"
-              >
-                <Plus className="w-3.5 h-3.5" /> Thêm sản phẩm
-              </Button>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-100 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                  <tr>
-                    <th className="p-3 pl-4">Sản phẩm</th>
-                    <th className="p-3 w-20 text-center">SL</th>
-                    <th className="p-3 w-36 text-right">Đơn giá</th>
-                    <th className="p-3 w-20 text-center">CK (%)</th>
-                    <th className="p-3 w-32 text-right">Tiền CK</th>
-                    <th className="p-3 w-36 text-right">Thành tiền</th>
-                    <th className="p-3 w-12 text-center"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {items.map((item) => (
-                    <tr key={item.tempId} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="p-3 pl-4">
-                        <select 
-                          value={item.productId} 
-                          onChange={(e) => handleItemChange(item.tempId, 'productId', e.target.value)} 
-                          className="w-full bg-transparent outline-none border border-gray-300 focus:border-blue-500 rounded-md p-1.5 text-sm font-semibold"
-                        >
-                          <option value="">-- Chọn sản phẩm --</option>
-                          {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                        </select>
-                      </td>
-                      <td className="p-3">
-                        <input 
-                          type="number" 
-                          min="1" 
-                          value={item.quantity} 
-                          onChange={(e) => handleItemChange(item.tempId, 'quantity', Number(e.target.value))} 
-                          className="w-full text-center bg-gray-50 border border-gray-300 focus:border-blue-500 rounded-md p-1.5 text-sm outline-none" 
-                        />
-                      </td>
-                      <td className="p-3 text-right text-gray-500 font-medium">
-                        {formatCurrency(item.unitPrice)}
-                      </td>
-                      <td className="p-3">
-                        <input 
-                          type="number" 
-                          min="0" 
-                          max="100" 
-                          value={item.discountPercent} 
-                          onChange={(e) => handleItemChange(item.tempId, 'discountPercent', Number(e.target.value))} 
-                          className="w-full text-center bg-gray-50 border border-gray-300 focus:border-blue-500 rounded-md p-1.5 text-sm outline-none" 
-                        />
-                      </td>
-                      <td className="p-3 text-right text-rose-500 font-medium">
-                        -{formatCurrency((item.quantity * item.unitPrice * item.discountPercent) / 100)}
-                      </td>
-                      <td className="p-3 text-right font-semibold text-gray-900">
-                        {formatCurrency((item.quantity * item.unitPrice) * (1 - item.discountPercent / 100))}
-                      </td>
-                      <td className="p-3 text-center">
-                        <button 
-                          type="button" 
-                          onClick={() => handleRemoveItem(item.tempId)} 
-                          className="text-red-400 hover:text-red-600 p-1 hover:bg-red-50 rounded transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {items.length === 0 && (
-                    <tr>
-                      <td colSpan={7} className="p-6 text-center text-gray-400 text-sm italic">
-                        Báo giá chưa có mặt hàng nào. Vui lòng bấm nút "Thêm sản phẩm" phía trên.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* 3. Trạng thái & Bảng tổng hợp thanh toán */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
-            {/* Trạng thái báo giá - 1 dropdown duy nhất */}
-            <div className="space-y-4">
-              <SelectBox
-                label="Trạng thái báo giá"
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                options={STATUS_OPTIONS}
+              <TextInput 
+                label="Ngày hết hạn" 
+                name="validUntil" 
+                type="date"
+                required 
+                value={formData.validUntil} 
+                onChange={handleChange} 
               />
             </div>
 
-            {/* Bảng tổng kết số tiền */}
-            <div className="bg-slate-900 text-slate-100 p-5 rounded-2xl space-y-3 shadow-lg max-w-lg ml-auto w-full">
-              <div className="flex justify-between text-sm text-slate-400">
-                <span>Cộng tiền hàng:</span>
-                <span className="font-semibold text-slate-200">{formatCurrency(summary.subtotal)}</span>
+            {/* 2. Chi tiết mặt hàng */}
+            <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+              <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/70">
+                <h4 className="font-semibold text-gray-700 text-sm">Chi tiết mặt hàng</h4>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleAddItem} 
+                  className="text-xs py-1.5 h-8 flex items-center gap-1.5 border border-blue-500 text-blue-600 hover:bg-blue-50"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Thêm sản phẩm
+                </Button>
               </div>
-              <div className="flex justify-between text-sm text-rose-400">
-                <span>Tổng chiết khấu:</span>
-                <span className="font-semibold">-{formatCurrency(summary.totalDisc)}</span>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-100 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <tr>
+                      <th className="p-3 pl-4">Sản phẩm</th>
+                      <th className="p-3 w-20 text-center">SL</th>
+                      <th className="p-3 w-36 text-right">Đơn giá</th>
+                      <th className="p-3 w-20 text-center">CK (%)</th>
+                      <th className="p-3 w-32 text-right">Tiền CK</th>
+                      <th className="p-3 w-36 text-right">Thành tiền</th>
+                      <th className="p-3 w-12 text-center"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {items.map((item) => (
+                      <tr key={item.tempId} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="p-3 pl-4">
+                          <select 
+                            value={item.productId} 
+                            onChange={(e) => handleItemChange(item.tempId, 'productId', e.target.value)} 
+                            className="w-full bg-transparent outline-none border border-gray-300 focus:border-blue-500 rounded-md p-1.5 text-sm font-semibold"
+                          >
+                            <option value="">-- Chọn sản phẩm --</option>
+                            {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                          </select>
+                        </td>
+                        <td className="p-3">
+                          <input 
+                            type="number" 
+                            min="1" 
+                            value={item.quantity} 
+                            onChange={(e) => handleItemChange(item.tempId, 'quantity', Number(e.target.value))} 
+                            className="w-full text-center bg-gray-50 border border-gray-300 focus:border-blue-500 rounded-md p-1.5 text-sm outline-none" 
+                          />
+                        </td>
+                        <td className="p-3 text-right text-gray-500 font-medium">
+                          {formatCurrency(item.unitPrice)}
+                        </td>
+                        <td className="p-3">
+                          <input 
+                            type="number" 
+                            min="0" 
+                            max="100" 
+                            value={item.discountPercent} 
+                            onChange={(e) => handleItemChange(item.tempId, 'discountPercent', Number(e.target.value))} 
+                            className="w-full text-center bg-gray-50 border border-gray-300 focus:border-blue-500 rounded-md p-1.5 text-sm outline-none" 
+                          />
+                        </td>
+                        <td className="p-3 text-right text-rose-500 font-medium">
+                          -{formatCurrency((item.quantity * item.unitPrice * item.discountPercent) / 100)}
+                        </td>
+                        <td className="p-3 text-right font-semibold text-gray-900">
+                          {formatCurrency((item.quantity * item.unitPrice) * (1 - item.discountPercent / 100))}
+                        </td>
+                        <td className="p-3 text-center">
+                          <button 
+                            type="button" 
+                            onClick={() => handleRemoveItem(item.tempId)} 
+                            className="text-red-400 hover:text-red-600 p-1 hover:bg-red-50 rounded transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {items.length === 0 && (
+                      <tr>
+                        <td colSpan={7} className="p-6 text-center text-gray-400 text-sm italic">
+                          Báo giá chưa có mặt hàng nào. Vui lòng bấm nút "Thêm sản phẩm" phía trên.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
-              <div className="flex justify-between text-sm text-slate-400">
-                <span>Thuế giá trị gia tăng (10% VAT):</span>
-                <span className="font-semibold text-slate-200">{formatCurrency(summary.tax)}</span>
+            </div>
+
+            {/* 3. Trạng thái & Bảng tổng hợp thanh toán */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 border-t border-gray-200 pt-6">
+              {/* Trạng thái báo giá - 1 dropdown duy nhất */}
+              <div className="space-y-4">
+                <SelectBox
+                  label="Trạng thái báo giá"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  options={STATUS_OPTIONS}
+                />
               </div>
-              <div className="flex justify-between text-lg font-bold border-t border-slate-800 pt-3 text-blue-400">
-                <span>TỔNG CỘNG THANH TOÁN:</span>
-                <span className="font-black text-xl">{formatCurrency(summary.grandTotal)}</span>
+
+              {/* Bảng tổng kết số tiền */}
+              <div className="bg-slate-900 text-slate-100 p-5 rounded-2xl space-y-3 shadow-lg max-w-lg ml-auto w-full">
+                <div className="flex justify-between text-sm text-slate-400">
+                  <span>Cộng tiền hàng:</span>
+                  <span className="font-semibold text-slate-200">{formatCurrency(summary.subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-rose-400">
+                  <span>Tổng chiết khấu:</span>
+                  <span className="font-semibold">-{formatCurrency(summary.totalDisc)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-slate-400">
+                  <span>Thuế giá trị gia tăng (10% VAT):</span>
+                  <span className="font-semibold text-slate-200">{formatCurrency(summary.tax)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold border-t border-slate-800 pt-3 text-blue-400">
+                  <span>TỔNG CỘNG THANH TOÁN:</span>
+                  <span className="font-black text-xl">{formatCurrency(summary.grandTotal)}</span>
+                </div>
               </div>
             </div>
           </div>

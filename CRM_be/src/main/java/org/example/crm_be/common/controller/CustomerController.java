@@ -9,7 +9,7 @@ import java.util.List;
 
 @RequestMapping("/api/customers")
 @CrossOrigin(origins = "*")
-@RestController("commonCustomerController")
+// @RestController("commonCustomerController")
 public class CustomerController {
 
     private final CustomerJpaRepository customerJpaRepository;

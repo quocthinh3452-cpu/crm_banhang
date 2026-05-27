@@ -18,6 +18,19 @@ import { getProductsUseCase } from '../../../modules/product/useCases/getProduct
 import { Product, ProductFilters } from '../../../modules/product/types/product.type';
 import { ProductTypeResponse } from '../../../modules/product/types/productType.type';
 
+// Helper: Tạo URL đầy đủ cho ảnh sản phẩm
+// imageUrl có thể là: "/uploads/products/abc.jpg" (mới) hoặc "hinh.jpg" (cũ từ seed)
+const BASE_API_URL = 'http://localhost:8081';
+const getImageUrl = (imageUrl: string | null | undefined): string | null => {
+    if (!imageUrl) return null;
+    if (imageUrl.startsWith('/') || imageUrl.startsWith('http')) {
+        // Đường dẫn đầy đủ: /uploads/products/abc.jpg
+        return imageUrl.startsWith('http') ? imageUrl : `${BASE_API_URL}${imageUrl}`;
+    }
+    // Tên file thuần (seed cũ): hinh.jpg → /uploads/products/hinh.jpg
+    return `${BASE_API_URL}/uploads/products/${imageUrl}`;
+};
+
 // 1. Schema
 const productSchema = z.object({
     productCode: z.string().min(1, 'Mã sản phẩm không được để trống'),
@@ -45,6 +58,7 @@ export default function ProductsPage() {
 
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalElements, setTotalElements] = useState(0);
     const [filters, setFilters] = useState<ProductFilters>({
         page: 1,
         size: 5,
@@ -78,6 +92,7 @@ export default function ProductsPage() {
             setProducts(productData.items || []);
             setTotalPages(productData.totalPages || 1);
             setCurrentPage(productData.currentPage || 1);
+            setTotalElements(productData.totalElements || 0);
             setTypes(typesData || []);
         } catch (err) {
             console.error('Lỗi fetch data:', err);
@@ -358,17 +373,20 @@ export default function ProductsPage() {
                                 products.map((item) => (
                                     <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors">
                                         <td className="p-4">
-                                            {item.imageUrl ? (
+                                            {getImageUrl(item.imageUrl) ? (
                                                 <img
-                                                    src={`http://localhost:8080${item.imageUrl}`}
+                                                    src={getImageUrl(item.imageUrl)!}
                                                     alt={item.name}
-                                                    className="w-12 h-12 object-cover rounded border border-gray-200 shadow-sm"
+                                                    className="w-12 h-12 object-cover rounded-lg border border-gray-200 shadow-sm"
+                                                    onError={(e) => {
+                                                        (e.target as HTMLImageElement).style.display = 'none';
+                                                        (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                                                    }}
                                                 />
-                                            ) : (
-                                                <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center text-gray-400 text-xs">
-                                                    Trống
-                                                </div>
-                                            )}
+                                            ) : null}
+                                            <div className={`w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 text-lg ${getImageUrl(item.imageUrl) ? 'hidden' : ''}`}>
+                                                📦
+                                            </div>
                                         </td>
 
                                         <td className="p-4 font-mono text-sm text-gray-600">{item.productCode}</td>
@@ -420,6 +438,8 @@ export default function ProductsPage() {
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
+                    totalElements={totalElements}
+                    pageSize={filters.size}
                     onPageChange={(p) => setFilters({ ...filters, page: p })}
                 />
             )}
@@ -428,71 +448,74 @@ export default function ProductsPage() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={editingProduct ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
+                size="lg"
             >
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextInput
-                            label="Mã sản phẩm"
-                            placeholder="VD: SP001"
-                            {...register('productCode')}
-                            error={errors.productCode?.message}
-                        />
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+                    <div className="space-y-4 overflow-y-auto max-h-[58vh] pr-2 pb-2 mt-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <TextInput
+                                label="Mã sản phẩm"
+                                placeholder="VD: SP001"
+                                {...register('productCode')}
+                                error={errors.productCode?.message}
+                            />
 
-                        <TextInput
-                            label="Tên sản phẩm"
-                            placeholder="Nhập tên..."
-                            {...register('name')}
-                            error={errors.name?.message}
-                        />
+                            <TextInput
+                                label="Tên sản phẩm"
+                                placeholder="Nhập tên..."
+                                {...register('name')}
+                                error={errors.name?.message}
+                            />
 
-                        <SelectBox
-                            label="Loại sản phẩm"
-                            options={[
-                                { label: '-- Chọn loại SP --', value: '' },
-                                ...types
-                                    .filter(t => t.isActive === 1 || t.id === editingProduct?.typeId)
-                                    .map(t => ({ label: t.typeName, value: String(t.id) }))
-                            ]}
-                            {...register('typeId')}
-                            error={errors.typeId?.message}
-                        />
+                            <SelectBox
+                                label="Loại sản phẩm"
+                                options={[
+                                    { label: '-- Chọn loại SP --', value: '' },
+                                    ...types
+                                        .filter(t => t.isActive === 1 || t.id === editingProduct?.typeId)
+                                        .map(t => ({ label: t.typeName, value: String(t.id) }))
+                                ]}
+                                {...register('typeId')}
+                                error={errors.typeId?.message}
+                            />
 
-                        <TextInput
-                            label="Giá bán (VND)"
-                            type="number"
-                            placeholder="0"
-                            {...register('price')}
-                            error={errors.price?.message}
-                        />
-                    </div>
+                            <TextInput
+                                label="Giá bán (VND)"
+                                type="number"
+                                placeholder="0"
+                                {...register('price')}
+                                error={errors.price?.message}
+                            />
+                        </div>
 
-                    <div className="col-span-1 md:col-span-2">
-                        <TextInput
-                            label="Mô tả"
-                            placeholder="Mô tả ngắn gọn về sản phẩm..."
-                            {...register('description')}
-                            error={errors.description?.message}
-                        />
-                    </div>
+                        <div className="col-span-1 md:col-span-2">
+                            <TextInput
+                                label="Mô tả"
+                                placeholder="Mô tả ngắn gọn về sản phẩm..."
+                                {...register('description')}
+                                error={errors.description?.message}
+                            />
+                        </div>
 
-                    <div className="col-span-1 md:col-span-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Hình ảnh sản phẩm (Tùy chọn)
-                        </label>
-                        <input
-                            // BỔ SUNG: Ép React reset input file khi đóng mở form
-                            key={isModalOpen ? 'open' : 'closed'}
-                            type="file"
-                            accept="image/*"
-                            {...register('image')}
-                            className="block w-full text-sm text-gray-500 
-                                       file:mr-4 file:py-2 file:px-4 
-                                       file:rounded-md file:border-0 
-                                       file:text-sm file:font-semibold 
-                                       file:bg-sky-100 file:text-sky-700 
-                                       hover:file:bg-sky-200 cursor-pointer"
-                        />
-                        <p className="text-xs text-gray-400 mt-2">Định dạng hỗ trợ: JPG, PNG, GIF. Kích thước tối đa 5MB.</p>
+                        <div className="col-span-1 md:col-span-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Hình ảnh sản phẩm (Tùy chọn)
+                            </label>
+                            <input
+                                // BỔ SUNG: Ép React reset input file khi đóng mở form
+                                key={isModalOpen ? 'open' : 'closed'}
+                                type="file"
+                                accept="image/*"
+                                {...register('image')}
+                                className="block w-full text-sm text-gray-500 
+                                           file:mr-4 file:py-2 file:px-4 
+                                           file:rounded-md file:border-0 
+                                           file:text-sm file:font-semibold 
+                                           file:bg-sky-100 file:text-sky-700 
+                                           hover:file:bg-sky-200 cursor-pointer"
+                            />
+                            <p className="text-xs text-gray-400 mt-2">Định dạng hỗ trợ: JPG, PNG, GIF. Kích thước tối đa 5MB.</p>
+                        </div>
                     </div>
 
                     <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">

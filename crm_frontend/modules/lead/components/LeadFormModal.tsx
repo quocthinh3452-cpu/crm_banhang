@@ -195,42 +195,35 @@ const onSubmit: SubmitHandler<LeadFormValues> = async (data) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={currentLead ? "Cập nhật Lead" : "Thêm mới Lead"}>
+    <Modal isOpen={isOpen} onClose={onClose} title={currentLead ? "Cập nhật Lead" : "Thêm mới Lead"} size="5xl">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
         
-        <div className="space-y-3 overflow-y-auto max-h-[60vh] pr-2 pb-2">
-          <TextInput label="Họ và tên (*)" {...register('name')} error={errors.name?.message} />
-          
-          <div className="grid grid-cols-2 gap-3">
-            <TextInput label="Tên công ty (*)" {...register('company')} error={errors.company?.message} />
-            <TextInput label="Số điện thoại (*)" {...register('phone')} error={errors.phone?.message} />
-          </div>
-          
-          <TextInput label="Email (*)" type="email" {...register('email')} error={errors.email?.message} />
-          
-          {/* KHU VỰC THÔNG TIN BẢO MẬT (Nút Xem chi tiết) */}
-          <div className="mt-2 border border-gray-200 rounded-md overflow-hidden">
-            <div className="bg-gray-50 p-3 flex justify-between items-center">
-              <span className="text-sm font-semibold text-gray-700">Thông tin định danh (MST, CCCD) (*)</span>
-              <button
-                type="button"
-                onClick={() => setShowSensitiveInfo(!showSensitiveInfo)}
-                className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline focus:outline-none transition-colors"
-              >
-                {showSensitiveInfo ? "Thu gọn ▲" : "Xem chi tiết ▼"}
-              </button>
-            </div>
+        <div className="space-y-4 overflow-y-auto max-h-[58vh] pr-2 pb-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             
-            {showSensitiveInfo && (
-              <div className="p-3 bg-white grid grid-cols-2 gap-3 border-t border-gray-200">
-                <TextInput label="Mã số thuế (*)" {...register('taxCode')} error={errors.taxCode?.message} />
-                <TextInput label="Số CCCD (*)" {...register('idCard')} error={errors.idCard?.message} />
-              </div>
-            )}
-          </div>
+            {/* Hàng 1: Họ tên, Điện thoại, Công ty */}
+            <TextInput label="Họ và tên (*)" {...register('name')} error={errors.name?.message} />
+            <TextInput label="Số điện thoại (*)" {...register('phone')} error={errors.phone?.message} />
+            <TextInput label="Tên công ty (*)" {...register('company')} error={errors.company?.message} />
 
-          {/* KHU VỰC MỚI: TỈNH THÀNH, NGUỒN, NHÓM BÁN HÀNG */}
-          <div className="grid grid-cols-3 gap-3 mt-3">
+            {/* Hàng 2: Email, Trạng thái, Doanh số */}
+            <TextInput label="Email (*)" type="email" {...register('email')} error={errors.email?.message} />
+            
+            <SelectBox 
+              label="Trạng thái (*)" 
+              options={[
+                { label: 'Mới nhận', value: 'NEW' },
+                { label: 'Đang liên hệ', value: 'CONTACTING' },
+                { label: 'Đã chuyển đổi', value: 'CONVERTED' },
+                { label: 'Ngừng chăm sóc', value: 'DROPPED' }
+              ]} 
+              {...register('status')} 
+              error={errors.status?.message} 
+            />
+
+            <TextInput label="Doanh số dự kiến (*)" type="number" {...register('expectedRevenue')} error={errors.expectedRevenue?.message} />
+
+            {/* Hàng 3: Tỉnh thành, Nguồn, Nhóm bán hàng */}
             <SelectBox 
               label="Tỉnh / Thành phố" 
               options={[
@@ -260,25 +253,36 @@ const onSubmit: SubmitHandler<LeadFormValues> = async (data) => {
               {...register('salesGroupId')} 
               error={errors.salesGroupId?.message} 
             />
-          </div>
 
-          <div className="grid grid-cols-2 gap-3 mt-3">
-            <SelectBox 
-              label="Trạng thái (*)" 
-              options={[
-                { label: 'Mới nhận', value: 'NEW' },
-                { label: 'Đang liên hệ', value: 'CONTACTING' },
-                { label: 'Đã chuyển đổi', value: 'CONVERTED' },
-                { label: 'Ngừng chăm sóc', value: 'DROPPED' }
-              ]} 
-              {...register('status')} 
-              error={errors.status?.message} 
-            />
-            <TextInput label="Doanh số dự kiến (*)" type="number" {...register('expectedRevenue')} error={errors.expectedRevenue?.message} />
+            {/* Hàng 4: SP quan tâm & CCCD/MST toggle */}
+            <div className="md:col-span-2">
+              <TextInput label="Sản phẩm quan tâm (*)" {...register('serviceInterest')} error={errors.serviceInterest?.message} />
+            </div>
+            
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowSensitiveInfo(!showSensitiveInfo)}
+                className="w-full mt-7 py-2.5 bg-gray-50 hover:bg-gray-100 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg transition-all"
+              >
+                {showSensitiveInfo ? "🙈 Ẩn CCCD / MST" : "👁️ Điền CCCD / MST"}
+              </button>
+            </div>
+
+            {/* Vùng thông tin bảo mật */}
+            {showSensitiveInfo && (
+              <div className="md:col-span-3 grid grid-cols-2 gap-4 bg-amber-50/30 p-4 rounded-xl border border-amber-200/50">
+                <TextInput label="Mã số thuế (*)" {...register('taxCode')} error={errors.taxCode?.message} />
+                <TextInput label="Số CCCD (*)" {...register('idCard')} error={errors.idCard?.message} />
+              </div>
+            )}
+
+            {/* Ghi chú */}
+            <div className="md:col-span-3">
+              <TextInput label="Ghi chú (*)" {...register('note')} error={errors.note?.message} />
+            </div>
+
           </div>
-          
-          <TextInput label="Sản phẩm quan tâm (*)" {...register('serviceInterest')} error={errors.serviceInterest?.message} />
-          <TextInput label="Ghi chú (*)" {...register('note')} error={errors.note?.message} />
         </div>
 
         <div className="flex justify-end space-x-2 mt-4 pt-4 border-t border-gray-200 shrink-0">

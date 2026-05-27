@@ -21,7 +21,7 @@ public class UpdateCustomerInteractor
 
     @Override
     public CustomerOutput execute(
-            Long id,
+            Integer id,
             UpdateCustomerInput input
     ) {
 

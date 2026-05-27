@@ -43,17 +43,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
       // 3. XỬ LÝ PHÂN QUYỀN CHO TÀI KHOẢN ADMIN
       if (user.role === 'admin') {
-        // Admin chỉ được phép vào trang quản lý người dùng `/crm/users`
-        if (pathname === '/crm/users') {
-          setHasPermission(true);
-        } else if (pathname === '/' || pathname === '/dashboard') {
-          // Tự động chuyển hướng Admin từ trang chủ về trang quản lý người dùng
-          router.push('/crm/users');
-          setHasPermission(true);
-        } else {
-          setHasPermission(false);
-          setDenialReason('Tài khoản Quản trị viên (Admin) chỉ được phép truy cập chức năng Quản lý tài khoản & Phân quyền.');
-        }
+        // Admin được toàn quyền truy cập tất cả các trang hệ thống
+        setHasPermission(true);
         return;
       }
 
@@ -98,6 +89,30 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           if (!userPerms.includes('CUSTOMERS_VIEW')) {
             setHasPermission(false);
             setDenialReason('Tài khoản của bạn không có quyền xem Danh sách Khách hàng. Vui lòng liên hệ Quản trị viên.');
+            return;
+          }
+        }
+
+        if (pathname === '/crm/lead') {
+          if (!userPerms.includes('LEADS_VIEW')) {
+            setHasPermission(false);
+            setDenialReason('Tài khoản của bạn không có quyền xem Phân hệ Quản lý Lead. Vui lòng liên hệ Quản trị viên.');
+            return;
+          }
+        }
+
+        if (pathname === '/crm/quotes') {
+          if (!userPerms.includes('QUOTES_VIEW')) {
+            setHasPermission(false);
+            setDenialReason('Tài khoản của bạn không có quyền xem Phân hệ Quản lý Báo giá. Vui lòng liên hệ Quản trị viên.');
+            return;
+          }
+        }
+
+        if (pathname === '/crm/contracts') {
+          if (!userPerms.includes('CONTRACTS_VIEW')) {
+            setHasPermission(false);
+            setDenialReason('Tài khoản của bạn không có quyền xem Phân hệ Quản lý Hợp đồng. Vui lòng liên hệ Quản trị viên.');
             return;
           }
         }
@@ -183,6 +198,12 @@ export default function AuthGuard({ children }: AuthGuardProps) {
                   router.push('/crm/documents');
                 } else if (perms.includes('CUSTOMERS_VIEW')) {
                   router.push('/crm/customers');
+                } else if (perms.includes('LEADS_VIEW')) {
+                  router.push('/crm/lead');
+                } else if (perms.includes('QUOTES_VIEW')) {
+                  router.push('/crm/quotes');
+                } else if (perms.includes('CONTRACTS_VIEW')) {
+                  router.push('/crm/contracts');
                 } else {
                   router.push('/dashboard');
                 }

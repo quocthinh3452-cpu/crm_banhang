@@ -12,7 +12,8 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  ChevronRight
+  ChevronRight,
+  Briefcase
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -41,6 +42,13 @@ const Sidebar = () => {
     if (session) {
       try {
         setCurrentUser(JSON.parse(session));
+        
+        // Auto open submenu containing current path
+        if (pathname) {
+          if (pathname.startsWith('/crm/products') || pathname.startsWith('/crm/product-types')) {
+            setOpenSubmenu('Sản phẩm');
+          }
+        }
       } catch (e) {
         console.error('Lỗi khi đọc session:', e);
       }
@@ -65,7 +73,24 @@ const Sidebar = () => {
 
     if (currentUser.role === 'admin') {
       return [
-        { name: 'Quản lý người dùng', path: '/crm/users', icon: Users }
+        { name: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard },
+        { name: 'Quản lý người dùng', path: '/crm/users', icon: Users },
+        { name: 'Quản lý Lead', path: '/crm/lead', icon: Briefcase },
+        { name: 'Khách hàng', path: '/crm/customers', icon: Users },
+        { name: 'Quản lý báo giá', path: '/crm/quotes', icon: FileText },
+        { name: 'Quản lý hợp đồng', path: '/crm/contracts', icon: FileSignature },
+        {
+          name: 'Sản phẩm',
+          path: '/crm/products',
+          icon: ShoppingCart,
+          children: [
+            { name: 'Danh sách sản phẩm', path: '/crm/products' },
+            { name: 'Loại sản phẩm', path: '/crm/product-types' }
+          ]
+        },
+        { name: 'Tài liệu', path: '/crm/documents', icon: FileText },
+        { name: 'Báo cáo', path: '/reports', icon: BarChart3 },
+        { name: 'Cài đặt', path: '/settings', icon: Settings },
       ];
     }
 
@@ -76,6 +101,10 @@ const Sidebar = () => {
     items.push({ name: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard });
 
     // Các menu phân quyền
+    if (perms.includes('LEADS_VIEW')) {
+      items.push({ name: 'Quản lý Lead', path: '/crm/lead', icon: Briefcase });
+    }
+
     if (perms.includes('CUSTOMERS_VIEW')) {
       items.push({ name: 'Khách hàng', path: '/crm/customers', icon: Users });
     }
@@ -145,7 +174,53 @@ const Sidebar = () => {
         <ul className="space-y-1.5">
           {finalMenuItems.map((item, index) => {
             const Icon = item.icon || LayoutDashboard;
-            const isActive = pathname === item.path || pathname?.startsWith(item.path + '/');
+            const hasChildren = item.children && item.children.length > 0;
+            const isSubmenuOpen = openSubmenu === item.name;
+            const isParentActive = hasChildren && item.children.some((child: any) => pathname === child.path);
+            const isActive = !hasChildren && (pathname === item.path || pathname?.startsWith(item.path + '/'));
+
+            if (hasChildren) {
+              return (
+                <li key={index} className="space-y-1">
+                  <button
+                    onClick={() => handleToggleSubmenu(item.name)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group cursor-pointer text-left ${
+                      isParentActive 
+                        ? 'bg-slate-800 text-white font-semibold' 
+                        : 'hover:bg-slate-800 hover:text-slate-100 text-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className={`w-5 h-5 ${isParentActive ? 'text-blue-500' : 'text-slate-400 group-hover:text-slate-200'}`} />
+                      <span className="font-medium text-sm">{item.name}</span>
+                    </div>
+                    <ChevronRight className={`w-4 h-4 text-slate-400 group-hover:text-slate-200 transition-transform duration-200 ${isSubmenuOpen ? 'rotate-90 text-slate-200' : ''}`} />
+                  </button>
+                  
+                  {isSubmenuOpen && (
+                    <ul className="ml-5 pl-4 border-l border-slate-800 space-y-1 mt-1">
+                      {item.children.map((child: any, idx: number) => {
+                        const isChildActive = pathname === child.path;
+                        return (
+                          <li key={idx}>
+                            <Link
+                              href={child.path}
+                              className={`flex items-center px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
+                                isChildActive
+                                  ? 'bg-blue-600 text-white shadow-sm'
+                                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
+                              }`}
+                            >
+                              {child.name}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </li>
+              );
+            }
 
             return (
               <li key={index}>

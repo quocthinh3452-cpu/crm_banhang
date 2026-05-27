@@ -8,7 +8,7 @@ import lombok.Data;
 
 public class CustomerOutput {
 
-    private Long id;
+    private Integer id;
 
     private String customerCode;
 

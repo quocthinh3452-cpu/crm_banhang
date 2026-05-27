@@ -153,200 +153,194 @@ export default function CustomerForm({
         handleFormSubmit
       )}
       onKeyDown={handleFormKeyDown}
-      className="space-y-6"
+      className="space-y-4"
     >
-      {/* Name */}
-      <div>
-        <label className="block text-sm font-medium text-slate-200 mb-2">
-          Tên khách hàng *
-        </label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+        {/* Name */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-slate-200 mb-1.5">
+            Tên khách hàng *
+          </label>
+          <input
+            type="text"
+            placeholder="Nhập tên khách hàng"
+            autoFocus
+            {...register('name', {
+              required: 'Tên khách hàng là bắt buộc',
+            })}
+            disabled={
+              isSubmitting || loading
+            }
+            onKeyDown={handleEnterKey}
+            className={inputClass}
+          />
+          {errors.name ? (
+            <p className="mt-1 text-sm text-rose-400">
+              {errors.name.message}
+            </p>
+          ) : null}
+        </div>
 
-        <input
-          type="text"
-          placeholder="Nhập tên khách hàng"
-          autoFocus
-          {...register('name', {
-            required: 'Tên khách hàng là bắt buộc',
-          })}
-          disabled={
-            isSubmitting || loading
-          }
-          onKeyDown={handleEnterKey}
-          className={inputClass}
-        />
-        {errors.name ? (
-          <p className="mt-2 text-sm text-rose-400">
-            {errors.name.message}
-          </p>
-        ) : null}
-      </div>
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-medium text-slate-200 mb-1.5">
+            Email *
+          </label>
+          <input
+            type="email"
+            placeholder="abc@gmail.com"
+            {...register('email', {
+              required: 'Email là bắt buộc',
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: 'Email không hợp lệ',
+              },
+            })}
+            disabled={
+              isSubmitting || loading
+            }
+            onKeyDown={handleEnterKey}
+            className={inputClass}
+          />
+          {errors.email ? (
+            <p className="mt-1 text-sm text-rose-400">
+              {errors.email.message}
+            </p>
+          ) : null}
+        </div>
 
-      {/* Email */}
-      <div>
-        <label className="block text-sm font-medium text-slate-200 mb-2">
-          Email *
-        </label>
+        {/* Phone */}
+        <div>
+          <label className="block text-sm font-medium text-slate-200 mb-1.5">
+            Điện thoại
+          </label>
+          <input
+            type="text"
+            placeholder="0912345678"
+            {...register('phone', {
+              pattern: {
+                value: /^[0-9+\s()-]*$/,
+                message: 'Số điện thoại không hợp lệ',
+              },
+            })}
+            disabled={
+              isSubmitting || loading
+            }
+            onKeyDown={handleEnterKey}
+            className={inputClass}
+          />
+          {errors.phone ? (
+            <p className="mt-1 text-sm text-rose-400">
+              {errors.phone.message}
+            </p>
+          ) : null}
+        </div>
 
-        <input
-          type="email"
-          placeholder="abc@gmail.com"
-          {...register('email', {
-            required: 'Email là bắt buộc',
-            pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: 'Email không hợp lệ',
-            },
-          })}
-          disabled={
-            isSubmitting || loading
-          }
-          onKeyDown={handleEnterKey}
-          className={inputClass}
-        />
-        {errors.email ? (
-          <p className="mt-2 text-sm text-rose-400">
-            {errors.email.message}
-          </p>
-        ) : null}
-      </div>
+        {/* Type */}
+        <div>
+          <label className="block text-sm font-medium text-slate-200 mb-1.5">
+            Loại khách hàng *
+          </label>
+          <select
+            {...register('type')}
+            onKeyDown={handleEnterKey}
+            className={inputClass}
+          >
+            {CUSTOMER_TYPES.map(
+              (type) => (
+                <option
+                  key={type.value}
+                  value={type.value}
+                >
+                  {type.label}
+                </option>
+              )
+            )}
+          </select>
+        </div>
 
-      {/* Phone */}
-      <div>
-        <label className="block text-sm font-medium text-slate-200 mb-2">
-          Điện thoại
-        </label>
+        {/* Tier */}
+        <div>
+          <label className="block text-sm font-medium text-slate-200 mb-1.5">
+            Hạng khách hàng *
+          </label>
+          <select
+            {...register('tier')}
+            onKeyDown={handleEnterKey}
+            className={inputClass}
+          >
+            {CUSTOMER_TIERS.map(
+              (tier) => (
+                <option
+                  key={tier.value}
+                  value={tier.value}
+                >
+                  {tier.label}
+                </option>
+              )
+            )}
+          </select>
+        </div>
 
-        <input
-          type="text"
-          placeholder="0912345678"
-          {...register('phone', {
-            pattern: {
-              value: /^[0-9+\s()-]*$/,
-              message: 'Số điện thoại không hợp lệ',
-            },
-          })}
-          disabled={
-            isSubmitting || loading
-          }
-          onKeyDown={handleEnterKey}
-          className={inputClass}
-        />
-        {errors.phone ? (
-          <p className="mt-2 text-sm text-rose-400">
-            {errors.phone.message}
-          </p>
-        ) : null}
-      </div>
+        {/* Status */}
+        <div>
+          <label className="block text-sm font-medium text-slate-200 mb-1.5">
+            Trạng thái *
+          </label>
+          <select
+            {...register('status')}
+            onKeyDown={handleEnterKey}
+            className={inputClass}
+          >
+            {CUSTOMER_STATUSES.map(
+              (status) => (
+                <option
+                  key={status.value}
+                  value={status.value}
+                >
+                  {status.label}
+                </option>
+              )
+            )}
+          </select>
+        </div>
 
-      {/* Type */}
-      <div>
-        <label className="block text-sm font-medium text-slate-200 mb-2">
-          Loại khách hàng *
-        </label>
+        {/* Budget */}
+        <div>
+          <label className="block text-sm font-medium text-slate-200 mb-1.5">
+            Ngân sách
+          </label>
+          <input
+            type="number"
+            {...register('budget', {
+              valueAsNumber: true,
+              min: {
+                value: 0,
+                message: 'Ngân sách không được âm',
+              },
+            })}
+            onKeyDown={handleEnterKey}
+            className={inputClass}
+          />
+          {errors.budget ? (
+            <p className="mt-1 text-sm text-rose-400">
+              {errors.budget.message}
+            </p>
+          ) : null}
+        </div>
 
-        <select
-          {...register('type')}
-          onKeyDown={handleEnterKey}
-          className={inputClass}
-        >
-          {CUSTOMER_TYPES.map(
-            (type) => (
-              <option
-                key={type.value}
-                value={type.value}
-              >
-                {type.label}
-              </option>
-            )
-          )}
-        </select>
-      </div>
-
-      {/* Tier */}
-      <div>
-        <label className="block text-sm font-medium text-slate-200 mb-2">
-          Hạng khách hàng *
-        </label>
-
-        <select
-          {...register('tier')}
-          onKeyDown={handleEnterKey}
-          className={inputClass}
-        >
-          {CUSTOMER_TIERS.map(
-            (tier) => (
-              <option
-                key={tier.value}
-                value={tier.value}
-              >
-                {tier.label}
-              </option>
-            )
-          )}
-        </select>
-      </div>
-
-      {/* Status */}
-      <div>
-        <label className="block text-sm font-medium text-slate-200 mb-2">
-          Trạng thái *
-        </label>
-
-        <select
-          {...register('status')}
-          onKeyDown={handleEnterKey}
-          className={inputClass}
-        >
-          {CUSTOMER_STATUSES.map(
-            (status) => (
-              <option
-                key={status.value}
-                value={status.value}
-              >
-                {status.label}
-              </option>
-            )
-          )}
-        </select>
-      </div>
-
-      {/* Budget */}
-      <div>
-        <label className="block text-sm font-medium text-slate-200 mb-2">
-          Ngân sách
-        </label>
-
-        <input
-          type="number"
-          {...register('budget', {
-            valueAsNumber: true,
-            min: {
-              value: 0,
-              message: 'Ngân sách không được âm',
-            },
-          })}
-          onKeyDown={handleEnterKey}
-          className={inputClass}
-        />
-        {errors.budget ? (
-          <p className="mt-2 text-sm text-rose-400">
-            {errors.budget.message}
-          </p>
-        ) : null}
-      </div>
-
-      {/* Notes */}
-      <div>
-        <label className="block text-sm font-medium text-slate-200 mb-2">
-          Ghi chú
-        </label>
-
-        <textarea
-          rows={5}
-          {...register('notes')}
-          onKeyDown={handleEnterKey}
-          className={inputClass}
-        />
+        {/* Notes */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-slate-200 mb-1.5">
+            Ghi chú
+          </label>
+          <textarea
+            rows={3}
+            {...register('notes')}
+            onKeyDown={handleEnterKey}
+            className={inputClass}
+          />
+        </div>
       </div>
 
       {!hideActions ? (

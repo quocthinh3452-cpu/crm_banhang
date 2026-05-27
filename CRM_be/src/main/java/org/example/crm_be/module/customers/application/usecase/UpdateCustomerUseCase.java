@@ -6,7 +6,7 @@ import org.example.crm_be.module.customers.application.dto.output.CustomerOutput
 public interface UpdateCustomerUseCase {
 
     CustomerOutput execute(
-            Long id,
+            Integer id,
             UpdateCustomerInput input
     );
 }

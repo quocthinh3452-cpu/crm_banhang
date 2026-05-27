@@ -25,6 +25,12 @@ const SYSTEM_PERMISSIONS = [
   { code: 'DOCUMENTS_MANAGE', label: 'Thêm/Sửa/Xóa tài liệu' },
   { code: 'CUSTOMERS_VIEW', label: 'Xem khách hàng' },
   { code: 'CUSTOMERS_MANAGE', label: 'Thêm/Sửa/Xóa khách hàng' },
+  { code: 'LEADS_VIEW', label: 'Xem Leads' },
+  { code: 'LEADS_MANAGE', label: 'Thêm/Sửa/Xóa Leads' },
+  { code: 'QUOTES_VIEW', label: 'Xem Báo giá' },
+  { code: 'QUOTES_MANAGE', label: 'Thêm/Sửa/Xóa Báo giá' },
+  { code: 'CONTRACTS_VIEW', label: 'Xem Hợp đồng' },
+  { code: 'CONTRACTS_MANAGE', label: 'Thêm/Sửa/Xóa Hợp đồng' },
 ];
 
 // Zod Schema cho user validation
@@ -53,9 +59,11 @@ export default function UsersPage() {
   // State quản lý các checkbox quyền được chọn
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
 
-  const { register, handleSubmit, formState: { errors }, reset, setError } = useForm<UserFormValues>({
+  const { register, handleSubmit, formState: { errors }, reset, setError, watch } = useForm<UserFormValues>({
     resolver: zodResolver(userSchema) as any,
   });
+
+  const selectedRole = watch('role');
 
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -317,16 +325,18 @@ export default function UsersPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingUser ? "Chỉnh sửa người dùng & Phân quyền" : "Tạo tài khoản người dùng mới"}
+        size="5xl"
       >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-2">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
           
           {/* Thông tin cơ bản */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-1">
             <TextInput
               label="Họ và tên"
               placeholder="VD: Nguyễn Văn A"
               {...register('name')}
               error={errors.name?.message}
+              containerClassName="mb-1"
             />
 
             <TextInput
@@ -335,6 +345,7 @@ export default function UsersPage() {
               {...register('email')}
               error={errors.email?.message}
               disabled={!!editingUser} // Không cho phép đổi Email đối với tài khoản cũ để tránh lỗi dữ liệu
+              containerClassName="mb-1"
             />
 
             <TextInput
@@ -343,6 +354,7 @@ export default function UsersPage() {
               placeholder="••••••••"
               {...register('password')}
               error={errors.password?.message}
+              containerClassName="mb-1"
             />
 
             <SelectBox
@@ -355,6 +367,7 @@ export default function UsersPage() {
               {...register('role')}
               error={errors.role?.message}
               disabled={editingUser?.email === loggedInUser?.email} // Không tự sửa vai trò của mình để tránh mất quyền quản trị
+              containerClassName="mb-1"
             />
 
             {editingUser && (
@@ -367,52 +380,54 @@ export default function UsersPage() {
                 {...register('isActive')}
                 error={errors.isActive?.message}
                 disabled={editingUser.email === loggedInUser?.email} // Không tự khóa chính mình
+                containerClassName="mb-1"
               />
             )}
           </div>
 
           {/* Khu vực phân quyền chi tiết (Chỉ hiển thị nếu vai trò không phải Admin) */}
-          <div className="border-t border-gray-150 pt-4">
-            <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-1.5">
-              <KeyRound className="w-4 h-4 text-blue-600" />
-              Cấp quyền hạn nghiệp vụ cho thành viên
-            </h4>
+          {selectedRole !== 'admin' && (
+            <div className="border-t border-gray-150 pt-3">
+              <h4 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-1.5">
+                <KeyRound className="w-4 h-4 text-blue-600" />
+                Cấp quyền hạn nghiệp vụ cho thành viên
+              </h4>
 
-            {/* Nếu vai trò chọn là Admin, thông báo tự động cấp toàn quyền */}
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <label className="flex items-center gap-2 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Danh sách quyền hạn chi tiết
-              </label>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                {SYSTEM_PERMISSIONS.map((perm) => {
-                  const isChecked = selectedPermissions.includes(perm.code);
-                  
-                  return (
-                    <label 
-                      key={perm.code} 
-                      className={`flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer select-none transition-all ${
-                        isChecked 
-                          ? 'bg-blue-50/50 border-blue-200 text-blue-900 shadow-sm' 
-                          : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={(e) => handlePermissionChange(perm.code, e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                      />
-                      <span className="text-xs font-medium">{perm.label}</span>
-                    </label>
-                  );
-                })}
+              <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                <label className="flex items-center gap-2 mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Danh sách quyền hạn chi tiết
+                </label>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                  {SYSTEM_PERMISSIONS.map((perm) => {
+                    const isChecked = selectedPermissions.includes(perm.code);
+                    
+                    return (
+                      <label 
+                        key={perm.code} 
+                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer select-none transition-all ${
+                          isChecked 
+                            ? 'bg-blue-50/50 border-blue-200 text-blue-900 shadow-sm' 
+                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => handlePermissionChange(perm.code, e.target.checked)}
+                          className="w-3.5 h-3.5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                        />
+                        <span className="text-[11px] font-medium leading-tight">{perm.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Các nút điều hướng form */}
-          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+          <div className="flex justify-end gap-3 mt-4 pt-3 border-t border-gray-100">
             <Button variant="secondary" type="button" onClick={() => setIsModalOpen(false)}>
               Hủy bỏ
             </Button>

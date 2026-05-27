@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/shared/components/ui/Button';
 import { Skeleton } from '@/shared/components/ui/Skeleton';
 import { Modal } from '@/shared/components/ui/Modal';
+import { Pagination } from '@/shared/components/ui/Pagination';
 import { formatCurrency } from '@/shared/utils/formatters';
 import { Lead, leadApi } from '../services/leadApi';
 
@@ -145,12 +146,14 @@ export const LeadTable: React.FC<LeadTableProps> = ({
         </div>
       </Modal>
 
-      {/* Phần phân trang */}
+      {/* Phân trang đồng nhất */}
       {!isLoading && leads.length > 0 && (
-        <div className="flex justify-end mt-6 mb-4 space-x-1">
-          <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1} className="w-8 h-8 border rounded disabled:opacity-50 hover:bg-gray-50">{'<'}</button>
-          <div className="px-3 py-1 text-sm font-medium">Trang {currentPage} / {totalPages}</div>
-          <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= totalPages} className="w-8 h-8 border rounded disabled:opacity-50 hover:bg-gray-50">{'>'}</button>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-3">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
         </div>
       )}
     </div>

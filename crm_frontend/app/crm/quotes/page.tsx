@@ -446,15 +446,13 @@ export default function QuoteManagementPage() {
 
         {/* Thông tin Phân trang */}
         {!isLoading && quotes.length > 0 && (
-          <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-200/80 flex justify-between items-center text-sm text-slate-500">
-            <div>
-              Trang <span className="font-semibold text-slate-900">{page + 1}</span> / <span>{totalPages}</span>
-              {' '}(Tổng <span className="font-semibold text-slate-900">{totalElements}</span> báo giá)
-            </div>
-            <Pagination 
-              currentPage={page + 1} 
-              totalPages={totalPages} 
-              onPageChange={(p) => setPage(p - 1)} 
+          <div className="px-6 py-3 bg-slate-50/50 border-t border-slate-200/80">
+            <Pagination
+              currentPage={page + 1}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageSize={10}
+              onPageChange={(p) => setPage(p - 1)}
             />
           </div>
         )}

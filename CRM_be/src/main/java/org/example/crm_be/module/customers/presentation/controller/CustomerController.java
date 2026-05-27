@@ -34,7 +34,7 @@ public class CustomerController {
 
     @PutMapping("/{id}")
     public CustomerOutput update(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @RequestBody UpdateCustomerInput input
     ) {
         return updateCustomerUseCase.execute(id, input);

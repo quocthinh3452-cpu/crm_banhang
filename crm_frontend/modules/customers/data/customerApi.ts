@@ -20,7 +20,7 @@ export const customerApi = {
    * Get all customers with pagination and filters
    */
   getCustomers: async (params?: CustomerListParams): Promise<CustomerListResponse> => {
-    const response: AxiosResponse<CustomerListResponse | Customer[]> = await axiosClient.get(
+    const response: any = await axiosClient.get(
       API_BASE,
       {
         params: {
@@ -36,7 +36,7 @@ export const customerApi = {
       }
     );
 
-    const payload = response.data;
+    const payload = response;
 
     if (Array.isArray(payload)) {
       return {
@@ -55,27 +55,31 @@ export const customerApi = {
    * Get single customer by ID
    */
   getCustomerById: async (id: string | number): Promise<Customer> => {
-    return await axiosClient
-      .get<Customer>(`${API_BASE}/${id}`)
-      .then((response) => response.data);
+    return await axiosClient.get(`${API_BASE}/${id}`);
   },
 
   /**
    * Create new customer
    */
   createCustomer: async (data: CreateCustomerInput): Promise<Customer> => {
-    return await axiosClient
-      .post<Customer>(API_BASE, data)
-      .then((response) => response.data);
+    const sanitizedData = {
+      ...data,
+      budget: (data.budget === undefined || data.budget === null || isNaN(data.budget)) ? null : Number(data.budget),
+      note: data.notes || '', // Map notes (frontend) to note (backend CreateCustomerInput DTO)
+    };
+    return await axiosClient.post(API_BASE, sanitizedData);
   },
 
   /**
    * Update existing customer
    */
   updateCustomer: async (id: string | number, data: UpdateCustomerInput): Promise<Customer> => {
-    return await axiosClient
-      .put<Customer>(`${API_BASE}/${id}`, data)
-      .then((response) => response.data);
+    const sanitizedData = {
+      ...data,
+      budget: (data.budget === undefined || data.budget === null || isNaN(data.budget)) ? null : Number(data.budget),
+      note: data.notes || '', // Map notes (frontend) to note (backend UpdateCustomerInput DTO)
+    };
+    return await axiosClient.put(`${API_BASE}/${id}`, sanitizedData);
   },
 
   /**
@@ -89,6 +93,8 @@ export const customerApi = {
    * Bulk delete customers
    */
   bulkDeleteCustomers: async (ids: (string | number)[]): Promise<void> => {
-    await axiosClient.post(`${API_BASE}/bulk-delete`, { ids });
+    await Promise.all(
+      ids.map((id) => axiosClient.delete(`${API_BASE}/${id}`))
+    );
   },
 };

@@ -5,7 +5,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
+@Entity(name = "CommonProductDbEntity")
 @Table(name = "products")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class ProductDbEntity {

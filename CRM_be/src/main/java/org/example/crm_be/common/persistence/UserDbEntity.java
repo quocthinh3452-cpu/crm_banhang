@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity
+@Entity(name = "CommonUserDbEntity")
 @Table(name = "users")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class UserDbEntity {

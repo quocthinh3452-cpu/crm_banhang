@@ -11,7 +11,7 @@ public interface CustomerRepository {
 
     List<Customer> findAll();
 
-    Optional<Customer> findById(Long id);
+    Optional<Customer> findById(Integer id);
 
-    void deleteById(Long id);
+    void deleteById(Integer id);
 }

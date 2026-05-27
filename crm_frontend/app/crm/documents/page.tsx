@@ -333,7 +333,7 @@ export default function DocumentsPage() {
                                         <td className="p-4 text-center">
                                             {item.filePath ? (
                                                 <a
-                                                    href={`http://localhost:8080${item.filePath}`}
+                                                    href={`http://localhost:8081${item.filePath}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-sky-100 text-sky-700 hover:bg-sky-200 transition-colors"
@@ -371,6 +371,8 @@ export default function DocumentsPage() {
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}
+                    totalElements={filteredDocs.length}
+                    pageSize={itemsPerPage}
                     onPageChange={(p) => setCurrentPage(p)}
                 />
             )}
@@ -380,61 +382,64 @@ export default function DocumentsPage() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 title={editingDocument ? "Chỉnh sửa tài liệu" : "Tải lên tài liệu mới"}
+                size="lg"
             >
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <TextInput
-                            label="Tên tài liệu"
-                            placeholder="VD: Hợp đồng đại lý..."
-                            {...register('name')}
-                            error={errors.name?.message}
-                        />
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+                    <div className="space-y-4 overflow-y-auto max-h-[58vh] pr-2 pb-2 mt-2">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <TextInput
+                                label="Tên tài liệu"
+                                placeholder="VD: Hợp đồng đại lý..."
+                                {...register('name')}
+                                error={errors.name?.message}
+                            />
 
-                        <TextInput
-                            label="Loại tài liệu"
-                            placeholder="VD: Hợp đồng, Biểu mẫu..."
-                            {...register('type')}
-                            error={errors.type?.message}
-                        />
+                            <TextInput
+                                label="Loại tài liệu"
+                                placeholder="VD: Hợp đồng, Biểu mẫu..."
+                                {...register('type')}
+                                error={errors.type?.message}
+                            />
 
-                        <TextInput
-                            label="Phiên bản"
-                            placeholder="VD: v1.0"
-                            {...register('version')}
-                            error={errors.version?.message}
-                        />
+                            <TextInput
+                                label="Phiên bản"
+                                placeholder="VD: v1.0"
+                                {...register('version')}
+                                error={errors.version?.message}
+                            />
 
-                        <TextInput
-                            label="Ngày phát hành"
-                            type="date"
-                            {...register('releaseDate')}
-                            error={errors.releaseDate?.message}
-                        />
+                            <TextInput
+                                label="Ngày phát hành"
+                                type="date"
+                                {...register('releaseDate')}
+                                error={errors.releaseDate?.message}
+                            />
 
-                        <TextInput
-                            label="Ngày hết hạn"
-                            type="date"
-                            {...register('expiryDate')}
-                            error={errors.expiryDate?.message}
-                        />
-                    </div>
+                            <TextInput
+                                label="Ngày hết hạn"
+                                type="date"
+                                {...register('expiryDate')}
+                                error={errors.expiryDate?.message}
+                            />
+                        </div>
 
-                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Tệp đính kèm {!editingDocument && <span className="text-red-500">*</span>}
-                        </label>
-                        <input
-                            key={isModalOpen ? 'open' : 'closed'}
-                            type="file"
-                            {...register('file')}
-                            className="block w-full text-sm text-gray-500 
-                                       file:mr-4 file:py-2 file:px-4 
-                                       file:rounded-md file:border-0 
-                                       file:text-sm file:font-semibold 
-                                       file:bg-sky-100 file:text-sky-700 
-                                       hover:file:bg-sky-200 cursor-pointer"
-                        />
-                        <p className="text-xs text-gray-400 mt-2">Định dạng hỗ trợ: PDF, DOCX, XLSX, JPG, PNG. Dung lượng tối đa 10MB.</p>
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Tệp đính kèm {!editingDocument && <span className="text-red-500">*</span>}
+                            </label>
+                            <input
+                                key={isModalOpen ? 'open' : 'closed'}
+                                type="file"
+                                {...register('file')}
+                                className="block w-full text-sm text-gray-500 
+                                           file:mr-4 file:py-2 file:px-4 
+                                           file:rounded-md file:border-0 
+                                           file:text-sm file:font-semibold 
+                                           file:bg-sky-100 file:text-sky-700 
+                                           hover:file:bg-sky-200 cursor-pointer"
+                            />
+                            <p className="text-xs text-gray-400 mt-2">Định dạng hỗ trợ: PDF, DOCX, XLSX, JPG, PNG. Dung lượng tối đa 10MB.</p>
+                        </div>
                     </div>
 
                     <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">

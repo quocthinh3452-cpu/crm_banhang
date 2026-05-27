@@ -6,14 +6,15 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string; // Nhận message lỗi từ Zod
   hint?: string;
+  containerClassName?: string;
 }
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
-  ({ label, error, hint, className = '', id, ...props }, ref) => {
+  ({ label, error, hint, className = '', id, containerClassName = 'mb-4', ...props }, ref) => {
     const inputId = id || props.name;
 
     return (
-      <div className="w-full flex flex-col mb-4">
+      <div className={`w-full flex flex-col ${containerClassName}`}>
         <label htmlFor={inputId} className="mb-1 text-sm font-medium text-gray-700">
           {label} {props.required && <span className="text-red-500">*</span>}
         </label>

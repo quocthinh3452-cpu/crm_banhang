@@ -18,7 +18,7 @@ export const getProductsUseCase = async (filters: ProductFilters) => {
 
     // 3. BẢO VỆ DỮ LIỆU
     const rawItems = data?.items || [];
-    const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8080';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8081';
 
     // 4. FORMAT DỮ LIỆU (Data Transformation)
     const formattedItems = rawItems.map((item: any) => ({
@@ -34,9 +34,10 @@ export const getProductsUseCase = async (filters: ProductFilters) => {
       formattedUpdatedAt: item.updatedAt ? new Date(item.updatedAt).toLocaleString('vi-VN') : '---',
       
       // Xử lý URL ảnh tập trung
+      // imageUrl đã là đường dẫn đầy đủ như: /uploads/products/abc.jpg
       fullImageUrl: item.imageUrl 
-        ? `${API_URL}/uploads/${item.imageUrl}` 
-        : 'https://placehold.co/100x100?text=No+Image'
+        ? `${API_URL}${item.imageUrl}` 
+        : null
     }));
 
     // 5. Trả về cấu trúc chuẩn

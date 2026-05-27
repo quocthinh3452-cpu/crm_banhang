@@ -30,12 +30,12 @@ public class CustomerRepositoryImpl
     }
 
     @Override
-    public Optional<Customer> findById(Long id) {
+    public Optional<Customer> findById(Integer id) {
         return jpaRepository.findById(id);
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(Integer id) {
         jpaRepository.deleteById(id);
     }
 }

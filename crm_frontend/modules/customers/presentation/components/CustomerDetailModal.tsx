@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
@@ -47,14 +47,15 @@ export default function CustomerDetailModal({
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <motion.div
-        initial={{ opacity: 0, y: 24, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 24, scale: 0.98 }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
-        className="w-full max-w-6xl rounded-[32px] border border-slate-700 bg-slate-900 shadow-2xl shadow-black/40"
-      >
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      showDefaultHeader={false}
+      customPadding="p-0"
+      maxWidth="max-w-6xl"
+      className="!bg-slate-900 !rounded-[32px] border border-slate-700 shadow-2xl shadow-black/40"
+    >
+      <div className="w-full flex flex-col max-h-[90vh]">
         <div className="sticky top-0 z-30 border-b border-slate-700/70 bg-slate-950/95 backdrop-blur-xl">
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
@@ -115,7 +116,7 @@ export default function CustomerDetailModal({
           </div>
         </div>
 
-        <div className="max-h-[78vh] overflow-y-auto p-6">
+        <div className="max-h-[55vh] overflow-y-auto p-6">
           <div className="rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-sm">
             {children}
           </div>
@@ -141,7 +142,7 @@ export default function CustomerDetailModal({
             </button>
           </div>
         </div>
-      </motion.div>
+      </div>
     </Modal>
   );
 }
