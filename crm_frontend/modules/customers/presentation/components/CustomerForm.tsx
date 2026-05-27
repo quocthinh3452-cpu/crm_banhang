@@ -41,7 +41,7 @@ export default function CustomerForm({
   const isEditMode = !!customer;
 
   const inputClass =
-    'w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20';
+    'w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20';
 
   const {
     register,

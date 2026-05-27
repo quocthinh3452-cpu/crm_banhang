@@ -39,14 +39,22 @@ export const customerApi = {
     const payload = response;
 
     if (Array.isArray(payload)) {
-      return {
-        data: payload,
-        total: payload.length,
-        page: params?.page || 1,
-        pageSize: params?.pageSize || 10,
-        totalPages: 1,
-      };
-    }
+  const page = params?.page || 1;
+  const pageSize = params?.pageSize || 10;
+
+  const filteredData = payload;
+
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+
+  return {
+    data: filteredData.slice(start, end),
+    total: filteredData.length,
+    page,
+    pageSize,
+    totalPages: Math.ceil(filteredData.length / pageSize),
+  };
+}
 
     return payload;
   },

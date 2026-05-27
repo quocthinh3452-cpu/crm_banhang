@@ -51,6 +51,22 @@ export default function CustomerFilters({
   // Only call onFilterChange when the effective filter values actually change.
   const prevRef = React.useRef<Partial<CustomerListParams> | null>(null);
 
+  const handleReset = () => {
+  setSearch('');
+  setType(undefined);
+  setTier(undefined);
+  setStatus(undefined);
+
+  onReset?.();
+
+  onFilterChange({
+    search: '',
+    type: undefined,
+    tier: undefined,
+    status: undefined,
+  });
+};
+
   React.useEffect(() => {
     const next: Partial<CustomerListParams> = {
       search: debouncedSearch,
@@ -82,113 +98,152 @@ export default function CustomerFilters({
   }, [debouncedSearch, type, tier, status, onFilterChange]);
 
   return (
-    <div className="bg-slate-800 p-4 rounded-xl mb-6 border border-slate-700">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Search */}
-        <input
-          type="text"
-          placeholder="Tìm kiếm khách hàng..."
-          value={search}
-          onChange={(e) =>
-            setSearch(
-              e.target.value
-            )
-          }
+  <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Search */}
+      <input
+        type="text"
+        placeholder="Tìm kiếm khách hàng..."
+        value={search}
+        onChange={(e) =>
+          setSearch(e.target.value)
+        }
+        disabled={isLoading}
+        className="
+          h-14 px-4 rounded-lg
+          border border-gray-300
+          bg-white text-gray-800
+          placeholder:text-gray-400
+          focus:outline-none
+          focus:ring-2
+          focus:ring-blue-500
+          disabled:cursor-not-allowed
+          disabled:opacity-60
+        "
+      />
+
+      {/* Type */}
+      <select
+        value={type ?? ''}
+        onChange={(e) =>
+          setType(
+            e.target.value
+              ? (e.target.value as CustomerType)
+              : undefined
+          )
+        }
+        className="
+          h-14 px-4 rounded-lg
+          border border-gray-300
+          bg-white text-gray-800
+          focus:outline-none
+          focus:ring-2
+          focus:ring-blue-500
+        "
+      >
+        <option value="">
+          Tất cả loại
+        </option>
+
+        {CUSTOMER_TYPES.map(
+          (item) => (
+            <option
+              key={item.value}
+              value={item.value}
+            >
+              {item.label}
+            </option>
+          )
+        )}
+      </select>
+
+      {/* Tier */}
+      <select
+        value={tier ?? ''}
+        onChange={(e) =>
+          setTier(
+            e.target.value
+              ? (e.target.value as CustomerTier)
+              : undefined
+          )
+        }
+        className="
+          h-14 px-4 rounded-lg
+          border border-gray-300
+          bg-white text-gray-800
+          focus:outline-none
+          focus:ring-2
+          focus:ring-blue-500
+        "
+      >
+        <option value="">
+          Tất cả hạng
+        </option>
+
+        {CUSTOMER_TIERS.map(
+          (item) => (
+            <option
+              key={item.value}
+              value={item.value}
+            >
+              {item.label}
+            </option>
+          )
+        )}
+      </select>
+
+      {/* Status */}
+      <select
+        value={status ?? ''}
+        onChange={(e) =>
+          setStatus(
+            e.target.value
+              ? (e.target.value as CustomerStatus)
+              : undefined
+          )
+        }
+        className="
+          h-14 px-4 rounded-lg
+          border border-gray-300
+          bg-white text-gray-800
+          focus:outline-none
+          focus:ring-2
+          focus:ring-blue-500
+        "
+      >
+        <option value="">
+          Tất cả trạng thái
+        </option>
+
+        {CUSTOMER_STATUSES.map(
+          (item) => (
+            <option
+              key={item.value}
+              value={item.value}
+            >
+              {item.label}
+            </option>
+          )
+        )}
+      </select>
+    </div>
+
+    {onReset && (
+      <div className="mt-4 flex justify-end">
+        <button
+          type="button"
+          onClick={handleReset}
           disabled={isLoading}
-          className="px-4 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white disabled:cursor-not-allowed disabled:opacity-60"
-        />
-
-        {/* Type */}
-        <select
-          value={type ?? ''}
-          onChange={(e) =>
-            setType(
-              e.target.value
-                ? (e.target.value as CustomerType)
-                : undefined
-            )
-          }
-          className="px-4 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white"
-        >
-          <option value="">
-            Tất cả loại
-          </option>
-
-          {CUSTOMER_TYPES.map(
-            (item) => (
-              <option
-                key={item.value}
-                value={item.value}
-              >
-                {item.label}
-              </option>
-            )
-          )}
-        </select>
-
-        {/* Tier */}
-        <select
-          value={tier ?? ''}
-          onChange={(e) =>
-            setTier(
-              e.target.value
-                ? (e.target.value as CustomerTier)
-                : undefined
-            )
-          }
-          className="px-4 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white"
-        >
-          <option value="">
-            Tất cả hạng
-          </option>
-
-          {CUSTOMER_TIERS.map(
-            (item) => (
-              <option
-                key={item.value}
-                value={item.value}
-              >
-                {item.label}
-              </option>
-            )
-          )}
-        </select>
-
-        {/* Status */}
-        <select
-          value={status ?? ''}
-          onChange={(e) =>
-            setStatus(
-              e.target.value
-                ? (e.target.value as CustomerStatus)
-                : undefined
-            )
-          }
-          className="px-4 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white"
-        >
-          <option value="">
-            Tất cả trạng thái
-          </option>
-
-          {CUSTOMER_STATUSES.map(
-            (item) => (
-              <option
-                key={item.value}
-                value={item.value}
-              >
-                {item.label}
-              </option>
-            )
-          )}
-        </select>
-      </div>
-      {onReset && (
-        <div className="mt-4 flex justify-end">
-          <button
-            type="button"
-            onClick={onReset}
-            disabled={isLoading}
-            className="rounded-lg bg-slate-700 px-4 py-2 text-sm text-slate-200 transition hover:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="
+            h-12 px-5 rounded-lg
+            bg-blue-50
+            border border-blue-200
+            text-blue-600
+            hover:bg-blue-100
+            transition
+            disabled:cursor-not-allowed
+            disabled:opacity-60
+          "
           >
             Đặt lại
           </button>

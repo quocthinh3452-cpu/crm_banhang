@@ -122,7 +122,8 @@ export const useCustomers = (
           setState((prev) => ({
             ...prev,
 
-            loading: true,
+            loading:
+  prev.customers.length === 0,
 
             error: null,
           }));

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.example.crm_be.module.customers.application.dto.input.UpdateCustomerInput;
 import org.example.crm_be.module.customers.application.usecase.UpdateCustomerUseCase;
-
+import org.example.crm_be.module.customers.application.usecase.DeleteCustomerUseCase;
 @RequestMapping("/api/customers")
 @RequiredArgsConstructor
 @RestController("moduleCustomerController")
@@ -24,6 +24,8 @@ public class CustomerController {
     private final GetAllCustomersUseCase getAllCustomersUseCase;
 
     private final UpdateCustomerUseCase updateCustomerUseCase;
+
+    private final DeleteCustomerUseCase deleteCustomerUseCase;
 
     @PostMapping
     public CustomerOutput create(
@@ -40,8 +42,19 @@ public class CustomerController {
         return updateCustomerUseCase.execute(id, input);
     }
 
+    @DeleteMapping("/{id}")
+    public void delete(
+            @PathVariable Integer id
+    ) {
+        deleteCustomerUseCase.execute(id);
+    }
     @GetMapping
-    public List<CustomerOutput> getAll() {
-        return getAllCustomersUseCase.execute();
+    public List<CustomerOutput> getAll(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String tier,
+            @RequestParam(required = false) String status
+    ) {
+        return getAllCustomersUseCase.execute(search, type, tier, status);
     }
 }

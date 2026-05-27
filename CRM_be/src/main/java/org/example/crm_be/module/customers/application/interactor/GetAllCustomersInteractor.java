@@ -23,10 +23,37 @@ public class GetAllCustomersInteractor
     private final CustomerRepository repository;
 
     @Override
-    public List<CustomerOutput> execute() {
+    public List<CustomerOutput> execute(
+            String search,
+            String type,
+            String tier,
+            String status
+    ) {
 
         return repository.findAll()
                 .stream()
+
+                .filter(customer ->
+                        search == null ||
+                                customer.getName().toLowerCase()
+                                        .contains(search.toLowerCase())
+                )
+
+                .filter(customer ->
+                        type == null ||
+                                customer.getType().equalsIgnoreCase(type)
+                )
+
+                .filter(customer ->
+                        tier == null ||
+                                customer.getTier().equalsIgnoreCase(tier)
+                )
+
+                .filter(customer ->
+                        status == null ||
+                                customer.getStatus().equalsIgnoreCase(status)
+                )
+
                 .map(customer ->
                         CustomerOutput.builder()
                                 .id(customer.getId())

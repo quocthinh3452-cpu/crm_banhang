@@ -53,10 +53,10 @@ export default function CustomerDetailModal({
       showDefaultHeader={false}
       customPadding="p-0"
       maxWidth="max-w-6xl"
-      className="!bg-slate-900 !rounded-[32px] border border-slate-700 shadow-2xl shadow-black/40"
+      className="!bg-white !rounded-2xl border border-gray-200 shadow-2xl shadow-black/40"
     >
       <div className="w-full flex flex-col max-h-[90vh]">
-        <div className="sticky top-0 z-30 border-b border-slate-700/70 bg-slate-950/95 backdrop-blur-xl">
+        <div className="sticky top-0 z-30 border-b border-slate-700/70 bg-white/95 backdrop-blur-xl">
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-800 text-slate-100">
@@ -65,7 +65,7 @@ export default function CustomerDetailModal({
               <div>
                 <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Chi tiết khách hàng</p>
                 <div className="mt-1 flex flex-wrap items-center gap-3">
-                  <h2 className="text-2xl font-semibold text-slate-50">{headerLabel}</h2>
+                  <h2 className="text-2xl font-semibold text-gray-900">{headerLabel}</h2>
                   <StatusBadge status={customer?.status ?? 'Đang chăm sóc'} />
                 </div>
               </div>
@@ -91,7 +91,7 @@ export default function CustomerDetailModal({
             </button>
           </div>
 
-          <div className="flex w-full overflow-x-auto border-t border-slate-700/80 bg-slate-950/90 p-3">
+          <div className="flex w-full overflow-x-auto border-t border-slate-700/80 bg-white/90 p-3">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isDisabled = tab.key !== 'general' && !customer;
@@ -122,7 +122,7 @@ export default function CustomerDetailModal({
           </div>
         </div>
 
-        <div className="sticky bottom-0 z-30 border-t border-slate-700/70 bg-slate-950/95 backdrop-blur-xl px-6 py-4">
+        <div className="sticky bottom-0 z-30 border-t border-slate-700/70 bg-white/95 backdrop-blur-xl px-6 py-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <button
               onClick={onClose}

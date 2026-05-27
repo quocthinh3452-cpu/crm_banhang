@@ -138,11 +138,11 @@ export default function CustomerTable({
   }
 
   return (
-    <div className="overflow-x-auto rounded-3xl border border-slate-700 bg-slate-900 shadow-sm">
-      <table className="min-w-[900px] w-full border-separate border-spacing-0 bg-slate-950">
-        <thead className="border-b border-slate-700">
+    <div className="bg-white rounded-lg shadow overflow-hidden">
+      <table className="w-full text-left border-collapse">
+        <thead className="bg-gray-50 border-b">
           <tr>
-            <th className="px-6 py-4 text-left text-slate-300">
+            <th className="px-6 py-4 text-left text-gray-600">
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -166,19 +166,19 @@ export default function CustomerTable({
                   </label>
             </th>
 
-            <th className="px-6 py-4 text-left text-slate-300">
+            <th className="px-6 py-4 text-left text-gray-600">
               EMAIL / ĐIỆN THOẠI
             </th>
 
-            <th className="px-6 py-4 text-left text-slate-300">
+            <th className="px-6 py-4 text-left text-gray-600">
               PHÂN LOẠI
             </th>
 
-            <th className="px-6 py-4 text-right text-slate-300">
+            <th className="px-6 py-4 text-right text-gray-600">
               NGÂN SÁCH
             </th>
 
-            <th className="px-6 py-4 text-right text-slate-300">
+            <th className="px-6 py-4 text-right text-gray-600">
               HÀNH ĐỘNG
             </th>
           </tr>
@@ -189,7 +189,7 @@ export default function CustomerTable({
             (customer) => (
               <tr
                 key={customer.id}
-                className="border-b border-slate-700 bg-slate-950 transition duration-150 hover:bg-slate-800/80 hover:shadow-sm"
+                className="hover:bg-gray-50 text-sm border-b"
               >
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -215,11 +215,11 @@ export default function CustomerTable({
                       aria-label={`Chọn ${customer.name}`}
                     />
                     <div>
-                      <div className="text-white font-medium">
+                      <div className="text-gray-900 font-medium">
                         {customer.name}
                       </div>
 
-                      <div className="text-sm text-slate-400">
+                      <div className="text-sm text-gray-400">
                         {formatDate(
                           customer.createdAt
                         )}
@@ -229,11 +229,11 @@ export default function CustomerTable({
                 </td>
 
                 <td className="px-6 py-4">
-                  <div className="text-white">
+                  <div className="text-gray-900">
                     {customer.email}
                   </div>
 
-                  <div className="text-sm text-slate-400">
+                  <div className="text-sm text-gray-400">
                     {customer.phone}
                   </div>
                 </td>
@@ -267,7 +267,7 @@ export default function CustomerTable({
                       ) : (
                         <Shield
                           size={16}
-                          className="text-slate-300"
+                          className="text-gray-600"
                         />
                       )}
                       <span className="sr-only">
@@ -286,7 +286,7 @@ export default function CustomerTable({
                   </div>
                 </td>
 
-                <td className="px-6 py-4 text-right text-white font-semibold">
+                <td className="px-6 py-4 text-right text-gray-900 font-semibold">
                   {customer.budget != null
                     ? formatCurrency(customer.budget)
                     : 'Chưa cập nhật'}
@@ -300,11 +300,10 @@ export default function CustomerTable({
                           customer
                         )
                       }
-                      className="inline-flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-800 px-3 py-2 text-sm font-medium text-slate-100 transition hover:border-slate-600 hover:bg-slate-700"
+                      className="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
                       aria-label={`Sửa ${customer.name}`}
                     >
-                      <Pencil size={16} />
-                      Sửa
+                      <Pencil size={18} />
                     </button>
 
                     <button
@@ -313,11 +312,10 @@ export default function CustomerTable({
                           customer.id
                         )
                       }
-                      className="inline-flex items-center gap-2 rounded-2xl border border-slate-700 bg-rose-600 px-3 py-2 text-sm font-semibold text-white transition hover:border-rose-500 hover:bg-rose-500"
+                      className="inline-flex items-center justify-center w-10 h-10 rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition"
                       aria-label={`Xóa ${customer.name}`}
                     >
-                      <Trash2 size={16} />
-                      Xóa
+                      <Trash2 size={18} />
                     </button>
                   </div>
                 </td>

@@ -19,6 +19,7 @@ function buildQueryString(params?: CustomerListParams): string {
   if (params.pageSize) query.append('pageSize', params.pageSize.toString());
   if (params.search) query.append('search', params.search);
   if (params.type) query.append('type', params.type);
+  if (params.tier) query.append('tier', params.tier);
   if (params.status) query.append('status', params.status);
   if (params.sortBy) query.append('sortBy', params.sortBy);
   if (params.sortOrder) query.append('sortOrder', params.sortOrder);

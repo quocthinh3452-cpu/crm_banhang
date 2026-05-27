@@ -82,13 +82,21 @@ export default function CustomersPage() {
     };
   }, []);
 
-  const handleFilterChange = useCallback(async (params: Partial<CustomerListParams>) => {
+  const handleFilterChange = useCallback(
+  async (params: Partial<CustomerListParams>) => {
     try {
-      await fetchCustomers(params);
+      await fetchCustomers({
+        ...params,
+        page: 1,
+      });
+
+      setPage(1);
     } catch (error) {
       console.error(error);
     }
-  }, [fetchCustomers]);
+  },
+  [fetchCustomers, setPage]
+);
 
   const handleFormSubmit = async (data: CreateCustomerInput) => {
     setIsSaving(true);
@@ -171,7 +179,7 @@ export default function CustomersPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="flex items-center justify-center bg-[#f5f7fb]">
         <div className="text-red-500 text-2xl">
           {error}
         </div>
@@ -184,9 +192,9 @@ export default function CustomersPage() {
       {/* Header Area */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-100 mb-2">Quản lý khách hàng</h1>
-          <p className="text-slate-400">
-            Tổng cộng: <span className="font-semibold text-slate-300">{pagination.total}</span> khách hàng
+          <h1 className="text-3xl font-bold text-slate-800 mb-2">Quản lý khách hàng</h1>
+          <p className="text-slate-500">
+            Tổng cộng: <span className="font-semibold text-slate-700">{pagination.total}</span> khách hàng
           </p>
         </div>
         
@@ -216,17 +224,19 @@ export default function CustomersPage() {
       <CustomerFilters onFilterChange={handleFilterChange} onReset={resetFilters} isLoading={loading} />
 
       {/* Table */}
-      <CustomerTable
-        customers={customers}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onSelectionChange={setSelectedIds}
-      />
+      <div className="overflow-visible">
+  <CustomerTable
+    customers={customers}
+    loading={loading}
+    onEdit={handleEdit}
+    onDelete={handleDelete}
+    onSelectionChange={setSelectedIds}
+  />
+</div>
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (
-        <div className="flex justify-center">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-3 overflow-x-auto">
           <Pagination
             currentPage={pagination.page}
             totalPages={pagination.totalPages}
@@ -260,11 +270,11 @@ export default function CustomersPage() {
         )}
 
         {activeTab === 'contacts' && (
-          <div className="space-y-6">
+          <div className="space-y-6 overflow-hidden pb-6">
             {editingCustomer ? (
               <ContactsTab customerId={editingCustomer.id} contacts={editingCustomer.contacts || []} />
             ) : (
-              <div className="rounded-3xl border border-slate-700 bg-slate-900 p-8 text-center text-slate-400">
+              <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-500">
                 Lưu khách hàng trước khi thêm người liên hệ.
               </div>
             )}
@@ -280,7 +290,7 @@ export default function CustomersPage() {
                 contacts={editingCustomer.contacts || []}
               />
             ) : (
-              <div className="rounded-3xl border border-slate-700 bg-slate-900 p-8 text-center text-slate-400">
+              <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-400">
                 Lưu khách hàng trước khi ghi nhận tương tác.
               </div>
             )}
@@ -292,7 +302,7 @@ export default function CustomersPage() {
             {editingCustomer ? (
               <AttachmentsTab customerId={editingCustomer.id} />
             ) : (
-              <div className="rounded-3xl border border-slate-700 bg-slate-900 p-8 text-center text-slate-400">
+              <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-400">
                 Lưu khách hàng trước khi thêm tài liệu.
               </div>
             )}
@@ -304,7 +314,7 @@ export default function CustomersPage() {
             {editingCustomer ? (
               <ComplaintsTab customerId={editingCustomer.id} />
             ) : (
-              <div className="rounded-3xl border border-slate-700 bg-slate-900 p-8 text-center text-slate-400">
+              <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-400">
                 Lưu khách hàng trước khi tạo khiếu nại.
               </div>
             )}
@@ -316,7 +326,7 @@ export default function CustomersPage() {
             {editingCustomer ? (
               <DashboardTab customerId={editingCustomer.id} />
             ) : (
-              <div className="rounded-3xl border border-slate-700 bg-slate-900 p-8 text-center text-slate-400">
+              <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-400">
                 Lưu khách hàng trước khi xem dashboard.
               </div>
             )}

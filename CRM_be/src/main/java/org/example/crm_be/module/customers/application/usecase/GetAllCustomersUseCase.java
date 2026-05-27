@@ -6,5 +6,10 @@ import java.util.List;
 
 public interface GetAllCustomersUseCase {
 
-    List<CustomerOutput> execute();
+    List<CustomerOutput> execute(
+            String search,
+            String type,
+            String tier,
+            String status
+    );
 }
