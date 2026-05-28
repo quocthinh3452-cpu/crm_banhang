@@ -152,14 +152,14 @@ export default function UsersPage() {
         await userApi.create(userRequest);
         toast.success('Tạo tài khoản mới thành công!');
       }
-      
+
       setIsModalOpen(false);
       fetchUsers();
     } catch (error: any) {
       console.error(error);
       const backendError = error.response?.data;
       const msg = typeof backendError === 'string' ? backendError : 'Có lỗi xảy ra khi lưu dữ liệu.';
-      
+
       if (msg.toLowerCase().includes('email') && msg.toLowerCase().includes('tồn tại')) {
         setError('email', {
           type: 'manual',
@@ -238,7 +238,7 @@ export default function UsersPage() {
                 users.map((item) => {
                   const isSelf = loggedInUser?.email === item.email;
                   const permsList = item.permissions ? item.permissions.split(',') : [];
-                  
+
                   return (
                     <tr key={item.id} className={`border-b hover:bg-gray-50 transition-colors ${isSelf ? 'bg-blue-50/20' : ''}`}>
                       <td className="p-4 font-mono text-sm text-gray-500">#{item.id}</td>
@@ -252,13 +252,12 @@ export default function UsersPage() {
                       </td>
                       <td className="p-4 text-sm text-gray-600">{item.email}</td>
                       <td className="p-4">
-                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
-                          item.role === 'admin' 
-                            ? 'bg-purple-100 text-purple-800 border border-purple-200' 
+                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${item.role === 'admin'
+                            ? 'bg-purple-100 text-purple-800 border border-purple-200'
                             : item.role === 'manager'
-                            ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                            : 'bg-slate-100 text-slate-800 border border-slate-200'
-                        }`}>
+                              ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                              : 'bg-slate-100 text-slate-800 border border-slate-200'
+                          }`}>
                           {item.role === 'admin' ? 'Quản trị viên' : item.role === 'manager' ? 'Trưởng phòng' : 'Nhân viên'}
                         </span>
                       </td>
@@ -293,15 +292,24 @@ export default function UsersPage() {
                       <td className="p-4 text-center">
                         <div className="flex justify-center gap-2">
                           <Button variant="outline" className="text-xs px-3 h-8" onClick={() => handleOpenEdit(item)}>
-                            Sửa
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                              <path d="m15 5 4 4" />
+                            </svg>
                           </Button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             className={`text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200 ${isSelf ? 'opacity-40 cursor-not-allowed' : ''}`}
                             disabled={isSelf}
                             onClick={() => handleDelete(item)}
                           >
-                            Xóa
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M3 6h18" />
+                              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                              <line x1="10" x2="10" y1="11" y2="17" />
+                              <line x1="14" x2="14" y1="11" y2="17" />
+                            </svg>
                           </Button>
                         </div>
                       </td>
@@ -328,7 +336,7 @@ export default function UsersPage() {
         size="5xl"
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
-          
+
           {/* Thông tin cơ bản */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-1">
             <TextInput
@@ -397,19 +405,18 @@ export default function UsersPage() {
                 <label className="flex items-center gap-2 mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Danh sách quyền hạn chi tiết
                 </label>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                   {SYSTEM_PERMISSIONS.map((perm) => {
                     const isChecked = selectedPermissions.includes(perm.code);
-                    
+
                     return (
-                      <label 
-                        key={perm.code} 
-                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer select-none transition-all ${
-                          isChecked 
-                            ? 'bg-blue-50/50 border-blue-200 text-blue-900 shadow-sm' 
+                      <label
+                        key={perm.code}
+                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer select-none transition-all ${isChecked
+                            ? 'bg-blue-50/50 border-blue-200 text-blue-900 shadow-sm'
                             : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                        }`}
+                          }`}
                       >
                         <input
                           type="checkbox"

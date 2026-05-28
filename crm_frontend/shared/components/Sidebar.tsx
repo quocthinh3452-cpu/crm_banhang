@@ -73,24 +73,7 @@ const Sidebar = () => {
 
     if (currentUser.role === 'admin') {
       return [
-        { name: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Quản lý người dùng', path: '/crm/users', icon: Users },
-        { name: 'Quản lý Lead', path: '/crm/lead', icon: Briefcase },
-        { name: 'Khách hàng', path: '/crm/customers', icon: Users },
-        { name: 'Quản lý báo giá', path: '/crm/quotes', icon: FileText },
-        { name: 'Quản lý hợp đồng', path: '/crm/contracts', icon: FileSignature },
-        {
-          name: 'Sản phẩm',
-          path: '/crm/products',
-          icon: ShoppingCart,
-          children: [
-            { name: 'Danh sách sản phẩm', path: '/crm/products' },
-            { name: 'Loại sản phẩm', path: '/crm/product-types' }
-          ]
-        },
-        { name: 'Tài liệu', path: '/crm/documents', icon: FileText },
-        { name: 'Báo cáo', path: '/reports', icon: BarChart3 },
-        { name: 'Cài đặt', path: '/settings', icon: Settings },
       ];
     }
 
