@@ -35,6 +35,11 @@ public class CustomerRepositoryImpl
     }
 
     @Override
+    public Optional<Customer> findByLeadId(Integer leadId) {
+        return jpaRepository.findByLeadId(leadId);
+    }
+
+    @Override
     public void deleteById(Integer id) {
         jpaRepository.deleteById(id);
     }

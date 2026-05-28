@@ -40,6 +40,7 @@ public class UpdateCustomerInteractor
         customer.setStatus(input.getStatus());
         customer.setNote(input.getNote());
         customer.setBudget(input.getBudget());
+        customer.setLeadId(input.getLeadId());
 
         customer.setUpdatedAt(LocalDateTime.now());
 
@@ -58,6 +59,7 @@ public class UpdateCustomerInteractor
                 .status(customer.getStatus())
                 .note(customer.getNote())
                 .budget(customer.getBudget())
+                .leadId(customer.getLeadId())
                 .build();
     }
 }

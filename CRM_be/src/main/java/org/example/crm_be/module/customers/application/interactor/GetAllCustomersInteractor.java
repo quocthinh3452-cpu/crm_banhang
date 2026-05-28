@@ -21,6 +21,7 @@ public class GetAllCustomersInteractor
         implements GetAllCustomersUseCase {
 
     private final CustomerRepository repository;
+    private final org.example.crm_be.module.lead.infrastructure.persistence.SpringDataLeadRepository leadRepository;
 
     @Override
     public List<CustomerOutput> execute(
@@ -33,26 +34,40 @@ public class GetAllCustomersInteractor
         return repository.findAll()
                 .stream()
 
+                .filter(customer -> {
+                    if (customer.getLeadId() == null) {
+                        return false;
+                    }
+                    return leadRepository.findById(customer.getLeadId())
+                            .map(lead -> lead.getStatus() == org.example.crm_be.module.lead.domain.entity.LeadStatus.CONVERTED)
+                            .orElse(false);
+                })
+
                 .filter(customer ->
                         search == null ||
-                                customer.getName().toLowerCase()
-                                        .contains(search.toLowerCase())
+                                (customer.getName() != null &&
+                                        customer.getName().toLowerCase()
+                                                .contains(search.toLowerCase()))
                 )
 
                 .filter(customer ->
                         type == null ||
-                                customer.getType().equalsIgnoreCase(type)
+                                (customer.getType() != null &&
+                                        customer.getType().equalsIgnoreCase(type))
                 )
 
                 .filter(customer ->
                         tier == null ||
-                                customer.getTier().equalsIgnoreCase(tier)
+                                (customer.getTier() != null &&
+                                        customer.getTier().equalsIgnoreCase(tier))
                 )
 
                 .filter(customer ->
                         status == null ||
-                                customer.getStatus().equalsIgnoreCase(status)
+                                (customer.getStatus() != null &&
+                                        customer.getStatus().equalsIgnoreCase(status))
                 )
+
                 .filter(customer ->
                         customer.getDeleted() == null ||
                                 !customer.getDeleted()
@@ -72,6 +87,7 @@ public class GetAllCustomersInteractor
                                 .status(customer.getStatus())
                                 .note(customer.getNote())
                                 .budget(customer.getBudget())
+                                .leadId(customer.getLeadId())
                                 .build()
                 )
                 .toList();

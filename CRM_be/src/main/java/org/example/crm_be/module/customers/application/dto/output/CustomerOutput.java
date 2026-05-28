@@ -31,4 +31,6 @@ public class CustomerOutput {
     private String note;
 
     private Long budget;
+
+    private Integer leadId;
 }

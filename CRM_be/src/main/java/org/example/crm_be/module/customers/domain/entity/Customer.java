@@ -51,5 +51,8 @@ public class Customer {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "lead_id")
+    private Integer leadId;
+
     private Boolean deleted;
 }

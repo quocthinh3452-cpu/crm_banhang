@@ -27,4 +27,6 @@ public class CreateCustomerInput {
     private Long budget;
 
     private String note;
+
+    private Integer leadId;
 }

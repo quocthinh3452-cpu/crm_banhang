@@ -13,5 +13,7 @@ public interface CustomerRepository {
 
     Optional<Customer> findById(Integer id);
 
+    Optional<Customer> findByLeadId(Integer leadId);
+
     void deleteById(Integer id);
 }
