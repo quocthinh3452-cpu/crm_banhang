@@ -77,7 +77,7 @@ export default function QuoteManagementPage() {
       const data: any = await axiosClient.get('/quotes', {
         params: {
           page: currentPage,
-          size: 10,
+          size: 6,
           keyword: currentKeyword || undefined,
           status: statusVal || undefined,
           minTotal: minVal || undefined,
@@ -468,7 +468,7 @@ export default function QuoteManagementPage() {
               currentPage={page + 1}
               totalPages={totalPages}
               totalElements={totalElements}
-              pageSize={10}
+              pageSize={6}
               onPageChange={(p) => setPage(p - 1)}
             />
           </div>

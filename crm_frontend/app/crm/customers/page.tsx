@@ -79,7 +79,7 @@ const [
     setPage,
     resetFilters,
     clearError,
-  } = useCustomers(10);
+  } = useCustomers(6);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -310,6 +310,8 @@ setDocuments(
           <Pagination
             currentPage={pagination.page}
             totalPages={pagination.totalPages}
+            totalElements={pagination.total}
+            pageSize={pagination.pageSize}
             onPageChange={setPage}
             disabled={loading}
           />

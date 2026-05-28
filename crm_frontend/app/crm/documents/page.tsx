@@ -16,6 +16,7 @@ import * as z from 'zod';
 
 import { documentApi } from '@/modules/document/api/document.api';
 import { Document } from '@/modules/document/types/document.type';
+import toast from 'react-hot-toast';
 
 // 1. Zod Schema cho validation
 const documentSchema = z.object({
@@ -41,6 +42,9 @@ export default function DocumentsPage() {
     // Bộ lọc & Tìm kiếm
     const [searchTerm, setSearchTerm] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
+    const [versionFilter, setVersionFilter] = useState('');
+    const [sortField, setSortField] = useState('createdAt');
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
     // State cho Modal
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -192,17 +196,76 @@ export default function DocumentsPage() {
         }
     };
 
-    // Client-side search and filters
-    const filteredDocs = documents.filter(doc => {
-        const matchesSearch = 
-            doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (doc.type && doc.type.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            String(doc.id).includes(searchTerm);
-        
-        const matchesType = typeFilter === '' || doc.type === typeFilter;
+    // Tải về tài liệu
+    const handleDownload = async (doc: Document) => {
+        if (doc.filePath && doc.filePath.trim() !== '') {
+            const fileUrl = doc.filePath.startsWith('http') ? doc.filePath : `http://localhost:8081${doc.filePath}`;
+            try {
+                const response = await fetch(fileUrl);
+                if (!response.ok) {
+                    throw new Error("Lỗi tải file từ Server");
+                }
+                
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                
+                const fileName = doc.filePath.split('/').pop() || doc.name;
+                link.download = fileName;
+                
+                document.body.appendChild(link);
+                link.click();
+                
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(downloadUrl);
+            } catch (error) {
+                console.error("Lỗi khi tải tài liệu:", error);
+                toast.error("File tải về bị lỗi vui lòng cập nhật lại file");
+            }
+        } else {
+            // Thông báo
+            toast.error("Chưa có tài liệu vui lòng cập nhật tài liệu");
+        }
+    };
 
-        return matchesSearch && matchesType;
-    });
+    // Client-side search, filters and sorting
+    const filteredDocs = documents
+        .filter(doc => {
+            const matchesSearch = 
+                doc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (doc.type && doc.type.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                String(doc.id).includes(searchTerm);
+            
+            const matchesType = typeFilter === '' || doc.type === typeFilter;
+            const matchesVersion = versionFilter === '' || doc.version === versionFilter;
+
+            return matchesSearch && matchesType && matchesVersion;
+        })
+        .sort((a, b) => {
+            const valA = a[sortField as keyof Document];
+            const valB = b[sortField as keyof Document];
+
+            if (valA === null || valA === undefined || valA === '') {
+                return sortDir === 'asc' ? 1 : -1;
+            }
+            if (valB === null || valB === undefined || valB === '') {
+                return sortDir === 'asc' ? -1 : 1;
+            }
+
+            if (typeof valA === 'string' && typeof valB === 'string') {
+                return sortDir === 'asc' 
+                    ? valA.localeCompare(valB)
+                    : valB.localeCompare(valA);
+            }
+
+            if (typeof valA === 'number' && typeof valB === 'number') {
+                return sortDir === 'asc' ? valA - valB : valB - valA;
+            }
+
+            return 0;
+        });
 
     // Phân trang 6 dữ liệu trên 1 trang
     const [currentPage, setCurrentPage] = useState(1);
@@ -211,7 +274,7 @@ export default function DocumentsPage() {
     // Reset về trang 1 khi thay đổi điều kiện tìm kiếm hoặc bộ lọc
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchTerm, typeFilter]);
+    }, [searchTerm, typeFilter, versionFilter]);
 
     const totalPages = Math.ceil(filteredDocs.length / itemsPerPage) || 1;
 
@@ -228,6 +291,8 @@ export default function DocumentsPage() {
 
     // Lấy danh sách duy nhất các loại tài liệu làm bộ lọc
     const uniqueTypes = Array.from(new Set(documents.map(d => d.type).filter(Boolean)));
+    // Lấy danh sách duy nhất các phiên bản làm bộ lọc
+    const uniqueVersions = Array.from(new Set(documents.map(d => d.version).filter(Boolean)));
 
     return (
         <div className="space-y-6">
@@ -256,9 +321,9 @@ export default function DocumentsPage() {
             )}
 
             {/* Filter & Search Bar */}
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col xl:flex-row gap-4 items-center justify-between">
                 {/* Search Box */}
-                <div className="relative w-full md:w-80">
+                <div className="relative w-full xl:w-80">
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -283,17 +348,90 @@ export default function DocumentsPage() {
                     )}
                 </div>
 
-                {/* Dropdown Lọc theo Loại tài liệu */}
-                <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto justify-end">
+                {/* Sort and Filters */}
+                <div className="flex flex-wrap gap-2 w-full xl:w-auto justify-end">
+                    {/* Lọc theo phân loại */}
                     <select
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value)}
-                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-48 cursor-pointer transition-colors"
+                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-40 cursor-pointer transition-colors animate-fade-in"
                     >
                         <option value="">Tất cả phân loại</option>
                         {uniqueTypes.map(t => (
                             <option key={t} value={t}>{t}</option>
                         ))}
+                    </select>
+
+                    {/* Lọc theo phiên bản */}
+                    <select
+                        value={versionFilter}
+                        onChange={(e) => setVersionFilter(e.target.value)}
+                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-36 cursor-pointer transition-colors"
+                    >
+                        <option value="">Tất cả phiên bản</option>
+                        {uniqueVersions.map(v => (
+                            <option key={v} value={v}>{v}</option>
+                        ))}
+                    </select>
+
+                    {/* Sắp xếp theo ngày hết hạn */}
+                    <select
+                        value={sortField === 'expiryDate' ? sortDir : ''}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                                setSortField('expiryDate');
+                                setSortDir(val as 'asc' | 'desc');
+                            } else {
+                                setSortField('createdAt');
+                                setSortDir('desc');
+                            }
+                        }}
+                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-40 cursor-pointer transition-colors"
+                    >
+                        <option value="">Sắp xếp: Ngày hết hạn</option>
+                        <option value="asc">Hết hạn: Gần nhất</option>
+                        <option value="desc">Hết hạn: Xa nhất</option>
+                    </select>
+
+                    {/* Sắp xếp theo ngày phát hành */}
+                    <select
+                        value={sortField === 'releaseDate' ? sortDir : ''}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                                setSortField('releaseDate');
+                                setSortDir(val as 'asc' | 'desc');
+                            } else {
+                                setSortField('createdAt');
+                                setSortDir('desc');
+                            }
+                        }}
+                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-44 cursor-pointer transition-colors"
+                    >
+                        <option value="">Sắp xếp: Ngày phát hành</option>
+                        <option value="desc">Phát hành: Mới nhất</option>
+                        <option value="asc">Phát hành: Cũ nhất</option>
+                    </select>
+
+                    {/* Sắp xếp theo ngày tạo */}
+                    <select
+                        value={sortField === 'createdAt' ? sortDir : ''}
+                        onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                                setSortField('createdAt');
+                                setSortDir(val as 'asc' | 'desc');
+                            } else {
+                                setSortField('createdAt');
+                                setSortDir('desc');
+                            }
+                        }}
+                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-40 cursor-pointer transition-colors"
+                    >
+                        <option value="">Sắp xếp: Ngày tạo</option>
+                        <option value="desc">Ngày tạo: Mới nhất</option>
+                        <option value="asc">Ngày tạo: Cũ nhất</option>
                     </select>
                 </div>
             </div>
@@ -348,26 +486,37 @@ export default function DocumentsPage() {
                                             {item.createdAt ? formatDateTime(item.createdAt) : '---'}
                                         </td>
                                         <td className="p-4 text-center">
-                                            {item.filePath ? (
-                                                <a
-                                                    href={`http://localhost:8081${item.filePath}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-sky-100 text-sky-700 hover:bg-sky-200 transition-colors"
-                                                    title="Tải tài liệu xuống"
-                                                >
-                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                                    </svg>
-                                                </a>
-                                            ) : (
-                                                <span className="text-xs text-gray-400 italic">Trống</span>
-                                            )}
+                                            <button
+                                                onClick={() => handleDownload(item)}
+                                                className={`inline-flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
+                                                    item.filePath 
+                                                        ? 'bg-sky-100 text-sky-700 hover:bg-sky-200' 
+                                                        : 'bg-gray-100 text-gray-400 hover:bg-gray-200 border border-gray-200'
+                                                }`}
+                                                title={item.filePath ? "Tải tài liệu xuống" : "Chưa có tài liệu - Click để nhận thông báo"}
+                                            >
+                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                </svg>
+                                            </button>
                                         </td>
                                         <td className="p-4">
                                             <div className="flex justify-center gap-2">
-                                                <Button variant="outline" className="text-xs px-3 h-8" onClick={() => handleOpenEdit(item)}>Sửa</Button>
-                                                <Button variant="outline" className="text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200" onClick={() => handleOpenDelete(item)}>Xóa</Button>
+                                                <Button variant="outline" className="text-xs px-3 h-8" onClick={() => handleOpenEdit(item)}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                                                    <path d="m15 5 4 4" />
+                                                </svg>
+                                                </Button>
+                                                <Button variant="outline" className="text-xs px-3 h-8 text-red-600 hove r:bg-red-50 hover:border-red-200" onClick={() => handleOpenDelete(item)}>
+                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M3 6h18" />
+                                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                                    <line x1="10" x2="10" y1="11" y2="17" />
+                                                    <line x1="14" x2="14" y1="11" y2="17" />
+                                                </svg>
+                                                </Button>
                                             </div>
                                         </td>
                                     </tr>

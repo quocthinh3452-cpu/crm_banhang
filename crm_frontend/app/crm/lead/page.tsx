@@ -21,6 +21,7 @@ export default function LeadPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
 
   
   // 1. STATE BỘ LỌC MỞ RỘNG (Khớp với các param Backend có sẵn)
@@ -48,7 +49,7 @@ export default function LeadPage() {
   const loadLeadsData = async () => {
     setIsLoading(true);
     try {
-      const params: any = { page: currentPage, size: 10 };
+      const params: any = { page: currentPage, size: 6 };
 
       // 2. TRUYỀN TOÀN BỘ PARAM XUỐNG BACKEND
       if (filters.keyword?.trim()) params.keyword = filters.keyword.trim();
@@ -63,19 +64,24 @@ export default function LeadPage() {
 
       let finalLeads = [];
       let finalTotalPages = 1;
+      let finalTotalElements = 0;
 
-      if (Array.isArray(res)) {
-        finalLeads = res;
-      } else if (res?.content) {
+      if (res?.content) {
         finalLeads = res.content;
         finalTotalPages = res.totalPages || 1;
+        finalTotalElements = res.totalElements || 0;
       } else if (res?.data?.content) {
         finalLeads = res.data.content;
         finalTotalPages = res.data.totalPages || 1;
+        finalTotalElements = res.data.totalElements || 0;
+      } else if (Array.isArray(res)) {
+        finalLeads = res;
+        finalTotalElements = res.length;
       }
 
       setLeads(finalLeads);
       setTotalPages(finalTotalPages);
+      setTotalElements(finalTotalElements);
     } catch (error) {
       console.error('Không thể fetch dữ liệu:', error);
     } finally {
@@ -253,6 +259,8 @@ export default function LeadPage() {
         isLoading={isLoading}
         currentPage={currentPage}
         totalPages={totalPages}
+        totalElements={totalElements}
+        pageSize={6}
         onPageChange={(p: number) => setCurrentPage(p)}
         onEdit={(lead: Lead) => { setEditingLead(lead); setIsModalOpen(true); }}
         onView={(lead: Lead) => { setViewingLead(lead); setIsDetailModalOpen(true); }}

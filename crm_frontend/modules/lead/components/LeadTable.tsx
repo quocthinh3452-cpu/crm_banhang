@@ -16,10 +16,12 @@ interface LeadTableProps {
   onEdit: (lead: Lead) => void;
   onDeleteSuccess: () => void; // Callback để thông báo cho trang cha
   onView: (lead: Lead) => void;
+  totalElements?: number;
+  pageSize?: number;
 }
 
 export const LeadTable: React.FC<LeadTableProps> = ({
-  leads, isLoading, currentPage, totalPages, onPageChange, onEdit, onDeleteSuccess, onView
+  leads, isLoading, currentPage, totalPages, onPageChange, onEdit, onDeleteSuccess, onView, totalElements, pageSize
 }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
@@ -159,6 +161,8 @@ export const LeadTable: React.FC<LeadTableProps> = ({
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
+            totalElements={totalElements}
+            pageSize={pageSize}
             onPageChange={onPageChange}
           />
         </div>
