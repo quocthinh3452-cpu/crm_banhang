@@ -14,17 +14,19 @@ interface Props {
 type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement> & { size?: number }>;
 
 const typeStyles: Record<string, { badge: string; accent: string; icon: IconComponent }> = {
-  Call: {
+  call: {
     badge: 'bg-sky-500/15 text-sky-200',
     accent: 'border-sky-600',
     icon: Phone,
   },
-  Email: {
+
+  email: {
     badge: 'bg-emerald-500/15 text-emerald-200',
     accent: 'border-emerald-600',
     icon: Mail,
   },
-  Meeting: {
+
+  meeting: {
     badge: 'bg-violet-500/15 text-violet-200',
     accent: 'border-violet-600',
     icon: Users,
@@ -52,14 +54,18 @@ export default function InteractionTimeline({
   return (
     <div className="grid gap-4">
       {interactions.map((interaction) => {
-        const typeMeta = typeStyles[interaction.type] ?? typeStyles.Call;
+        const typeKey = interaction.type?.toLowerCase();
+
+        const typeMeta =
+          typeStyles[typeKey] ??
+          typeStyles.call;
 
         return (
           <TimelineItem
             key={interaction.id}
             icon={typeMeta.icon}
-            title={interaction.subject}
-            description={interaction.content || 'Không có mô tả chi tiết.'}
+            title={interaction.type}
+            description={interaction.note || 'Không có mô tả chi tiết.'}
             date={interaction.interactionDate}
             author={interaction.createdBy || 'Người dùng'}
             badgeText={interaction.type}

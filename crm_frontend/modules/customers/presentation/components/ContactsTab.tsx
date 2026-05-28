@@ -2,6 +2,7 @@
 
 import React, {
   useState,
+  useEffect,
 } from 'react';
 
 import { Plus } from 'lucide-react';
@@ -33,7 +34,33 @@ export default function ContactsTab({
     setContacts,
   ] = useState<Contact[]>(
     initialContacts || []
-  );  const [deleteTarget, setDeleteTarget] = useState<string | number | null>(null);
+  );
+  useEffect(() => {
+  const loadContacts = async () => {
+    try {
+      const data =
+        await customerRepository.getContactsByCustomerId(
+          customerId
+        );
+
+      setContacts(
+      Array.isArray(data)
+       ? data
+        : data?.data || data?.content || []
+    );
+    } catch (error) {
+      console.error(
+        'Load contacts failed',
+        error
+      );
+    }
+  };
+
+  if (customerId) {
+    loadContacts();
+  }
+}, [customerId]);  
+  const [deleteTarget, setDeleteTarget] = useState<string | number | null>(null);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [
     showForm,

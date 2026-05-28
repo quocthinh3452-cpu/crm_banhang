@@ -6,6 +6,8 @@ import { toast } from 'react-hot-toast';
 
 import { useCustomers } from '@/modules/customers/presentation/hooks/useCustomers';
 
+import { customerRepository } from '@/modules/customers/data/customerRepository';
+
 import {
   CustomerTable,
   CustomerForm,
@@ -43,6 +45,18 @@ export default function CustomersPage() {
 
   const customerFormSubmitRef = useRef<HTMLButtonElement | null>(null);
 
+
+  const [contacts, setContacts] =
+  useState([]);
+
+const [
+  interactions,
+  setInteractions,
+] = useState([]);
+const [
+  documents,
+  setDocuments,
+] = useState([]);
   const modalTabs = [
     { key: 'general', label: 'Thông tin chung', icon: Users },
     { key: 'contacts', label: 'Người liên hệ', icon: Phone },
@@ -82,6 +96,61 @@ export default function CustomersPage() {
     };
   }, []);
 
+
+  useEffect(() => {
+  const loadData =
+    async () => {
+      if (
+        !editingCustomer?.id
+      ) {
+        return;
+      }
+
+      try {
+        const contactData =
+          await customerRepository.getContactsByCustomerId(
+            editingCustomer.id
+          );
+
+        setContacts(
+          Array.isArray(
+            contactData
+          )
+            ? contactData
+            : []
+        );
+
+        const interactionData =
+          await customerRepository.getInteractionsByCustomer(
+            editingCustomer.id
+          );
+
+        setInteractions(
+          Array.isArray(
+            interactionData
+          )
+            ? interactionData
+            : []
+        );
+        const documentData =
+  await customerRepository.getDocumentsByCustomerId(
+    editingCustomer.id
+  );
+
+setDocuments(
+  Array.isArray(documentData)
+    ? documentData
+    : []
+);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+  loadData();
+}, [editingCustomer]);
+
+
   const handleFilterChange = useCallback(
   async (params: Partial<CustomerListParams>) => {
     try {
@@ -90,6 +159,7 @@ export default function CustomersPage() {
         page: 1,
       });
 
+      
       setPage(1);
     } catch (error) {
       console.error(error);
@@ -272,7 +342,12 @@ export default function CustomersPage() {
         {activeTab === 'contacts' && (
           <div className="space-y-6 overflow-hidden pb-6">
             {editingCustomer ? (
-              <ContactsTab customerId={editingCustomer.id} contacts={editingCustomer.contacts || []} />
+              <ContactsTab
+  customerId={
+    editingCustomer.id
+  }
+  contacts={contacts}
+/>
             ) : (
               <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-500">
                 Lưu khách hàng trước khi thêm người liên hệ.
@@ -286,8 +361,10 @@ export default function CustomersPage() {
             {editingCustomer ? (
               <InteractionLogsTab
                 customerId={editingCustomer.id}
-                interactions={editingCustomer.interactionLogs || []}
-                contacts={editingCustomer.contacts || []}
+                interactions={
+  interactions
+}
+                contacts={contacts}
               />
             ) : (
               <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-400">
@@ -300,7 +377,10 @@ export default function CustomersPage() {
         {activeTab === 'attachments' && (
           <div className="space-y-6">
             {editingCustomer ? (
-              <AttachmentsTab customerId={editingCustomer.id} />
+              <AttachmentsTab
+              customerId={editingCustomer.id}
+              documents={documents}
+            />
             ) : (
               <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center text-slate-400">
                 Lưu khách hàng trước khi thêm tài liệu.

@@ -16,6 +16,85 @@ import {
 const API_BASE = '/customers';
 
 export const customerApi = {
+
+  getContactsByCustomerId: async (
+  customerId: string | number
+) => {
+  return contactApi.getByCustomerId(
+    Number(customerId)
+  );
+},
+
+createContact: async (
+  data: any
+) => {
+  return contactApi.create(
+    data
+  );
+},
+
+updateContact: async (
+  id: string | number,
+  data: any
+) => {
+  return contactApi.update(
+    Number(id),
+    data
+  );
+},
+
+deleteContact: async (
+  id: string | number
+) => {
+  return contactApi.delete(
+    Number(id)
+  );
+},
+
+getInteractionsByCustomerId: async (
+  customerId: string | number
+) => {
+  return interactionApi.getByCustomerId(
+    Number(customerId)
+  );
+},
+
+createInteraction: async (
+  data: any
+) => {
+  return interactionApi.create(
+    data
+  );
+},
+
+updateInteraction: async (
+  id: string | number,
+  data: any
+) => {
+  return interactionApi.update(
+    Number(id),
+    data
+  );
+},
+
+deleteInteraction: async (
+  id: string | number
+) => {
+  return interactionApi.delete(
+    Number(id)
+  );
+},
+
+
+getDocumentsByCustomerId: async (
+  customerId: string | number
+) => {
+  const res = await fetch(
+    `http://localhost:8081/api/customer-documents/customer/${customerId}`
+  );
+
+  return res.json();
+},
   /**
    * Get all customers with pagination and filters
    */
@@ -36,6 +115,7 @@ export const customerApi = {
       }
     );
 
+    
     const payload = response;
 
     if (Array.isArray(payload)) {
@@ -103,6 +183,187 @@ export const customerApi = {
   bulkDeleteCustomers: async (ids: (string | number)[]): Promise<void> => {
     await Promise.all(
       ids.map((id) => axiosClient.delete(`${API_BASE}/${id}`))
+    
     );
+
+  },
+};
+export const interactionApi = {
+  async getByCustomerId(
+    customerId: number
+  ) {
+    const res = await fetch(
+      `http://localhost:8081/api/interactions/customer/${customerId}`
+    );
+
+    return res.json();
+  },
+  
+
+  async create(data: any) {
+    const res = await fetch(
+      'http://localhost:8081/api/interactions',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type':
+            'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    return res.json();
+  },
+
+  async update(
+    id: number,
+    data: any
+  ) {
+    const res = await fetch(
+      `http://localhost:8081/api/interactions/${id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type':
+            'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    return res.json();
+  },
+
+  async delete(id: number) {
+    await fetch(
+      `http://localhost:8081/api/interactions/${id}`,
+      {
+        method: 'DELETE',
+      }
+    );
+  },
+};
+export const contactApi = {
+  async getByCustomerId(
+    customerId: number
+  ) {
+    const res = await fetch(
+      `http://localhost:8081/api/contacts/customer/${customerId}`
+    );
+
+    return res.json();
+  },
+
+  async create(data: any) {
+    const res = await fetch(
+      'http://localhost:8081/api/contacts',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type':
+            'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    return res.json();
+  },
+
+  async update(
+    id: number,
+    data: any
+  ) {
+    const res = await fetch(
+      `http://localhost:8081/api/contacts/${id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type':
+            'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    return res.json();
+  },
+
+  async delete(id: number) {
+    await fetch(
+      `http://localhost:8081/api/contacts/${id}`,
+      {
+        method: 'DELETE',
+      }
+    );
+  },
+};
+export const complaintApi = {
+
+  async getByCustomerId(
+    customerId: number
+  ) {
+    const res = await fetch(
+      `http://localhost:8081/api/complaints/customer/${customerId}`
+    );
+
+    return res.json();
+  },
+
+  async create(data: any) {
+    const res = await fetch(
+      'http://localhost:8081/api/complaints',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type':
+            'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    return res.json();
+  },
+
+  async update(
+    id: number,
+    data: any
+  ) {
+    const res = await fetch(
+      `http://localhost:8081/api/complaints/${id}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type':
+            'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    return res.json();
+  },
+
+  async delete(id: number) {
+    await fetch(
+      `http://localhost:8081/api/complaints/${id}`,
+      {
+        method: 'DELETE',
+      }
+    );
+  },
+};
+export const dashboardApi = {
+
+  async getByCustomerId(
+    customerId: number
+  ) {
+    const res = await fetch(
+      `http://localhost:8081/api/customers/${customerId}/dashboard`
+    );
+
+    return res.json();
   },
 };

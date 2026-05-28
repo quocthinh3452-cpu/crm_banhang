@@ -25,7 +25,11 @@ import {
   CustomerListParams,
 } from '../domain/types';
 
-import { customerApi } from './customerApi';
+import {
+  customerApi,
+  complaintApi,
+  dashboardApi,
+} from './customerApi';
 
 /* =========================================
    MOCK CONTACTS - TASK 2.2
@@ -595,150 +599,90 @@ class CustomerRepository {
      CONTACTS - TASK 2.2
   ========================================= */
 
-  async getContactsByCustomer(
-    customerId:
-      | string
-      | number
-  ): Promise<Contact[]> {
-    return mockContacts.filter(
-      (contact) =>
-        contact.customerId ===
-        Number(customerId)
-    );
-  }
+  /* =========================================
+   CONTACTS API REAL DATABASE
+========================================= */
 
-  async createContact(
-    data: CreateContactInput
-  ): Promise<Contact> {
-    const newContact: Contact =
-      {
-        id:
-          mockContacts.length +
-          1,
+async getContactsByCustomerId(
+  customerId: string | number
+): Promise<Contact[]> {
+  return customerApi.getContactsByCustomerId(
+    customerId
+  );
+}
 
-        ...data,
+async createContact(
+  data: CreateContactInput
+): Promise<Contact> {
+  return customerApi.createContact(
+    data
+  );
+}
 
-        createdAt:
-          new Date().toISOString(),
-      };
+async updateContact(
+  id: string | number,
+  data: UpdateContactInput
+): Promise<Contact> {
+  return customerApi.updateContact(
+    id,
+    data
+  );
+}
 
-    mockContacts.push(
-      newContact
-    );
-
-    return newContact;
-  }
-
-  async updateContact(
-    id: string | number,
-    data: UpdateContactInput
-  ): Promise<Contact> {
-    const index =
-      mockContacts.findIndex(
-        (c) =>
-          c.id === Number(id)
-      );
-
-    if (index === -1) {
-      throw new Error(
-        'Không tìm thấy contact'
-      );
-    }
-
-    mockContacts[index] = {
-      ...mockContacts[index],
-
-      ...data,
-    };
-
-    return mockContacts[index];
-  }
-
-  async deleteContact(
-    id: string | number
-  ): Promise<void> {
-    mockContacts =
-      mockContacts.filter(
-        (c) =>
-          c.id !== Number(id)
-      );
-  }
+async deleteContact(
+  id: string | number
+): Promise<void> {
+  return customerApi.deleteContact(
+    id
+  );
+}
 
   /* =========================================
      INTERACTION LOGS - TASK 2.3
   ========================================= */
 
   async getInteractionsByCustomer(
-    customerId:
-      | string
-      | number
-  ): Promise<
-    InteractionLog[]
-  > {
-    return mockInteractions.filter(
-      (interaction) =>
-        interaction.customerId ===
-        Number(customerId)
-    );
-  }
+  customerId:
+    | string
+    | number
+): Promise<InteractionLog[]> {
+  return customerApi.getInteractionsByCustomerId(
+    customerId
+  );
+}
 
-  async createInteraction(
-    data: CreateInteractionInput
-  ): Promise<InteractionLog> {
-    const newInteraction: InteractionLog =
-      {
-        id:
-          mockInteractions.length +
-          1,
+async createInteraction(
+  data: CreateInteractionInput
+): Promise<InteractionLog> {
+  return customerApi.createInteraction(
+    data
+  );
+}
 
-        ...data,
+async updateInteraction(
+  id: string | number,
+  data: UpdateInteractionInput
+): Promise<InteractionLog> {
+  return customerApi.updateInteraction(
+    id,
+    data
+  );
+}
 
-        createdAt:
-          new Date().toISOString(),
-      };
-
-    mockInteractions.unshift(
-      newInteraction
-    );
-
-    return newInteraction;
-  }
-
-  async updateInteraction(
-    id: string | number,
-    data: UpdateInteractionInput
-  ): Promise<InteractionLog> {
-    const index =
-      mockInteractions.findIndex(
-        (i) =>
-          i.id === Number(id)
-      );
-
-    if (index === -1) {
-      throw new Error(
-        'Không tìm thấy interaction'
-      );
-    }
-
-    mockInteractions[index] = {
-      ...mockInteractions[index],
-
-      ...data,
-    };
-
-    return mockInteractions[index];
-  }
-
-  async deleteInteraction(
-    id: string | number
-  ): Promise<void> {
-    mockInteractions =
-      mockInteractions.filter(
-        (i) =>
-          i.id !== Number(id)
-      );
-  }
-
+async deleteInteraction(
+  id: string | number
+): Promise<void> {
+  return customerApi.deleteInteraction(
+    id
+  );
+}
+async getDocumentsByCustomerId(
+  customerId: string | number
+) {
+  return customerApi.getDocumentsByCustomerId(
+    customerId
+  );
+}
   /* =========================================
      TASK 2.4
      ATTACHMENTS
@@ -817,72 +761,38 @@ class CustomerRepository {
   ========================================= */
 
   async getComplaintsByCustomer(
-    customerId:
-      | string
-      | number
-  ): Promise<Complaint[]> {
-    return mockComplaints.filter(
-      (complaint) =>
-        complaint.customerId ===
-        Number(customerId)
-    );
-  }
+  customerId:
+    | string
+    | number
+): Promise<Complaint[]> {
+  return complaintApi.getByCustomerId(
+    Number(customerId)
+  );
+}
 
-  async createComplaint(
-    data: CreateComplaintInput
-  ): Promise<Complaint> {
-    const newComplaint: Complaint = {
-      id:
-        mockComplaints.length + 1,
+async createComplaint(
+  data: CreateComplaintInput
+): Promise<Complaint> {
+  return complaintApi.create(data);
+}
 
-      ...data,
+async updateComplaint(
+  id: string | number,
+  data: UpdateComplaintInput
+): Promise<Complaint> {
+  return complaintApi.update(
+    Number(id),
+    data
+  );
+}
 
-      createdAt:
-        new Date().toISOString(),
-    };
-
-    mockComplaints.push(
-      newComplaint
-    );
-
-    return newComplaint;
-  }
-
-  async updateComplaint(
-    id: string | number,
-    data: UpdateComplaintInput
-  ): Promise<Complaint> {
-    const index =
-      mockComplaints.findIndex(
-        (complaint) =>
-          complaint.id === Number(id)
-      );
-
-    if (index === -1) {
-      throw new Error(
-        'Không tìm thấy complaint'
-      );
-    }
-
-    mockComplaints[index] = {
-      ...mockComplaints[index],
-      ...data,
-    };
-
-    return mockComplaints[index];
-  }
-
-  async deleteComplaint(
-    id: string | number
-  ): Promise<void> {
-    mockComplaints =
-      mockComplaints.filter(
-        (complaint) =>
-          complaint.id !==
-          Number(id)
-      );
-  }
-
+async deleteComplaint(
+  id: string | number
+): Promise<void> {
+  return complaintApi.delete(
+    Number(id)
+  );
+}
   /* =========================================
      TASK 2.7
      STATUS HISTORY
@@ -904,66 +814,36 @@ class CustomerRepository {
      TASK 2.5
      DASHBOARD
   ========================================= */
+async getCustomerDashboardSummary(
+  customerId:
+    | string
+    | number
+): Promise<TransactionSummary> {
 
-  async getCustomerDashboardSummary(
-    customerId:
-      | string
-      | number
-  ): Promise<TransactionSummary> {
-    const customerIdNumber =
-      Number(customerId);
+  const data =
+    await dashboardApi.getByCustomerId(
+      Number(customerId)
+    );
 
-    const totalContacts =
-      mockContacts.filter(
-        (c) => c.customerId === customerIdNumber
-      ).length;
+  return {
+    totalContacts:
+      data.totalContacts ?? 0,
 
-    const totalInteractions =
-      mockInteractions.filter(
-        (i) => i.customerId === customerIdNumber
-      ).length;
+    totalInteractions:
+      data.totalInteractions ?? 0,
 
-    const totalComplaints =
-      mockComplaints.filter(
-        (c) => c.customerId === customerIdNumber
-      ).length;
+    totalComplaints:
+      data.totalComplaints ?? 0,
 
-    const totalAttachments =
-      mockAttachments.filter(
-        (a) => a.customerId === customerIdNumber
-      ).length;
+    totalAttachments:
+      data.totalDocuments ?? 0,
 
-    const lastInteractionDate =
-      mockInteractions
-        .filter(
-          (i) => i.customerId === customerIdNumber
-        )
-        .sort(
-          (a, b) =>
-            Number(
-              new Date(
-                b.interactionDate
-              )
-            ) -
-            Number(
-              new Date(
-                a.interactionDate
-              )
-            )
-        )[0]?.interactionDate;
+    totalRevenue: 0,
 
-    return {
-      totalContacts,
-      totalInteractions,
-      totalComplaints,
-      totalAttachments,
-      totalRevenue:
-        mockCustomers.find(
-          (c) => c.id === customerIdNumber
-        )?.budget,
-      lastInteractionDate,
-    } as TransactionSummary;
-  }
+    lastInteractionDate:
+      undefined,
+  };
+}
 }
 
 export const customerRepository =

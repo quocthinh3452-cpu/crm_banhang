@@ -21,6 +21,7 @@ import { EmptyState } from '@/shared/components/ui/EmptyState';
 
 interface Props {
   customerId: string | number;
+  documents: any[];
 }
 
 const ATTACHMENT_TYPES: Record<string, AttachmentType> = {
@@ -60,6 +61,7 @@ const formatSize = (size?: number) => {
 
 export default function AttachmentsTab({
   customerId,
+  documents,
 }: Props) {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -68,15 +70,8 @@ export default function AttachmentsTab({
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   useEffect(() => {
-    const loadAttachments = async () => {
-      const data = await customerRepository.getAttachmentsByCustomer(
-        customerId
-      );
-      setAttachments(data);
-    };
-
-    loadAttachments();
-  }, [customerId]);
+  setAttachments(documents || []);
+}, [documents]);
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -183,15 +178,15 @@ export default function AttachmentsTab({
                 <div className="flex items-center gap-2 text-slate-100">
                   <FileText size={20} />
                   <span className="font-semibold">
-                    {attachment.fileName}
+                    {attachment.name}
                   </span>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
                   <span className="inline-flex items-center rounded-full bg-slate-800 px-2.5 py-1">
-                    {attachment.fileType}
+                    {attachment.type || 'DOCUMENT'}
                   </span>
-                  <span>{formatSize(attachment.fileSize)}</span>
+                  <span>{attachment.fileUrl || 'Không có file'}</span>
                   <span className="inline-flex items-center gap-1">
                     <CalendarDays size={14} />
                     {attachment.createdAt ?? 'N/A'}

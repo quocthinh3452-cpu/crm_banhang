@@ -53,6 +53,10 @@ public class GetAllCustomersInteractor
                         status == null ||
                                 customer.getStatus().equalsIgnoreCase(status)
                 )
+                .filter(customer ->
+                        customer.getDeleted() == null ||
+                                !customer.getDeleted()
+                )
 
                 .map(customer ->
                         CustomerOutput.builder()

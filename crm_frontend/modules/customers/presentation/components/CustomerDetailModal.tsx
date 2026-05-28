@@ -7,7 +7,8 @@ import { Users } from 'lucide-react';
 import { Modal } from '@/shared/components/ui/Modal';
 import { StatusBadge } from '@/shared/components/ui/StatusBadge';
 import { Customer } from '@/modules/customers/domain/types';
-
+import { useEffect } from "react";
+import { contactApi } from "../../data/customerApi";
 type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement> & { size?: number }>;
 
 interface TabItem {
