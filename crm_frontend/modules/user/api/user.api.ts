@@ -3,7 +3,7 @@ import { User, LoginRequest, UserRequest } from '../types/user.type';
 
 export const userApi = {
   login: async (request: LoginRequest): Promise<User> => {
-    return axiosClient.post('/auth/login', request);
+    return axiosClient.post('/auth/login', request, { skipGlobalToast: true });
   },
 
   getAll: async (): Promise<User[]> => {

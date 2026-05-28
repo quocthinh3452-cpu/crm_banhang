@@ -7,7 +7,8 @@ import { Skeleton } from '@/shared/components/ui/Skeleton';
 import { Pagination } from '@/shared/components/ui/Pagination';
 import { formatCurrency } from '@/shared/utils/formatters';
 import axiosClient from '@/shared/api/axiosClient';
-import { Plus, Search, Pencil, Eye } from 'lucide-react';
+import { Plus, Search, Pencil, Eye, FileSignature } from 'lucide-react';
+import { EmptyState } from '@/shared/components/ui/EmptyState';
 import ContractModal from './ContractModal';
 import ContractDetailModal from './ContractDetailModal';
 import toast from 'react-hot-toast';
@@ -57,43 +58,6 @@ function ContractPageInner() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [viewingContract, setViewingContract] = useState<Contract | null>(null);
 
-  // --- EFFECT: Tải danh sách hợp đồng khi page thay đổi ---
-  useEffect(() => {
-    fetchContracts(page, keyword, statusFilter, minValueFilter, maxValueFilter, startDateFilter, endDateFilter);
-  }, [page]);
-
-  // --- EFFECT: Xử lý 1-Click Convert từ trang Báo giá sang ---
-  useEffect(() => {
-    if (convertQuoteId) {
-      const fetchQuoteForConversion = async () => {
-        setIsLoading(true);
-        try {
-          const q: any = await axiosClient.get(`/quotes/${convertQuoteId}`);
-          if (q) {
-            setSelectedContract({
-              id: 0,
-              contractNumber: `HD-\${q.quoteNumber}`,
-              customerId: q.leadId,
-              customerName: q.customerName,
-              quoteId: q.id,
-              value: q.grandTotal,
-              status: 'active',
-            });
-            setIsModalOpen(true);
-            toast.success(`⚡ Đã chuyển đổi dữ liệu từ Báo giá #${q.quoteNumber} thành công!`);
-            router.replace('/crm/contracts');
-          }
-        } catch (err) {
-          console.error('Lỗi khi tải thông tin báo giá để tạo hợp đồng:', err);
-          toast.error('⚠️ Không thể tải dữ liệu báo giá để chuyển đổi!');
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      fetchQuoteForConversion();
-    }
-  }, [convertQuoteId]);
-
   // --- HÀM XỬ LÝ ---
   const fetchContracts = async (
     currentPage: number, 
@@ -128,6 +92,43 @@ function ContractPageInner() {
       setIsLoading(false);
     }
   };
+
+  // --- EFFECT: Tải danh sách hợp đồng khi page thay đổi ---
+  useEffect(() => {
+    fetchContracts(page, keyword, statusFilter, minValueFilter, maxValueFilter, startDateFilter, endDateFilter);
+  }, [page]);
+
+  // --- EFFECT: Xử lý 1-Click Convert từ trang Báo giá sang ---
+  useEffect(() => {
+    if (convertQuoteId) {
+      const fetchQuoteForConversion = async () => {
+        setIsLoading(true);
+        try {
+          const q: any = await axiosClient.get(`/quotes/${convertQuoteId}`);
+          if (q) {
+            setSelectedContract({
+              id: 0,
+              contractNumber: `HD-${q.quoteNumber}`,
+              customerId: q.leadId,
+              customerName: q.customerName,
+              quoteId: q.id,
+              value: q.grandTotal,
+              status: 'active',
+            });
+            setIsModalOpen(true);
+            toast.success(`⚡ Đã chuyển đổi dữ liệu từ Báo giá #${q.quoteNumber} thành công!`);
+            router.replace('/crm/contracts');
+          }
+        } catch (err) {
+          console.error('Lỗi khi tải thông tin báo giá để tạo hợp đồng:', err);
+          toast.error('⚠️ Không thể tải dữ liệu báo giá để chuyển đổi!');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchQuoteForConversion();
+    }
+  }, [convertQuoteId]);
 
   const handleSearch = () => {
     setPage(0); // Reset về trang 1
@@ -316,19 +317,19 @@ function ContractPageInner() {
             {/* Khoảng ngày ký */}
             <div>
               <label className="block mb-1.5 text-xs font-semibold text-slate-600 uppercase tracking-wider">Ngày ký (Từ ngày ~ Đến ngày)</label>
-              <div className="flex gap-2 items-center">
+              <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
                 <input
                   type="date"
                   value={startDateFilter}
                   onChange={(e) => setStartDateFilter(e.target.value)}
-                  className="w-full px-2 py-1.5 border border-slate-200 rounded-lg outline-none focus:border-blue-500 text-xs bg-white text-slate-800 cursor-pointer"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500 text-xs bg-white text-slate-800 cursor-pointer h-10"
                 />
-                <span className="text-slate-400 text-xs">~</span>
+                <span className="text-slate-400 text-xs self-center">~</span>
                 <input
                   type="date"
                   value={endDateFilter}
                   onChange={(e) => setEndDateFilter(e.target.value)}
-                  className="w-full px-2 py-1.5 border border-slate-200 rounded-lg outline-none focus:border-blue-500 text-xs bg-white text-slate-800 cursor-pointer"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none focus:border-blue-500 text-xs bg-white text-slate-800 cursor-pointer h-10"
                 />
               </div>
             </div>
@@ -351,7 +352,7 @@ function ContractPageInner() {
       {/* Bảng dữ liệu */}
       <div className="bg-white rounded-xl shadow-sm border border-slate-200/60 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead>
               <tr className="border-b border-slate-200/80 bg-slate-50/75">
                 <th className="px-6 py-4 font-semibold text-slate-500 text-xs tracking-wider uppercase whitespace-nowrap">Số hợp đồng</th>
@@ -363,7 +364,7 @@ function ContractPageInner() {
                 <th className="px-6 py-4 font-semibold text-slate-500 text-xs tracking-wider uppercase text-center whitespace-nowrap">Thao tác</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 bg-white">
               {isLoading ? (
                 [1, 2, 3, 4, 5].map((i) => (
                   <tr key={i} className="border-b border-slate-100">
@@ -378,13 +379,17 @@ function ContractPageInner() {
                 ))
               ) : contracts.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-slate-400 text-sm font-medium">
-                    Không tìm thấy hợp đồng nào trong hệ thống.
+                  <td colSpan={7} className="p-6 bg-white">
+                    <EmptyState
+                      icon={FileSignature}
+                      title="Không tìm thấy hợp đồng"
+                      description="Không tìm thấy hợp đồng nào phù hợp với bộ lọc tìm kiếm hiện tại."
+                    />
                   </td>
                 </tr>
               ) : (
                 contracts.map((c) => (
-                  <tr key={c.id} className="border-b border-slate-100 hover:bg-slate-50/60 transition-all duration-150">
+                  <tr key={c.id} className="border-b border-slate-100 hover:bg-slate-50/60 transition-all duration-150 text-sm">
                     <td className="px-6 py-4 font-semibold text-slate-900">
                       <div className="font-bold text-slate-900">#{c.contractNumber}</div>
                       {c.quoteId && (
@@ -393,13 +398,13 @@ function ContractPageInner() {
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-700 font-medium">
+                    <td className="px-6 py-4 text-slate-700 font-bold">
                       {c.customerName || `Khách hàng #${c.customerId}`}
                     </td>
-                    <td className="px-6 py-4 text-right font-bold text-blue-600 text-sm">
+                    <td className="px-6 py-4 text-right font-bold text-blue-600">
                       {formatCurrency(c.value)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600 font-medium">
+                    <td className="px-6 py-4 text-slate-650 font-medium">
                       {c.managerName || `Manager #${c.managerId}`}
                     </td>
                     <td className="px-6 py-4 text-center text-xs whitespace-nowrap">
@@ -419,14 +424,14 @@ function ContractPageInner() {
                       <div className="flex items-center justify-center gap-3">
                         <button
                           onClick={() => { setViewingContract(c); setIsDetailModalOpen(true); }}
-                          className="p-1.5 text-blue-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-150 shadow-sm border border-transparent hover:border-blue-200/50 bg-white"
+                          className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-blue-500 hover:text-blue-650 hover:bg-blue-50/40 cursor-pointer shadow-sm"
                           title="Xem chi tiết hợp đồng"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => { setSelectedContract(c); setIsModalOpen(true); }}
-                          className="p-1.5 text-amber-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all duration-150 shadow-sm border border-transparent hover:border-amber-200/50 bg-white"
+                          className="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-amber-500 hover:text-amber-600 hover:bg-amber-50/40 cursor-pointer shadow-sm"
                           title="Cập nhật trạng thái hợp đồng"
                         >
                           <Pencil className="w-4 h-4" />

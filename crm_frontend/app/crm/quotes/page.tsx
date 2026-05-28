@@ -5,6 +5,7 @@ import { Button } from '@/shared/components/ui/Button';
 import { TextInput } from '@/shared/components/form/TextInput';
 import { Skeleton } from '@/shared/components/ui/Skeleton';
 import { Pagination } from '@/shared/components/ui/Pagination';
+import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog';
 import { formatCurrency } from '@/shared/utils/formatters';
 import axiosClient from '@/shared/api/axiosClient';
 import toast from 'react-hot-toast';
@@ -49,6 +50,12 @@ export default function QuoteManagementPage() {
   const [editingQuoteId, setEditingQuoteId] = useState<number | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [viewingQuoteId, setViewingQuoteId] = useState<number | null>(null);
+
+  // State Confirm Dialog Xóa
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const [deleteTargetName, setDeleteTargetName] = useState<string>('');
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   // --- EFFECT: Tải dữ liệu khi render hoặc thay đổi page ---
   useEffect(() => {
@@ -107,16 +114,21 @@ export default function QuoteManagementPage() {
     toast.success('🧹 Đã xóa tất cả bộ lọc tìm kiếm!');
   };
 
-  const deleteQuote = async (id: number, status: string) => {
-    if (status === 'Approved') {
-      toast.error('⚠️ Không thể xóa báo giá đã duyệt!'); 
-      return; 
+  const handleOpenDelete = (quote: Quote) => {
+    if (quote.approvalStatus === 'Approved') {
+      toast.error('⚠️ Không thể xóa báo giá đã duyệt!');
+      return;
     }
-    
-    if (!confirm('Bạn có chắc chắn muốn xóa báo giá này?')) return;
-    
+    setDeleteTargetId(quote.id);
+    setDeleteTargetName(quote.quoteNumber);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteTargetId === null) return;
+    setConfirmLoading(true);
     try {
-      await axiosClient.delete(`/quotes/${id}`);
+      await axiosClient.delete(`/quotes/${deleteTargetId}`);
       toast.success('Xóa báo giá thành công!');
       const isLastElementOnPage = quotes.length === 1;
       const newPage = isLastElementOnPage && page > 0 ? page - 1 : page;
@@ -124,6 +136,10 @@ export default function QuoteManagementPage() {
       fetchQuotes(newPage, keyword, statusFilter, minTotalFilter, maxTotalFilter, startDateFilter, endDateFilter);
     } catch (err) {
       console.error('Lỗi khi xóa báo giá:', err);
+    } finally {
+      setConfirmLoading(false);
+      setIsConfirmOpen(false);
+      setDeleteTargetId(null);
     }
   };
 
@@ -317,12 +333,13 @@ export default function QuoteManagementPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-200/80 bg-slate-50/75">
-                <th className="px-6 py-4 font-semibold text-slate-500 text-xs tracking-wider uppercase whitespace-nowrap">Mã báo giá</th>
-                <th className="px-6 py-4 font-semibold text-slate-500 text-xs tracking-wider uppercase whitespace-nowrap">Khách hàng</th>
-                <th className="px-6 py-4 font-semibold text-slate-500 text-xs tracking-wider uppercase text-center whitespace-nowrap">Trạng thái Báo giá</th>
-                <th className="px-6 py-4 font-semibold text-slate-500 text-xs tracking-wider uppercase text-right whitespace-nowrap">Tổng cộng</th>
-                <th className="px-6 py-4 font-semibold text-slate-500 text-xs tracking-wider uppercase text-center whitespace-nowrap">Thao tác</th>
+              <tr className="border-b border-slate-200/80 bg-slate-50/75 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="px-6 py-4 whitespace-nowrap w-40">Mã báo giá</th>
+                <th className="px-6 py-4 whitespace-nowrap">Khách hàng</th>
+                <th className="px-6 py-4 text-center whitespace-nowrap w-44">Ngày lập / Hết hạn</th>
+                <th className="px-6 py-4 text-center whitespace-nowrap w-36">Trạng thái Báo giá</th>
+                <th className="px-6 py-4 text-right whitespace-nowrap w-36">Tổng cộng</th>
+                <th className="px-6 py-4 text-center whitespace-nowrap w-48">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -331,38 +348,38 @@ export default function QuoteManagementPage() {
                   <tr key={i} className="border-b border-slate-100">
                     <td className="px-6 py-4"><Skeleton className="h-5 w-20" /></td>
                     <td className="px-6 py-4"><Skeleton className="h-5 w-44" /></td>
-                    <td className="px-6 py-4"><Skeleton className="h-6 w-24 mx-auto rounded-full" /></td>
+                    <td className="px-6 py-4 text-center"><Skeleton className="h-5 w-40 mx-auto" /></td>
+                    <td className="px-6 py-4 text-center"><Skeleton className="h-6 w-24 mx-auto rounded-full" /></td>
                     <td className="px-6 py-4 text-right"><Skeleton className="h-5 w-28 ml-auto" /></td>
-                    <td className="px-6 py-4 text-center"><Skeleton className="h-8 w-16 mx-auto rounded-md" /></td>
+                    <td className="px-6 py-4 text-center"><Skeleton className="h-8 w-24 mx-auto rounded-md" /></td>
                   </tr>
                 ))
               ) : quotes.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-10 text-center text-slate-400 text-sm font-medium">
+                  <td colSpan={6} className="px-6 py-10 text-center text-slate-400 text-sm font-medium">
                     Không tìm thấy báo giá nào phù hợp.
                   </td>
                 </tr>
               ) : (
                 quotes.map((q) => (
-                  <tr key={q.id} className="border-b border-slate-100 hover:bg-slate-50/60 transition-all duration-150">
-                    <td className="px-6 py-4 font-semibold text-slate-900">
-                      <div className="font-bold text-slate-900">#{q.quoteNumber}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5 font-medium">
-                        Lập: {q.quoteDate}
-                        {q.validUntil && (
-                          <span className={isQuoteExpired(q.validUntil) ? 'text-red-500 font-semibold ml-1' : 'ml-1 text-slate-500'}>
-                            (Hạn: {q.validUntil}) {isQuoteExpired(q.validUntil) && '⚠️ Hết hạn'}
-                          </span>
-                        )}
+                  <tr key={q.id} className="border-b border-slate-100 hover:bg-slate-50/60 transition-all duration-150 text-sm">
+                    <td className="px-6 py-4 font-bold text-slate-900 font-mono whitespace-nowrap">
+                      #{q.quoteNumber}
+                    </td>
+                    <td className="px-6 py-4 text-slate-700 font-bold">{q.customerName}</td>
+                    <td className="px-6 py-4 text-center text-xs whitespace-nowrap">
+                      <div className="text-slate-900 font-semibold">Lập: {q.quoteDate || '-'}</div>
+                      <div className={`text-[10px] mt-1 ${q.validUntil && isQuoteExpired(q.validUntil) ? 'text-red-500 font-semibold' : 'text-slate-400 font-medium'}`}>
+                        {q.validUntil ? `Hạn: ${q.validUntil}` : 'Vô thời hạn'}
+                        {q.validUntil && isQuoteExpired(q.validUntil) && ' (Hết hạn)'}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-700 font-medium">{q.customerName}</td>
                     <td className="px-6 py-4 text-center">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap ${getStatusBadgeClass(q.approvalStatus)}`}>
                         {translateStatus(q.approvalStatus)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right font-bold text-blue-600 text-sm">{formatCurrency(q.grandTotal)}</td>
+                    <td className="px-6 py-4 text-right font-bold text-blue-600 whitespace-nowrap">{formatCurrency(q.grandTotal)}</td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-3">
                         <button 
@@ -370,7 +387,7 @@ export default function QuoteManagementPage() {
                             setViewingQuoteId(q.id);
                             setIsDetailModalOpen(true);
                           }}
-                          className="p-1.5 rounded-lg transition-all duration-150 shadow-sm border text-blue-500 hover:text-blue-600 hover:bg-blue-50 bg-white border-slate-200/50 cursor-pointer"
+                          className="p-1.5 rounded-lg transition-all duration-150 shadow-sm border text-blue-500 hover:text-blue-650 hover:bg-blue-50 bg-white border-slate-200/50 cursor-pointer"
                           title="Xem chi tiết báo giá"
                         >
                           <Eye className="w-4 h-4" />
@@ -384,7 +401,7 @@ export default function QuoteManagementPage() {
                           disabled={q.approvalStatus?.toLowerCase() !== 'closed'}
                           className={`p-1.5 rounded-lg transition-all duration-150 shadow-sm border ${
                             q.approvalStatus?.toLowerCase() === 'closed'
-                              ? 'text-blue-500 hover:text-blue-600 hover:bg-blue-50 bg-white border-slate-200/50 cursor-pointer'
+                              ? 'text-blue-500 hover:text-blue-650 hover:bg-blue-55/40 bg-white border-slate-200/50 cursor-pointer'
                               : 'text-gray-300 bg-slate-50 border-slate-100 cursor-not-allowed opacity-40'
                           }`}
                           title={
@@ -418,14 +435,14 @@ export default function QuoteManagementPage() {
                         <button 
                           onClick={() => {
                             if (q.approvalStatus?.toLowerCase() !== 'closed') {
-                              deleteQuote(q.id, q.approvalStatus);
+                              handleOpenDelete(q);
                             }
                           }}
                           disabled={q.approvalStatus?.toLowerCase() === 'closed'}
                           className={`p-1.5 rounded-lg transition-all duration-150 shadow-sm border ${
                             q.approvalStatus?.toLowerCase() === 'closed'
                               ? 'text-gray-300 bg-slate-50 border-slate-100 cursor-not-allowed opacity-40'
-                              : 'text-red-500 hover:text-red-600 hover:bg-red-50 bg-white border-slate-200/50 cursor-pointer'
+                              : 'text-red-500 hover:text-red-650 hover:bg-red-50 bg-white border-slate-200/50 cursor-pointer'
                           }`}
                           title={
                             q.approvalStatus?.toLowerCase() === 'closed'
@@ -480,6 +497,18 @@ export default function QuoteManagementPage() {
           }} 
         />
       )}
+
+      {/* Confirm Dialog Xóa */}
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Xác nhận xóa báo giá"
+        message={`Bạn có chắc chắn muốn xóa báo giá #${deleteTargetName}? Hành động này không thể hoàn tác.`}
+        itemName={`#${deleteTargetName}`}
+        onCancel={() => setIsConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+        loading={confirmLoading}
+        confirmText="Xác nhận xóa"
+      />
     </div>
   );
 }

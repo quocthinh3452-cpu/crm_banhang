@@ -14,6 +14,7 @@ import { Skeleton } from '@/shared/components/ui/Skeleton';
 import { userApi } from '@/modules/user/api/user.api';
 import { User } from '@/modules/user/types/user.type';
 import { ShieldCheck, ShieldAlert, KeyRound, UserMinus } from 'lucide-react';
+import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog';
 
 // Định nghĩa danh sách các quyền nghiệp vụ để tích chọn
 const SYSTEM_PERMISSIONS = [
@@ -55,6 +56,11 @@ export default function UsersPage() {
   // States quản lý Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+
+  // State Confirm Dialog Xóa
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [deleteTargetUser, setDeleteTargetUser] = useState<User | null>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   // State quản lý các checkbox quyền được chọn
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
@@ -152,14 +158,14 @@ export default function UsersPage() {
         await userApi.create(userRequest);
         toast.success('Tạo tài khoản mới thành công!');
       }
-
+      
       setIsModalOpen(false);
       fetchUsers();
     } catch (error: any) {
       console.error(error);
       const backendError = error.response?.data;
       const msg = typeof backendError === 'string' ? backendError : 'Có lỗi xảy ra khi lưu dữ liệu.';
-
+      
       if (msg.toLowerCase().includes('email') && msg.toLowerCase().includes('tồn tại')) {
         setError('email', {
           type: 'manual',
@@ -173,21 +179,30 @@ export default function UsersPage() {
     }
   };
 
-  const handleDelete = async (user: User) => {
+  const handleDelete = (user: User) => {
     // Ngăn chặn admin tự xóa chính mình
     if (loggedInUser && loggedInUser.email === user.email) {
       toast.error('Bạn không được phép xóa tài khoản Admin đang đăng nhập!');
       return;
     }
 
-    if (window.confirm(`Bạn có chắc chắn muốn xóa (xóa mềm) tài khoản '${user.name}' không?`)) {
-      try {
-        await userApi.delete(user.id);
-        toast.success('Xóa tài khoản thành công!');
-        fetchUsers();
-      } catch (e) {
-        toast.error('Không thể xóa người dùng này.');
-      }
+    setDeleteTargetUser(user);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetUser) return;
+    setConfirmLoading(true);
+    try {
+      await userApi.delete(deleteTargetUser.id);
+      toast.success('Xóa tài khoản thành công!');
+      fetchUsers();
+    } catch (e) {
+      toast.error('Không thể xóa người dùng này.');
+    } finally {
+      setConfirmLoading(false);
+      setIsConfirmOpen(false);
+      setDeleteTargetUser(null);
     }
   };
 
@@ -238,7 +253,7 @@ export default function UsersPage() {
                 users.map((item) => {
                   const isSelf = loggedInUser?.email === item.email;
                   const permsList = item.permissions ? item.permissions.split(',') : [];
-
+                  
                   return (
                     <tr key={item.id} className={`border-b hover:bg-gray-50 transition-colors ${isSelf ? 'bg-blue-50/20' : ''}`}>
                       <td className="p-4 font-mono text-sm text-gray-500">#{item.id}</td>
@@ -252,12 +267,13 @@ export default function UsersPage() {
                       </td>
                       <td className="p-4 text-sm text-gray-600">{item.email}</td>
                       <td className="p-4">
-                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${item.role === 'admin'
-                            ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
+                          item.role === 'admin' 
+                            ? 'bg-purple-100 text-purple-800 border border-purple-200' 
                             : item.role === 'manager'
-                              ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                              : 'bg-slate-100 text-slate-800 border border-slate-200'
-                          }`}>
+                            ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                            : 'bg-slate-100 text-slate-800 border border-slate-200'
+                        }`}>
                           {item.role === 'admin' ? 'Quản trị viên' : item.role === 'manager' ? 'Trưởng phòng' : 'Nhân viên'}
                         </span>
                       </td>
@@ -336,7 +352,7 @@ export default function UsersPage() {
         size="5xl"
       >
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
-
+          
           {/* Thông tin cơ bản */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-1">
             <TextInput
@@ -405,18 +421,19 @@ export default function UsersPage() {
                 <label className="flex items-center gap-2 mb-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Danh sách quyền hạn chi tiết
                 </label>
-
+                
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                   {SYSTEM_PERMISSIONS.map((perm) => {
                     const isChecked = selectedPermissions.includes(perm.code);
-
+                    
                     return (
-                      <label
-                        key={perm.code}
-                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer select-none transition-all ${isChecked
-                            ? 'bg-blue-50/50 border-blue-200 text-blue-900 shadow-sm'
+                      <label 
+                        key={perm.code} 
+                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer select-none transition-all ${
+                          isChecked 
+                            ? 'bg-blue-50/50 border-blue-200 text-blue-900 shadow-sm' 
                             : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                          }`}
+                        }`}
                       >
                         <input
                           type="checkbox"
@@ -445,6 +462,20 @@ export default function UsersPage() {
 
         </form>
       </Modal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Xác nhận xóa tài khoản"
+        message={`Bạn có chắc chắn muốn xóa (xóa mềm) tài khoản '${deleteTargetUser?.name}' không?`}
+        itemName={deleteTargetUser?.name}
+        onCancel={() => {
+          setIsConfirmOpen(false);
+          setDeleteTargetUser(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        loading={confirmLoading}
+        confirmText="Xác nhận xóa"
+      />
     </div>
   );
 }

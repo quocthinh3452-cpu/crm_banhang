@@ -9,15 +9,19 @@ import { Modal } from '@/shared/components/ui/Modal';
 import { TextInput } from '@/shared/components/form/TextInput';
 import { SelectBox } from '@/shared/components/form/SelectBox';
 import { Skeleton } from '@/shared/components/ui/Skeleton';
+import toast from 'react-hot-toast';
+import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog';
 
 export default function ProductTypesPage() {
     const [productTypes, setProductTypes] = useState<ProductTypeResponse[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
-    // Thông báo lỗi/thành công toàn cục
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
-    const [successMsg, setSuccessMsg] = useState<string | null>(null);
+    // State Confirm Dialog Xóa
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+    const [deleteTargetName, setDeleteTargetName] = useState<string>('');
+    const [confirmLoading, setConfirmLoading] = useState(false);
 
     // Bộ lọc & Tìm kiếm
     const [searchTerm, setSearchTerm] = useState('');
@@ -33,22 +37,6 @@ export default function ProductTypesPage() {
     const [editTypeName, setEditTypeName] = useState('');
     const [editIsActive, setEditIsActive] = useState<number>(1);
 
-    // Load danh sách danh mục khi vào trang
-    useEffect(() => {
-        fetchProductTypes();
-    }, []);
-
-    // Tự động tắt thông báo lỗi/thành công sau 3 giây
-    useEffect(() => {
-        if (successMsg || errorMsg) {
-            const timer = setTimeout(() => {
-                setSuccessMsg(null);
-                setErrorMsg(null);
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [successMsg, errorMsg]);
-
     const fetchProductTypes = async () => {
         setIsLoading(true);
         try {
@@ -56,16 +44,19 @@ export default function ProductTypesPage() {
             setProductTypes(data || []);
         } catch (error) {
             console.error("Lỗi khi tải danh mục:", error);
-            setErrorMsg("Không thể tải danh sách loại sản phẩm.");
+            toast.error("Không thể tải danh sách loại sản phẩm.");
         } finally {
             setIsLoading(false);
         }
     };
 
+    // Load danh sách danh mục khi vào trang
+    useEffect(() => {
+        fetchProductTypes();
+    }, []);
+
     const handleOpenAdd = () => {
         setNewTypeName('');
-        setErrorMsg(null);
-        setSuccessMsg(null);
         setIsAddModalOpen(true);
     };
 
@@ -74,20 +65,17 @@ export default function ProductTypesPage() {
         if (!newTypeName.trim()) return;
 
         setIsSaving(true);
-        setErrorMsg(null);
-        setSuccessMsg(null);
-
         try {
             await productTypeApi.create({
                 typeName: newTypeName.trim(),
                 isActive: 1
             });
-            setSuccessMsg("Thêm loại sản phẩm mới thành công!");
+            toast.success("Thêm loại sản phẩm mới thành công!");
             setIsAddModalOpen(false);
             fetchProductTypes(); // Tải lại danh sách
         } catch (error: any) {
             const errorResponse = error.response?.data;
-            setErrorMsg(typeof errorResponse === 'string' ? errorResponse : "Đã xảy ra lỗi khi thêm mới.");
+            toast.error(typeof errorResponse === 'string' ? errorResponse : "Đã xảy ra lỗi khi thêm mới.");
         } finally {
             setIsSaving(false);
         }
@@ -97,8 +85,6 @@ export default function ProductTypesPage() {
         setEditingType(type);
         setEditTypeName(type.typeName);
         setEditIsActive(type.isActive);
-        setErrorMsg(null);
-        setSuccessMsg(null);
         setIsEditModalOpen(true);
     };
 
@@ -107,39 +93,43 @@ export default function ProductTypesPage() {
         if (!editingType || !editTypeName.trim()) return;
 
         setIsSaving(true);
-        setErrorMsg(null);
-        setSuccessMsg(null);
-
         try {
             await productTypeApi.update(editingType.id, {
                 typeName: editTypeName.trim(),
                 isActive: editIsActive
             });
-            setSuccessMsg("Cập nhật loại sản phẩm thành công!");
+            toast.success("Cập nhật loại sản phẩm thành công!");
             setIsEditModalOpen(false);
             setEditingType(null);
             fetchProductTypes(); // Tải lại danh sách
         } catch (error: any) {
             const errorResponse = error.response?.data;
-            setErrorMsg(typeof errorResponse === 'string' ? errorResponse : "Đã xảy ra lỗi khi cập nhật.");
+            toast.error(typeof errorResponse === 'string' ? errorResponse : "Đã xảy ra lỗi khi cập nhật.");
         } finally {
             setIsSaving(false);
         }
     };
 
-    const handleDelete = async (id: number) => {
-        if (!window.confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
+    const handleOpenDelete = (type: ProductTypeResponse) => {
+        setDeleteTargetId(type.id);
+        setDeleteTargetName(type.typeName);
+        setIsConfirmOpen(true);
+    };
 
-        setErrorMsg(null);
-        setSuccessMsg(null);
-
+    const handleConfirmDelete = async () => {
+        if (deleteTargetId === null) return;
+        setConfirmLoading(true);
         try {
-            await productTypeApi.delete(id);
-            setSuccessMsg("Xóa danh mục thành công!");
+            await productTypeApi.delete(deleteTargetId);
+            toast.success("Xóa danh mục thành công!");
             fetchProductTypes(); // Tải lại danh sách
         } catch (error: any) {
             const errorResponse = error.response?.data;
-            setErrorMsg(typeof errorResponse === 'string' ? errorResponse : "Không thể xóa danh mục này.");
+            toast.error(typeof errorResponse === 'string' ? errorResponse : "Không thể xóa danh mục này.");
+        } finally {
+            setConfirmLoading(false);
+            setIsConfirmOpen(false);
+            setDeleteTargetId(null);
         }
     };
 
@@ -169,18 +159,6 @@ export default function ProductTypesPage() {
                 </Button>
             </div>
 
-            {/* Banner hiển thị thông báo thành công / lỗi */}
-            {successMsg && (
-                <div className="p-4 rounded-lg bg-green-50 border border-green-200 text-green-700 flex items-center transition-all duration-300">
-                    <span className="font-medium">{successMsg}</span>
-                </div>
-            )}
-
-            {errorMsg && (
-                <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-center transition-all duration-300">
-                    <span className="font-medium">{errorMsg}</span>
-                </div>
-            )}
 
             {/* Filter & Search Bar giống y hệt trang Sản phẩm */}
             <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -275,7 +253,7 @@ export default function ProductTypesPage() {
                                                 <Button 
                                                     variant="outline" 
                                                     className="text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200" 
-                                                    onClick={() => handleDelete(type.id)}
+                                                    onClick={() => handleOpenDelete(type)}
                                                 >
                                                     Xóa
                                                 </Button>
@@ -356,6 +334,17 @@ export default function ProductTypesPage() {
                     </div>
                 </form>
             </Modal>
+
+            <ConfirmDialog
+                isOpen={isConfirmOpen}
+                title="Xác nhận xóa danh mục"
+                message={`Bạn có chắc chắn muốn xóa danh mục '${deleteTargetName}'? Thao tác này sẽ xóa danh mục khỏi hệ thống.`}
+                itemName={deleteTargetName}
+                onCancel={() => setIsConfirmOpen(false)}
+                onConfirm={handleConfirmDelete}
+                loading={confirmLoading}
+                confirmText="Xác nhận xóa"
+            />
         </div>
     );
 }

@@ -11,6 +11,10 @@ import { formatCurrency, formatDateTime } from '@/shared/utils/formatters';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog';
+import { EmptyState } from '@/shared/components/ui/EmptyState';
+import { PackageOpen } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { productApi } from '../../../modules/product/api/product.api';
 import { productTypeApi } from '../../../modules/product/api/productType.api';
@@ -56,6 +60,12 @@ export default function ProductsPage() {
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Confirm delete modal state
+    const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+    const [deleteTargetName, setDeleteTargetName] = useState<string>('');
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
+
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalElements, setTotalElements] = useState(0);
@@ -69,8 +79,8 @@ export default function ProductsPage() {
     });
 
     const { register, handleSubmit, formState: { errors }, reset, setError } = useForm({
-        resolver: zodResolver(productSchema),
-    });
+    resolver: zodResolver(productSchema),
+});
 
     useEffect(() => {
         if (successMsg || errorMsg) {
@@ -96,7 +106,7 @@ export default function ProductsPage() {
             setTypes(typesData || []);
         } catch (err) {
             console.error('Lỗi fetch data:', err);
-            setErrorMsg("Không thể tải dữ liệu sản phẩm.");
+            toast.error("Không thể tải dữ liệu sản phẩm.");
         } finally {
             setIsLoading(false);
         }
@@ -155,10 +165,10 @@ export default function ProductsPage() {
 
             if (editingProduct) {
                 await productApi.updateProduct(editingProduct.id, formData);
-                setSuccessMsg("Cập nhật sản phẩm thành công!");
+                toast.success("Cập nhật sản phẩm thành công!");
             } else {
                 await productApi.createProduct(formData);
-                setSuccessMsg("Thêm sản phẩm mới thành công!");
+                toast.success("Thêm sản phẩm mới thành công!");
             }
             setIsModalOpen(false);
             fetchData();
@@ -176,9 +186,9 @@ export default function ProductsPage() {
             // Hiển thị lỗi trực tiếp tại ô nhập liệu nếu trùng mã
             const lowerMsg = msg.toLowerCase();
             if (
-                lowerMsg.includes("đã tồn tại") ||
-                lowerMsg.includes("duplicate") ||
-                lowerMsg.includes("already exists") ||
+                lowerMsg.includes("đã tồn tại") || 
+                lowerMsg.includes("duplicate") || 
+                lowerMsg.includes("already exists") || 
                 lowerMsg.includes("trùng")
             ) {
                 setError("productCode", {
@@ -186,7 +196,7 @@ export default function ProductsPage() {
                     message: "Mã đã tồn tại vui lòng chọn mã khác"
                 });
             } else {
-                setErrorMsg(msg);
+                toast.error(msg);
             }
             console.error(error);
         } finally {
@@ -194,18 +204,27 @@ export default function ProductsPage() {
         }
     };
 
-    const handleDelete = async (id: number) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?')) {
-            setErrorMsg(null);
-            setSuccessMsg(null);
-            try {
-                await productApi.deleteProduct(id);
-                setSuccessMsg("Xóa sản phẩm thành công!");
-                fetchData();
-            } catch (error: any) {
-                const backendError = error.response?.data;
-                setErrorMsg(typeof backendError === 'string' ? backendError : 'Lỗi khi xóa sản phẩm.');
-            }
+    const handleOpenDelete = (product: Product) => {
+        setDeleteTargetId(product.id);
+        setDeleteTargetName(product.name);
+        setIsConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (deleteTargetId === null) return;
+        setConfirmLoading(true);
+        try {
+            await productApi.deleteProduct(deleteTargetId);
+            toast.success("Xóa sản phẩm thành công!");
+            fetchData();
+        } catch (error: any) {
+            const backendError = error.response?.data;
+            const msg = typeof backendError === 'string' ? backendError : 'Lỗi khi xóa sản phẩm.';
+            toast.error(msg);
+        } finally {
+            setConfirmLoading(false);
+            setIsConfirmOpen(false);
+            setDeleteTargetId(null);
         }
     };
 
@@ -326,35 +345,23 @@ export default function ProductsPage() {
                 </div>
             </div>
 
-            {successMsg && (
-                <div className="p-4 rounded-lg bg-green-50 border border-green-200 text-green-700 flex items-center transition-all duration-300">
-                    <span className="font-medium">{successMsg}</span>
-                </div>
-            )}
-
-            {errorMsg && (
-                <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-center transition-all duration-300">
-                    <span className="font-medium">{errorMsg}</span>
-                </div>
-            )}
-
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-white rounded-lg shadow border border-slate-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[1200px]">
                         <thead className="bg-gray-50 border-b">
                             <tr>
-                                <th className="p-4 font-semibold text-gray-600">Hình ảnh</th>
-                                <th className="p-4 font-semibold text-gray-600">Mã SP</th>
-                                <th className="p-4 font-semibold text-gray-600">Tên sản phẩm</th>
-                                <th className="p-4 font-semibold text-gray-600">Mô tả</th>
-                                <th className="p-4 font-semibold text-gray-600">Loại sản phẩm</th>
-                                <th className="p-4 font-semibold text-gray-600">Giá bán</th>
-                                <th className="p-4 font-semibold text-gray-600">Ngày tạo</th>
-                                <th className="p-4 font-semibold text-gray-600">Ngày cập nhật</th>
-                                <th className="p-4 font-semibold text-gray-600 text-center">Thao tác</th>
+                                <th className="p-4 font-semibold text-gray-650">Hình ảnh</th>
+                                <th className="p-4 font-semibold text-gray-650">Mã SP</th>
+                                <th className="p-4 font-semibold text-gray-650">Tên sản phẩm</th>
+                                <th className="p-4 font-semibold text-gray-650">Mô tả</th>
+                                <th className="p-4 font-semibold text-gray-650">Loại sản phẩm</th>
+                                <th className="p-4 font-semibold text-gray-650">Giá bán</th>
+                                <th className="p-4 font-semibold text-gray-650">Ngày tạo</th>
+                                <th className="p-4 font-semibold text-gray-650">Ngày cập nhật</th>
+                                <th className="p-4 font-semibold text-gray-650 text-center">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-slate-100 bg-white">
                             {isLoading ? (
                                 [1, 2, 3, 4, 5].map((i) => (
                                     <tr key={i} className="border-b">
@@ -422,21 +429,27 @@ export default function ProductsPage() {
                                                     <path d="m15 5 4 4" />
                                                 </svg></Button>
                                                 {/* //xóa */}
-                                                <Button variant="outline" className="text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200" onClick={() => handleDelete(item.id)}>   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <Button variant="outline" className="text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200" onClick={() => handleOpenDelete(item)}>   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                     <path d="M3 6h18" />
                                                     <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
                                                     <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
                                                     <line x1="10" x2="10" y1="11" y2="17" />
                                                     <line x1="14" x2="14" y1="11" y2="17" />
                                                 </svg></Button>
+                                                <Button variant="outline" className="text-xs px-3 h-8 shadow-sm rounded-lg" onClick={() => handleOpenEdit(item)}>Sửa</Button>
+                                                <Button variant="outline" className="text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200 hover:text-red-700 shadow-sm rounded-lg" onClick={() => handleOpenDelete(item)}>Xóa</Button>
                                             </div>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={9} className="p-10 text-center text-gray-500">
-                                        Không tìm thấy sản phẩm nào
+                                    <td colSpan={9} className="p-6 bg-white">
+                                        <EmptyState
+                                            icon={PackageOpen}
+                                            title="Không tìm thấy sản phẩm"
+                                            description="Không tìm thấy sản phẩm nào phù hợp với bộ lọc tìm kiếm của bạn."
+                                        />
                                     </td>
                                 </tr>
                             )}
@@ -539,6 +552,17 @@ export default function ProductsPage() {
                     </div>
                 </form>
             </Modal>
+
+            <ConfirmDialog
+                isOpen={isConfirmOpen}
+                title="Xác nhận xóa sản phẩm"
+                message={`Bạn có chắc chắn muốn xóa sản phẩm ${deleteTargetName}? Hành động này sẽ loại bỏ sản phẩm khỏi kho hàng.`}
+                itemName={deleteTargetName}
+                onCancel={() => setIsConfirmOpen(false)}
+                onConfirm={handleConfirmDelete}
+                loading={confirmLoading}
+                confirmText="Xác nhận xóa"
+            />
         </div>
     );
 }

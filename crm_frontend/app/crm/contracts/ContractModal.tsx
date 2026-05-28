@@ -55,7 +55,7 @@ export default function ContractModal({ contract, onClose, onSaved }: ContractMo
     customerId: '',
     quoteId: '',
     templateId: '',
-    signDate: new Date().toISOString().split('T')[0],
+    signDate: '', // Khởi tạo rỗng để đồng bộ SSR và Client
     expiryDate: '',
     value: '',
     managerId: '',
@@ -67,6 +67,16 @@ export default function ContractModal({ contract, onClose, onSaved }: ContractMo
   // Trường hợp 1-click convert từ Báo giá, contract có id=0 → vẫn là TẠO MỚI
   const isEditMode = !!(contract && contract.id > 0);
 
+  // Khởi tạo ngày ký hợp đồng mới ở client-side để tránh Hydration Mismatch múi giờ
+  useEffect(() => {
+    if (!isEditMode && !contract) {
+      setFormData(prev => ({
+        ...prev,
+        signDate: new Date().toISOString().split('T')[0],
+      }));
+    }
+  }, [isEditMode, contract]);
+
   // --- EFFECTS ---
 
   // 1. Tải danh mục tĩnh (Khách hàng, Người dùng/Quản lý, Báo giá) từ Backend
@@ -74,13 +84,22 @@ export default function ContractModal({ contract, onClose, onSaved }: ContractMo
     const loadCatalogs = async () => {
       try {
         const [customersData, usersData, quotesPage]: [any, any, any] = await Promise.all([
-          axiosClient.get('/customers'),
-          axiosClient.get('/users'),
+          axiosClient.get('/customers?size=1000'),
+          axiosClient.get('/users?size=1000'),
           axiosClient.get('/quotes?size=100'),
         ]);
-        setCustomers(customersData || []);
-        setUsers(usersData || []);
-        setQuotes(quotesPage.content || []);
+
+        const rawCustomers = Array.isArray(customersData)
+          ? customersData
+          : (customersData?.data || customersData?.content || []);
+
+        const rawUsers = Array.isArray(usersData)
+          ? usersData
+          : (usersData?.data || usersData?.content || usersData?.items || []);
+
+        setCustomers(rawCustomers);
+        setUsers(rawUsers);
+        setQuotes(quotesPage.content || quotesPage.items || quotesPage || []);
       } catch (err) {
         console.error('Lỗi tải danh mục khách hàng/người dùng/báo giá:', err);
       } finally {

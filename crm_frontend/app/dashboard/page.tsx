@@ -149,13 +149,22 @@ export default function DashboardPage() {
             CRM Bán Hàng Dự Án IT
           </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Chào mừng trở lại, {currentUser?.name || 'Thành viên'} 
+            Chào mừng trở lại, {currentUser?.name || 'Thành viên'} 👋
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             Dưới đây là tổng quan hiệu suất bán hàng và quản lý khách hàng của bạn hôm nay.
           </p>
         </div>
-   
+        
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => router.push('/crm/customers')}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium text-sm rounded-xl transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Thêm Khách Hàng
+          </button>
+        </div>
       </div>
 
       {/* --- GRID THỐNG KÊ SỐ LIỆU --- */}

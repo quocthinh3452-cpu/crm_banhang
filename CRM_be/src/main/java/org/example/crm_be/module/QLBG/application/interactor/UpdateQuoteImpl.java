@@ -25,7 +25,7 @@ public class UpdateQuoteImpl implements IUpdateQuote {
         }
 
         // 3. VALIDATE NGHIỆP VỤ (Ngày tháng, trạng thái...)
-        validateRequest(request);
+        validateRequest(id, request);
 
         // 4. THỰC HIỆN CẬP NHẬT
         // Đảm bảo mapper đã map cả danh sách items từ request vào newQuote
@@ -43,8 +43,15 @@ public class UpdateQuoteImpl implements IUpdateQuote {
         return quoteMapper.toResponse(savedQuote);
     }
 
-    // Validate ngày tháng
-    private void validateRequest(QuoteRequest request) {
+    // Validate ngày tháng và mã trùng
+    private void validateRequest(Integer id, QuoteRequest request) {
+        if (request.getQuoteNumber() != null) {
+            quoteRepository.findByQuoteNumber(request.getQuoteNumber()).ifPresent(q -> {
+                if (q.getId() != id) {
+                    throw new IllegalArgumentException("⚠️ Lỗi: Mã báo giá \"" + request.getQuoteNumber() + "\" đã tồn tại trong hệ thống!");
+                }
+            });
+        }
         if (request.getValidUntil() != null && request.getValidUntil().isBefore(request.getQuoteDate())) {
             throw new RuntimeException("Ngày hết hạn phải sau hoặc bằng ngày lập báo giá.");
         }

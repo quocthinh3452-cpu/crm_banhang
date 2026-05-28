@@ -21,7 +21,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         <input
           id={inputId}
           ref={ref}
-          className={`px-4 py-2 border rounded-md outline-none transition-colors 
+          className={`px-4 py-2.5 border rounded-lg outline-none transition-all duration-200 text-sm text-gray-900 placeholder-gray-400 bg-white
             ${error ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'}
             disabled:bg-gray-100 disabled:cursor-not-allowed ${className}`}
           {...props}

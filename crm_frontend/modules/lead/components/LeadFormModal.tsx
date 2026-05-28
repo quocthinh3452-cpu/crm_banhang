@@ -8,6 +8,7 @@ import { SelectBox } from '@/shared/components/form/SelectBox';
 import { Button } from '@/shared/components/ui/Button';
 import { leadApi, Lead } from '../services/leadApi';
 import { lookupApi, LookupItem } from '../services/lookupApi';
+import toast from 'react-hot-toast';
 
 // 1. ZOD SCHEMA
 const leadSchema = z.object({
@@ -95,7 +96,7 @@ export const LeadFormModal: React.FC<{
     }
   }, [isOpen]);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<LeadFormValues>({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm<LeadFormValues>({
     resolver: zodResolver(leadSchema) as unknown as Resolver<LeadFormValues, any>,
     defaultValues: {
       status: 'NEW',
@@ -188,9 +189,11 @@ const onSubmit: SubmitHandler<LeadFormValues> = async (data) => {
         await leadApi.createLead(payload as any);
       }
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Lỗi khi lưu:', error);
-      alert('Lỗi 400: Kiểm tra định dạng dữ liệu!');
+      const backendError = error.response?.data;
+      const msg = typeof backendError === 'string' ? backendError : 'Kiểm tra định dạng dữ liệu hoặc trùng lặp!';
+      toast.error(`⚠️ ${msg}`);
     }
   };
 
@@ -286,8 +289,8 @@ const onSubmit: SubmitHandler<LeadFormValues> = async (data) => {
         </div>
 
         <div className="flex justify-end space-x-2 mt-4 pt-4 border-t border-gray-200 shrink-0">
-          <Button variant="secondary" type="button" onClick={onClose}>Hủy</Button>
-          <Button type="submit">Lưu lại</Button>
+          <Button variant="secondary" type="button" onClick={onClose} disabled={isSubmitting}>Hủy</Button>
+          <Button type="submit" isLoading={isSubmitting} disabled={isSubmitting}>Lưu lại</Button>
         </div>
         
       </form>

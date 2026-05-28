@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface QuoteRepository {
     Quote save(Quote quote);
+    Optional<Quote> findByQuoteNumber(String quoteNumber);
     Optional<Quote> findById(int id);
     Page<Quote> findAll(Pageable pageable);
     void deleteById(Integer id);

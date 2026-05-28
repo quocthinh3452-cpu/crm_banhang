@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/shared/components/ui/Button';
 import { Modal } from '@/shared/components/ui/Modal';
+import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog';
 import { TextInput } from '@/shared/components/form/TextInput';
 import { SelectBox } from '@/shared/components/form/SelectBox';
 import { Skeleton } from '@/shared/components/ui/Skeleton';
@@ -44,6 +45,12 @@ export default function DocumentsPage() {
     // State cho Modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDocument, setEditingDocument] = useState<Document | null>(null);
+
+    // State Confirm Dialog Xóa
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+    const [deleteTargetName, setDeleteTargetName] = useState<string>('');
+    const [confirmLoading, setConfirmLoading] = useState(false);
 
     const { register, handleSubmit, formState: { errors }, reset, setError } = useForm<DocumentFormValues>({
         resolver: zodResolver(documentSchema),
@@ -160,18 +167,28 @@ export default function DocumentsPage() {
         }
     };
 
-    const handleDelete = async (id: number) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa (xóa mềm) tài liệu này không?')) {
-            setErrorMsg(null);
-            setSuccessMsg(null);
-            try {
-                await documentApi.delete(id);
-                setSuccessMsg("Xóa mềm tài liệu thành công!");
-                fetchData();
-            } catch (error: any) {
-                const backendError = error.response?.data;
-                setErrorMsg(typeof backendError === 'string' ? backendError : 'Lỗi khi xóa tài liệu.');
-            }
+    const handleOpenDelete = (doc: Document) => {
+        setDeleteTargetId(doc.id);
+        setDeleteTargetName(doc.name);
+        setIsConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (deleteTargetId === null) return;
+        setConfirmLoading(true);
+        setErrorMsg(null);
+        setSuccessMsg(null);
+        try {
+            await documentApi.delete(deleteTargetId);
+            setSuccessMsg("Xóa mềm tài liệu thành công!");
+            fetchData();
+        } catch (error: any) {
+            const backendError = error.response?.data;
+            setErrorMsg(typeof backendError === 'string' ? backendError : 'Lỗi khi xóa tài liệu.');
+        } finally {
+            setConfirmLoading(false);
+            setIsConfirmOpen(false);
+            setDeleteTargetId(null);
         }
     };
 
@@ -350,7 +367,7 @@ export default function DocumentsPage() {
                                         <td className="p-4">
                                             <div className="flex justify-center gap-2">
                                                 <Button variant="outline" className="text-xs px-3 h-8" onClick={() => handleOpenEdit(item)}>Sửa</Button>
-                                                <Button variant="outline" className="text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200" onClick={() => handleDelete(item.id)}>Xóa</Button>
+                                                <Button variant="outline" className="text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200" onClick={() => handleOpenDelete(item)}>Xóa</Button>
                                             </div>
                                         </td>
                                     </tr>
@@ -452,6 +469,18 @@ export default function DocumentsPage() {
                     </div>
                 </form>
             </Modal>
+
+            {/* Confirm Dialog Xóa */}
+            <ConfirmDialog
+                isOpen={isConfirmOpen}
+                title="Xác nhận xóa tài liệu"
+                message={`Bạn có chắc chắn muốn xóa (xóa mềm) tài liệu này? Hành động này có thể khôi phục sau.`}
+                itemName={deleteTargetName}
+                onCancel={() => setIsConfirmOpen(false)}
+                onConfirm={handleConfirmDelete}
+                loading={confirmLoading}
+                confirmText="Xác nhận xóa"
+            />
         </div>
     );
 }

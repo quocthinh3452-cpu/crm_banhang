@@ -7,6 +7,9 @@ import { lookupApi, LookupItem } from '@/modules/lead/services/lookupApi';
 import { LeadTable } from '@/modules/lead/components/LeadTable';
 import { LeadFormModal } from '@/modules/lead/components/LeadFormModal';
 import { LeadDetailModal } from '@/modules/lead/components/LeadDetailModal';
+import toast from 'react-hot-toast';
+import { TextInput } from '@/shared/components/form/TextInput';
+import { SelectBox } from '@/shared/components/form/SelectBox';
 
 export default function LeadPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,7 +18,6 @@ export default function LeadPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
   const [viewingLead, setViewingLead] = useState<Lead | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -40,8 +42,7 @@ export default function LeadPage() {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+    toast.success(msg);
   };
 
   const loadLeadsData = async () => {
@@ -125,11 +126,7 @@ export default function LeadPage() {
         `}
       </style>
 
-      {toast && (
-        <div className="fixed top-20 right-5 z-[9999] bg-green-600 text-white px-6 py-3 rounded shadow-xl animate-bounce">
-          {toast}
-        </div>
-      )}
+
 
       <div className="flex justify-between items-center">
         <div>
@@ -143,16 +140,16 @@ export default function LeadPage() {
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
 
         {/* Lọc cơ bản */}
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
           <input
             type="text"
             placeholder="Tìm tên, công ty..."
-            className="flex-1 border px-3 py-2 rounded text-sm outline-none focus:border-blue-500"
+            className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-250 text-sm rounded-lg outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-gray-750 placeholder-gray-400 h-11"
             value={filters.keyword}
             onChange={(e) => handleFilterChange('keyword', e.target.value)}
           />
           <select
-            className="w-1/4 border px-3 py-2 rounded text-sm outline-none focus:border-blue-500 bg-white"
+            className="w-1/4 px-4 py-2.5 border border-gray-250 rounded-lg text-sm outline-none focus:border-blue-500 bg-white text-gray-750 cursor-pointer h-11 transition-colors"
             value={filters.status}
             onChange={(e) => handleFilterChange('status', e.target.value)}
           >
@@ -165,9 +162,13 @@ export default function LeadPage() {
 
           {/* Nút Bộ lọc nâng cao (Đã chuyển thành Icon cái phễu) */}
           <Button
-            variant={showAdvancedFilters ? "primary" : "outline"} /* <-- Đổi "default" thành "primary" ở đây */
+            variant={showAdvancedFilters ? "primary" : "outline"}
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className={`w-[42px] h-[42px] p-0 flex items-center justify-center shrink-0 transition-colors ${showAdvancedFilters ? 'bg-blue-600 text-white border-blue-600' : 'text-gray-600'}`}
+            className={`w-[44px] h-[44px] p-0 flex items-center justify-center shrink-0 rounded-lg transition-all duration-200 ${
+              showAdvancedFilters 
+                ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/10' 
+                : 'text-slate-650 hover:bg-slate-50'
+            }`}
             title="Bộ lọc nâng cao"
           >
             <svg
@@ -188,19 +189,19 @@ export default function LeadPage() {
 
         {/* Lọc nâng cao (Hiển thị dạng Grid) */}
         {showAdvancedFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <div className="grid grid-cols-4 gap-4">
+          <div className="mt-4 pt-4 border-t border-slate-100 animate-fadeIn">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
 
               <input
                 type="text"
-                placeholder="Số điện thoại"
-                className="border px-3 py-2 rounded text-sm outline-none focus:border-blue-500"
+                placeholder="Số điện thoại..."
+                className="px-4 py-2.5 bg-gray-50 border border-gray-250 text-sm rounded-lg outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-gray-750 placeholder-gray-400 h-11"
                 value={filters.phone}
                 onChange={(e) => handleFilterChange('phone', e.target.value)}
               />
 
               <select
-                className="border px-3 py-2 rounded text-sm outline-none focus:border-blue-500 bg-white"
+                className="px-4 py-2.5 border border-gray-250 rounded-lg text-sm outline-none focus:border-blue-500 bg-white text-gray-750 cursor-pointer h-11 transition-colors"
                 value={filters.provinceId}
                 onChange={(e) => handleFilterChange('provinceId', e.target.value)}
               >
@@ -211,7 +212,7 @@ export default function LeadPage() {
               </select>
 
               <select
-                className="border px-3 py-2 rounded text-sm outline-none focus:border-blue-500 bg-white"
+                className="px-4 py-2.5 border border-gray-250 rounded-lg text-sm outline-none focus:border-blue-500 bg-white text-gray-750 cursor-pointer h-11 transition-colors"
                 value={filters.salesGroupId}
                 onChange={(e) => handleFilterChange('salesGroupId', e.target.value)}
               >
@@ -222,7 +223,7 @@ export default function LeadPage() {
               </select>
 
               <select
-                className="border px-3 py-2 rounded text-sm outline-none focus:border-blue-500 bg-white"
+                className="px-4 py-2.5 border border-gray-250 rounded-lg text-sm outline-none focus:border-blue-500 bg-white text-gray-750 cursor-pointer h-11 transition-colors"
                 value={filters.sourceId}
                 onChange={(e) => handleFilterChange('sourceId', e.target.value)}
               >
@@ -234,12 +235,13 @@ export default function LeadPage() {
 
             </div>
 
-            <div className="flex justify-end mt-3">
+            <div className="flex justify-between items-center mt-4 pt-3 border-t border-slate-100">
+              <span className="text-xs text-slate-400 font-medium">Lọc Lead nâng cao giúp tối ưu hóa tập khách hàng tiềm năng</span>
               <button
                 onClick={clearFilters}
-                className="text-sm text-red-500 hover:text-red-700 hover:underline px-2 py-1"
+                className="text-xs text-red-500 hover:text-red-700 font-semibold flex items-center gap-1 transition-colors cursor-pointer"
               >
-                Xóa tất cả bộ lọc
+                🧹 Xóa tất cả bộ lọc
               </button>
             </div>
           </div>

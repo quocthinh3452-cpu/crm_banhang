@@ -56,10 +56,20 @@ export default function QuoteModal({ quoteId, onClose, onSaved }: QuoteModalProp
   const [formData, setFormData] = useState({
     quoteNumber: '',
     customerId: '',
-    quoteDate: new Date().toISOString().split('T')[0],
+    quoteDate: '', // Khởi tạo rỗng để đồng bộ SSR và Client
     validUntil: '',
     status: 'draft',
   });
+
+  // Khởi tạo ngày lập báo giá mới ở client-side để tránh lỗi Hydration Mismatch múi giờ
+  useEffect(() => {
+    if (!quoteId) {
+      setFormData(prev => ({
+        ...prev,
+        quoteDate: new Date().toISOString().split('T')[0],
+      }));
+    }
+  }, [quoteId]);
 
   // State cho danh sách sản phẩm của báo giá
   const [items, setItems] = useState<QuoteItem[]>([]);
@@ -71,11 +81,20 @@ export default function QuoteModal({ quoteId, onClose, onSaved }: QuoteModalProp
     const loadCatalogs = async () => {
       try {
         const [productsData, customersData]: [any, any] = await Promise.all([
-          axiosClient.get('/products'),
-          axiosClient.get('/customers'),
+          axiosClient.get('/products?size=1000'),
+          axiosClient.get('/customers?size=1000'),
         ]);
-        setProducts(productsData || []);
-        setCustomers(customersData || []);
+
+        const rawProducts = Array.isArray(productsData)
+          ? productsData
+          : (productsData?.items || productsData?.content || []);
+
+        const rawCustomers = Array.isArray(customersData)
+          ? customersData
+          : (customersData?.data || customersData?.content || []);
+
+        setProducts(rawProducts);
+        setCustomers(rawCustomers);
       } catch (err) {
         console.error('Lỗi tải danh mục sản phẩm/khách hàng:', err);
       } finally {
@@ -399,22 +418,22 @@ export default function QuoteModal({ quoteId, onClose, onSaved }: QuoteModalProp
               </div>
 
               {/* Bảng tổng kết số tiền */}
-              <div className="bg-slate-900 text-slate-100 p-5 rounded-2xl space-y-3 shadow-lg max-w-lg ml-auto w-full">
-                <div className="flex justify-between text-sm text-slate-400">
+              <div className="bg-slate-50 border border-slate-100 p-5 rounded-xl space-y-3 shadow-sm max-w-lg ml-auto w-full">
+                <div className="flex justify-between text-sm text-slate-500">
                   <span>Cộng tiền hàng:</span>
-                  <span className="font-semibold text-slate-200">{formatCurrency(summary.subtotal)}</span>
+                  <span className="font-semibold text-slate-700">{formatCurrency(summary.subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-sm text-rose-400">
+                <div className="flex justify-between text-sm text-red-600">
                   <span>Tổng chiết khấu:</span>
                   <span className="font-semibold">-{formatCurrency(summary.totalDisc)}</span>
                 </div>
-                <div className="flex justify-between text-sm text-slate-400">
+                <div className="flex justify-between text-sm text-slate-500">
                   <span>Thuế giá trị gia tăng (10% VAT):</span>
-                  <span className="font-semibold text-slate-200">{formatCurrency(summary.tax)}</span>
+                  <span className="font-semibold text-slate-700">{formatCurrency(summary.tax)}</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold border-t border-slate-800 pt-3 text-blue-400">
+                <div className="flex justify-between text-base font-bold border-t border-slate-200 pt-3 text-blue-600">
                   <span>TỔNG CỘNG THANH TOÁN:</span>
-                  <span className="font-black text-xl">{formatCurrency(summary.grandTotal)}</span>
+                  <span className="font-black text-lg text-blue-700">{formatCurrency(summary.grandTotal)}</span>
                 </div>
               </div>
             </div>

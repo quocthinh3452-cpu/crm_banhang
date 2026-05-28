@@ -17,15 +17,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-// 1. Tách cấu hình menu ra một mảng riêng để dễ quản lý và phân quyền sau này
-const menuItems = [
-  { name: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard },
-  { name: 'Khách hàng', path: '/crm/customers', icon: Users },
-  { name: 'Bán hàng', path: '/sales', icon: ShoppingCart },
-  { name: 'Báo cáo', path: '/reports', icon: BarChart3 },
-  { name: 'Cài đặt', path: '/settings', icon: Settings },
-];
-
 const Sidebar = () => {
   const pathname = usePathname();
   const router = useRouter();
@@ -73,7 +64,22 @@ const Sidebar = () => {
 
     if (currentUser.role === 'admin') {
       return [
+        { name: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Quản lý người dùng', path: '/crm/users', icon: Users },
+        { name: 'Quản lý Lead', path: '/crm/lead', icon: Briefcase },
+        { name: 'Khách hàng', path: '/crm/customers', icon: Users },
+        { name: 'Quản lý báo giá', path: '/crm/quotes', icon: FileText },
+        { name: 'Quản lý hợp đồng', path: '/crm/contracts', icon: FileSignature },
+        {
+          name: 'Sản phẩm',
+          path: '/crm/products',
+          icon: ShoppingCart,
+          children: [
+            { name: 'Danh sách sản phẩm', path: '/crm/products' },
+            { name: 'Loại sản phẩm', path: '/crm/product-types' }
+          ]
+        },
+        { name: 'Tài liệu', path: '/crm/documents', icon: FileText },
       ];
     }
 
