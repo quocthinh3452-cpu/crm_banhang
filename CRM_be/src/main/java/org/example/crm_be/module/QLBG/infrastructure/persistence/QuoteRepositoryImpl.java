@@ -36,6 +36,12 @@ public class QuoteRepositoryImpl implements QuoteRepository {
         return mapper.toDomain(saved);
     }
 
+    @Override
+    public Optional<Quote> findByQuoteNumber(String quoteNumber) {
+        return jpaRepository.findByQuoteNumber(quoteNumber)
+                .map(mapper::toDomain);
+    }
+
     // BỔ SUNG: Triển khai hàm findById để hết lỗi abstract
     @Override
     public Optional<Quote> findById(int id) {

@@ -6,9 +6,9 @@ import AuthGuard from '@/shared/components/AuthGuard';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi">
+    <html lang="vi" suppressHydrationWarning>
       <ToastProvider>
-        <body className="flex h-screen overflow-hidden bg-gray-50 text-gray-900">
+        <body className="flex h-screen overflow-hidden bg-gray-50 text-gray-900" suppressHydrationWarning>
           <AuthGuard>
             <Sidebar />
 

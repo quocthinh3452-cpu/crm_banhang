@@ -14,6 +14,7 @@ import { Skeleton } from '@/shared/components/ui/Skeleton';
 import { userApi } from '@/modules/user/api/user.api';
 import { User } from '@/modules/user/types/user.type';
 import { ShieldCheck, ShieldAlert, KeyRound, UserMinus } from 'lucide-react';
+import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog';
 
 // Định nghĩa danh sách các quyền nghiệp vụ để tích chọn
 const SYSTEM_PERMISSIONS = [
@@ -55,6 +56,11 @@ export default function UsersPage() {
   // States quản lý Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  
+  // State Confirm Dialog Xóa
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [deleteTargetUser, setDeleteTargetUser] = useState<User | null>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   // State quản lý các checkbox quyền được chọn
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
@@ -173,21 +179,30 @@ export default function UsersPage() {
     }
   };
 
-  const handleDelete = async (user: User) => {
+  const handleDelete = (user: User) => {
     // Ngăn chặn admin tự xóa chính mình
     if (loggedInUser && loggedInUser.email === user.email) {
       toast.error('Bạn không được phép xóa tài khoản Admin đang đăng nhập!');
       return;
     }
 
-    if (window.confirm(`Bạn có chắc chắn muốn xóa (xóa mềm) tài khoản '${user.name}' không?`)) {
-      try {
-        await userApi.delete(user.id);
-        toast.success('Xóa tài khoản thành công!');
-        fetchUsers();
-      } catch (e) {
-        toast.error('Không thể xóa người dùng này.');
-      }
+    setDeleteTargetUser(user);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetUser) return;
+    setConfirmLoading(true);
+    try {
+      await userApi.delete(deleteTargetUser.id);
+      toast.success('Xóa tài khoản thành công!');
+      fetchUsers();
+    } catch (e) {
+      toast.error('Không thể xóa người dùng này.');
+    } finally {
+      setConfirmLoading(false);
+      setIsConfirmOpen(false);
+      setDeleteTargetUser(null);
     }
   };
 
@@ -252,7 +267,7 @@ export default function UsersPage() {
                       </td>
                       <td className="p-4 text-sm text-gray-600">{item.email}</td>
                       <td className="p-4">
-                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
+                        <span className={`px-2.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
                           item.role === 'admin' 
                             ? 'bg-purple-100 text-purple-800 border border-purple-200' 
                             : item.role === 'manager'
@@ -268,7 +283,7 @@ export default function UsersPage() {
                         ) : permsList.length > 0 && permsList[0] !== '' ? (
                           <div className="flex flex-wrap gap-1">
                             {permsList.map((p) => (
-                              <span key={p} className="px-1.5 py-0.5 bg-blue-50 border border-blue-100 text-blue-700 rounded-md text-[10px] font-medium">
+                              <span key={p} className="px-1.5 py-0.5 bg-blue-50 border border-blue-100 text-blue-700 rounded-md text-[10px] font-medium whitespace-nowrap">
                                 {SYSTEM_PERMISSIONS.find((sp) => sp.code === p)?.label || p}
                               </span>
                             ))}
@@ -279,12 +294,12 @@ export default function UsersPage() {
                       </td>
                       <td className="p-4">
                         {item.isActive === 1 ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-green-50 text-green-700 border border-green-200 rounded-full">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-green-50 text-green-700 border border-green-200 rounded-full whitespace-nowrap">
                             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping" />
                             Đang hoạt động
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-red-50 text-red-700 border border-red-200 rounded-full">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-red-50 text-red-700 border border-red-200 rounded-full whitespace-nowrap">
                             <span className="w-1.5 h-1.5 bg-red-500 rounded-full" />
                             Đang bị khóa
                           </span>
@@ -435,9 +450,22 @@ export default function UsersPage() {
               {isSaving ? 'Đang xử lý...' : (editingUser ? 'Lưu thay đổi' : 'Lưu tài khoản')}
             </Button>
           </div>
-
         </form>
       </Modal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Xác nhận xóa tài khoản"
+        message={`Bạn có chắc chắn muốn xóa (xóa mềm) tài khoản '${deleteTargetUser?.name}' không?`}
+        itemName={deleteTargetUser?.name}
+        onCancel={() => {
+          setIsConfirmOpen(false);
+          setDeleteTargetUser(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        loading={confirmLoading}
+        confirmText="Xác nhận xóa"
+      />
     </div>
   );
 }

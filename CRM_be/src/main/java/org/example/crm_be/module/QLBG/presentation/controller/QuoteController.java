@@ -35,8 +35,12 @@ public class QuoteController {
     }
 
     @PostMapping
-    public ResponseEntity<QuoteResponse> createQuote(@RequestBody QuoteRequest request) {
-        return ResponseEntity.ok(createQuoteUseCase.execute(request));
+    public ResponseEntity<?> createQuote(@RequestBody QuoteRequest request) {
+        try {
+            return ResponseEntity.ok(createQuoteUseCase.execute(request));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping
@@ -64,12 +68,16 @@ public class QuoteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<QuoteResponse> updateQuote(
+    public ResponseEntity<?> updateQuote(
             @PathVariable Integer id,
             @RequestBody QuoteRequest request
     ) {
-        // Gọi Use Case xử lý
-        return ResponseEntity.ok(updateQuoteUseCase.execute(id, request));
+        try {
+            // Gọi Use Case xử lý
+            return ResponseEntity.ok(updateQuoteUseCase.execute(id, request));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")

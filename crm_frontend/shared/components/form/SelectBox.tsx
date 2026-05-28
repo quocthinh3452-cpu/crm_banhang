@@ -23,7 +23,7 @@ export const SelectBox = forwardRef<HTMLSelectElement, SelectBoxProps>(
 
     const labelClass = `mb-1 text-sm font-medium ${variant === 'dark' ? 'text-slate-200' : 'text-gray-700'}`;
     
-    const selectClass = `w-full px-4 py-2 border rounded-md appearance-none pr-10 transition-colors outline-none ${
+    const selectClass = `w-full px-4 py-2.5 border rounded-lg appearance-none pr-10 transition-all duration-200 outline-none text-sm ${
       variant === 'dark'
         ? 'bg-slate-750 text-slate-100 border-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
         : 'bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'

@@ -4,6 +4,8 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from '@/shared/components/ui/Button';
+import { TextInput } from '@/shared/components/form/TextInput';
+import { SelectBox } from '@/shared/components/form/SelectBox';
 import {
   CUSTOMER_TYPES,
   CUSTOMER_TIERS,
@@ -132,6 +134,7 @@ export default function CustomerForm({
         reset();
       } catch (error) {
         console.error(error);
+        throw error;
       }
     };
 
@@ -153,40 +156,30 @@ export default function CustomerForm({
         handleFormSubmit
       )}
       onKeyDown={handleFormKeyDown}
-      className="space-y-4"
+      className="space-y-4 bg-white p-2 rounded-xl"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
         {/* Name */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-slate-200 mb-1.5">
-            Tên khách hàng *
-          </label>
-          <input
-            type="text"
+          <TextInput
+            label="Tên khách hàng"
+            required
             placeholder="Nhập tên khách hàng"
             autoFocus
             {...register('name', {
               required: 'Tên khách hàng là bắt buộc',
             })}
-            disabled={
-              isSubmitting || loading
-            }
+            disabled={isSubmitting || loading}
             onKeyDown={handleEnterKey}
-            className={inputClass}
+            error={errors.name?.message}
           />
-          {errors.name ? (
-            <p className="mt-1 text-sm text-rose-400">
-              {errors.name.message}
-            </p>
-          ) : null}
         </div>
 
         {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-1.5">
-            Email *
-          </label>
-          <input
+          <TextInput
+            label="Email"
+            required
             type="email"
             placeholder="abc@gmail.com"
             {...register('email', {
@@ -196,26 +189,16 @@ export default function CustomerForm({
                 message: 'Email không hợp lệ',
               },
             })}
-            disabled={
-              isSubmitting || loading
-            }
+            disabled={isSubmitting || loading}
             onKeyDown={handleEnterKey}
-            className={inputClass}
+            error={errors.email?.message}
           />
-          {errors.email ? (
-            <p className="mt-1 text-sm text-rose-400">
-              {errors.email.message}
-            </p>
-          ) : null}
         </div>
 
         {/* Phone */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-1.5">
-            Điện thoại
-          </label>
-          <input
-            type="text"
+          <TextInput
+            label="Điện thoại"
             placeholder="0912345678"
             {...register('phone', {
               pattern: {
@@ -223,95 +206,57 @@ export default function CustomerForm({
                 message: 'Số điện thoại không hợp lệ',
               },
             })}
-            disabled={
-              isSubmitting || loading
-            }
+            disabled={isSubmitting || loading}
             onKeyDown={handleEnterKey}
-            className={inputClass}
+            error={errors.phone?.message}
           />
-          {errors.phone ? (
-            <p className="mt-1 text-sm text-rose-400">
-              {errors.phone.message}
-            </p>
-          ) : null}
         </div>
 
         {/* Type */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-1.5">
-            Loại khách hàng *
-          </label>
-          <select
+          <SelectBox
+            label="Loại khách hàng"
+            required
+            options={CUSTOMER_TYPES.map(t => ({ label: t.label, value: t.value }))}
             {...register('type')}
+            disabled={isSubmitting || loading}
             onKeyDown={handleEnterKey}
-            className={inputClass}
-          >
-            {CUSTOMER_TYPES.map(
-              (type) => (
-                <option
-                  key={type.value}
-                  value={type.value}
-                >
-                  {type.label}
-                </option>
-              )
-            )}
-          </select>
+            error={errors.type?.message}
+          />
         </div>
 
         {/* Tier */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-1.5">
-            Hạng khách hàng *
-          </label>
-          <select
+          <SelectBox
+            label="Hạng khách hàng"
+            required
+            options={CUSTOMER_TIERS.map(t => ({ label: t.label, value: t.value }))}
             {...register('tier')}
+            disabled={isSubmitting || loading}
             onKeyDown={handleEnterKey}
-            className={inputClass}
-          >
-            {CUSTOMER_TIERS.map(
-              (tier) => (
-                <option
-                  key={tier.value}
-                  value={tier.value}
-                >
-                  {tier.label}
-                </option>
-              )
-            )}
-          </select>
+            error={errors.tier?.message}
+          />
         </div>
 
         {/* Status */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-1.5">
-            Trạng thái *
-          </label>
-          <select
+          <SelectBox
+            label="Trạng thái"
+            required
+            options={CUSTOMER_STATUSES.map(s => ({ label: s.label, value: s.value }))}
             {...register('status')}
+            disabled={isSubmitting || loading}
             onKeyDown={handleEnterKey}
-            className={inputClass}
-          >
-            {CUSTOMER_STATUSES.map(
-              (status) => (
-                <option
-                  key={status.value}
-                  value={status.value}
-                >
-                  {status.label}
-                </option>
-              )
-            )}
-          </select>
+            error={errors.status?.message}
+          />
         </div>
 
         {/* Budget */}
         <div>
-          <label className="block text-sm font-medium text-slate-200 mb-1.5">
-            Ngân sách
-          </label>
-          <input
+          <TextInput
+            label="Ngân sách (VND)"
             type="number"
+            placeholder="0"
             {...register('budget', {
               valueAsNumber: true,
               min: {
@@ -319,26 +264,25 @@ export default function CustomerForm({
                 message: 'Ngân sách không được âm',
               },
             })}
+            disabled={isSubmitting || loading}
             onKeyDown={handleEnterKey}
-            className={inputClass}
+            error={errors.budget?.message}
           />
-          {errors.budget ? (
-            <p className="mt-1 text-sm text-rose-400">
-              {errors.budget.message}
-            </p>
-          ) : null}
         </div>
 
         {/* Notes */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-slate-200 mb-1.5">
+        <div className="md:col-span-2 mb-4">
+          <label htmlFor="notes" className="mb-1 text-sm font-semibold text-gray-750 block">
             Ghi chú
           </label>
           <textarea
+            id="notes"
             rows={3}
+            placeholder="Ghi chú thêm về khách hàng..."
             {...register('notes')}
             onKeyDown={handleEnterKey}
-            className={inputClass}
+            disabled={isSubmitting || loading}
+            className="w-full px-4 py-2.5 border rounded-lg border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm transition-all bg-white text-gray-900 placeholder-gray-400"
           />
         </div>
       </div>

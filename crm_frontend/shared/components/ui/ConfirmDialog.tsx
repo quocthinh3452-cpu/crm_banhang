@@ -64,7 +64,7 @@ export function ConfirmDialog({
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="w-full max-w-md rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-2xl shadow-black/40"
+            className="w-full max-w-md rounded-xl border border-slate-100 bg-white p-6 shadow-2xl shadow-slate-900/10"
             onClick={(event) => event.stopPropagation()}
             initial={{ y: 20, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -72,43 +72,43 @@ export function ConfirmDialog({
             transition={{ type: 'spring', stiffness: 260, damping: 24 }}
           >
             <div className="flex items-start gap-4">
-              <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-300">
-                <AlertTriangle size={26} />
+              <div className="mt-1 flex h-12 w-12 items-center justify-center shrink-0 rounded-xl bg-rose-50 border border-rose-100 text-rose-600">
+                <AlertTriangle size={24} />
               </div>
               <div className="flex-1">
-                <h3 id="confirm-dialog-title" className="text-xl font-semibold text-white">
+                <h3 id="confirm-dialog-title" className="text-lg font-bold text-slate-900">
                   {title}
                 </h3>
-                <p className="mt-2 text-sm leading-6 text-slate-300">
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
                   {message}
                 </p>
                 {itemName ? (
-                  <div className="mt-4 rounded-2xl bg-slate-950 px-4 py-3 text-sm text-slate-200 ring-1 ring-slate-700">
+                  <div className="mt-3 rounded-lg bg-slate-50 border border-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-700">
                     {itemName}
                   </div>
                 ) : null}
               </div>
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={onCancel}
                 disabled={loading}
-                className="inline-flex justify-center rounded-2xl border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex justify-center items-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                 title="Esc"
               >
-                {cancelText} <span className="text-xs opacity-75 ml-2">(Esc)</span>
+                {cancelText} <span className="text-[10px] opacity-60 ml-1.5">(Esc)</span>
               </button>
 
               <button
                 type="button"
                 onClick={onConfirm}
                 disabled={loading}
-                className="inline-flex justify-center rounded-2xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex justify-center items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-red-700 active:scale-95 shadow-sm shadow-red-500/10 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                 title="Enter"
               >
-                {loading ? 'Đang xóa...' : confirmText} <span className="text-xs opacity-75 ml-2">(Enter)</span>
+                {loading ? 'Đang xử lý...' : confirmText} <span className="text-[10px] opacity-75 ml-1.5">(Enter)</span>
               </button>
             </div>
           </motion.div>

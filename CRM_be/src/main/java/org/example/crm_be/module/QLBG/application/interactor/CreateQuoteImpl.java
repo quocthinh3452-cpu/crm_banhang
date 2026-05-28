@@ -58,6 +58,11 @@ public class CreateQuoteImpl implements ICreateQuote {
     }
 
     private void validateQuote(Quote quote, QuoteRequest request) {
+        // Kiểm tra mã báo giá trùng
+        if (quote.getQuoteNumber() != null && quoteRepository.findByQuoteNumber(quote.getQuoteNumber()).isPresent()) {
+            throw new IllegalArgumentException("⚠️ Lỗi: Mã báo giá \"" + quote.getQuoteNumber() + "\" đã tồn tại trong hệ thống!");
+        }
+
         // Kiểm tra danh sách sản phẩm
         if (quote.getDetails() == null || quote.getDetails().isEmpty()) {
             throw new RuntimeException("⚠️ Lỗi: Báo giá phải có ít nhất một sản phẩm!");

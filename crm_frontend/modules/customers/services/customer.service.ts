@@ -1,3 +1,7 @@
+/**
+ * @deprecated Khuyến nghị chuyển sang sử dụng customerApi.ts tại modules/customers/data/customerApi.ts
+ * để có hỗ trợ phân trang Client-side (slicing) đồng bộ hoàn hảo với dữ liệu flat của Backend.
+ */
 interface CustomerFilters {
   search?: string;
   customerType?: string;
@@ -20,13 +24,13 @@ const customerService = {
         url.searchParams.append('search', filters.search);
       }
       if (filters.customerType) {
-        url.searchParams.append('customerType', filters.customerType);
+        url.searchParams.append('type', filters.customerType);
       }
       if (filters.customerLevel) {
-        url.searchParams.append('customerLevel', filters.customerLevel);
+        url.searchParams.append('tier', filters.customerLevel);
       }
       if (filters.customerStatus) {
-        url.searchParams.append('customerStatus', filters.customerStatus);
+        url.searchParams.append('status', filters.customerStatus);
       }
 
       const response = await fetch(url.toString(), {

@@ -56,23 +56,23 @@ export default function CustomerDetailModal({
       className="!bg-white !rounded-2xl border border-gray-200 shadow-2xl shadow-black/40"
     >
       <div className="w-full flex flex-col max-h-[90vh]">
-        <div className="sticky top-0 z-30 border-b border-slate-700/70 bg-white/95 backdrop-blur-xl">
+        <div className="sticky top-0 z-30 border-b border-slate-100 bg-white/95 backdrop-blur-xl">
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-800 text-slate-100">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 border border-blue-100">
                 <Users size={28} />
               </div>
               <div>
-                <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Chi tiết khách hàng</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400 font-semibold">Chi tiết khách hàng</p>
                 <div className="mt-1 flex flex-wrap items-center gap-3">
-                  <h2 className="text-2xl font-semibold text-gray-900">{headerLabel}</h2>
+                  <h2 className="text-2xl font-bold text-gray-900">{headerLabel}</h2>
                   <StatusBadge status={customer?.status ?? 'Đang chăm sóc'} />
                 </div>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="inline-flex h-12 w-12 items-center justify-center rounded-3xl border border-slate-700 bg-slate-800 text-slate-300 transition hover:bg-slate-700 hover:text-white"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-800 cursor-pointer shadow-sm"
               aria-label="Close (Esc)"
               title="Esc"
             >
@@ -91,7 +91,7 @@ export default function CustomerDetailModal({
             </button>
           </div>
 
-          <div className="flex w-full overflow-x-auto border-t border-slate-700/80 bg-white/90 p-3">
+          <div className="flex w-full overflow-x-auto border-t border-slate-100 bg-white p-2.5 gap-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isDisabled = tab.key !== 'general' && !customer;
@@ -102,11 +102,11 @@ export default function CustomerDetailModal({
                   type="button"
                   onClick={() => onTabChange(tab.key)}
                   disabled={isDisabled}
-                  className={`inline-flex min-w-[130px] items-center gap-2 whitespace-nowrap rounded-3xl border px-4 py-3 text-left text-sm font-semibold transition ${
+                  className={`inline-flex min-w-[130px] items-center gap-2 whitespace-nowrap rounded-lg border px-4 py-2.5 text-left text-sm font-semibold transition-all duration-200 cursor-pointer ${
                     activeTab === tab.key
-                      ? 'border-blue-500 bg-slate-800 text-white shadow-sm'
-                      : 'border-transparent text-slate-300 hover:border-slate-600 hover:bg-slate-900'
-                  } ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
+                      ? 'border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-500/10'
+                      : 'border-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  } ${isDisabled ? 'cursor-not-allowed opacity-40' : ''}`}
                 >
                   <Icon size={16} />
                   {tab.label}
@@ -116,29 +116,29 @@ export default function CustomerDetailModal({
           </div>
         </div>
 
-        <div className="max-h-[55vh] overflow-y-auto p-6">
-          <div className="rounded-3xl border border-slate-700 bg-slate-900 p-6 shadow-sm">
+        <div className="max-h-[55vh] overflow-y-auto p-6 bg-slate-50/50">
+          <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-sm">
             {children}
           </div>
         </div>
 
-        <div className="sticky bottom-0 z-30 border-t border-slate-700/70 bg-white/95 backdrop-blur-xl px-6 py-4">
+        <div className="sticky bottom-0 z-30 border-t border-slate-100 bg-white/95 backdrop-blur-xl px-6 py-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <button
               onClick={onClose}
-              className="inline-flex justify-center rounded-3xl border border-slate-700 bg-slate-800 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-slate-700"
+              className="inline-flex justify-center items-center rounded-lg border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 cursor-pointer"
               title="Esc"
             >
-              Hủy <span className="text-xs opacity-75 ml-2">(Esc)</span>
+              Hủy <span className="text-[10px] opacity-60 ml-1.5">(Esc)</span>
             </button>
             <button
               type="button"
               onClick={onSave}
               disabled={saveDisabled}
-              className="inline-flex justify-center rounded-3xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex justify-center items-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer shadow-md shadow-blue-500/10"
               title="Enter"
             >
-              {saveLabel} <span className="text-xs opacity-75 ml-2">(Enter)</span>
+              {saveLabel} <span className="text-[10px] opacity-75 ml-1.5">(Enter)</span>
             </button>
           </div>
         </div>

@@ -32,13 +32,14 @@ export const productApi = {
     return axiosClient.delete(`/product-types/${id}`);
   },
 
-createProduct: (formData: FormData) => {
-        return axiosClient.post('/products', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-    },
+  createProduct: (formData: FormData) => {
+    return axiosClient.post('/products', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      skipGlobalToast: true
+    } as any);
+  },
 
   getProductById: async (id: number): Promise<Product> => {
     return axiosClient.get(`/products/${id}`);
@@ -46,10 +47,11 @@ createProduct: (formData: FormData) => {
 
   // Cập nhật sản phẩm
   updateProduct: (id: number, formData: FormData) => {
-        return axiosClient.put(`/products/${id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-    }
+    return axiosClient.put(`/products/${id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      skipGlobalToast: true
+    } as any);
+  }
 };

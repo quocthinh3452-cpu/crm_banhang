@@ -1,6 +1,12 @@
 import axios from 'axios';
-// Giả sử bạn có thư viện toast (như react-toastify hoặc react-hot-toast)
 import toast from 'react-hot-toast';
+
+// Khai báo mở rộng cấu hình AxiosRequestConfig để hỗ trợ cờ skipGlobalToast trong TypeScript
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    skipGlobalToast?: boolean;
+  }
+}
 
 const axiosClient = axios.create({
   baseURL: 'http://localhost:8081/api',
@@ -23,7 +29,12 @@ axiosClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
     const status = error.response?.status;
-    const message = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại sau!';
+    const data = error.response?.data;
+
+    // Trích xuất thông điệp lỗi thông minh từ cả chuỗi thô (plain-text) lẫn JSON object từ Spring Boot
+    const message = typeof data === 'string'
+      ? data
+      : (data?.message || data?.error || 'Có lỗi xảy ra, vui lòng thử lại sau!');
 
     if (status === 401) {
       toast.error('Phiên đăng nhập hết hạn!');
@@ -31,7 +42,10 @@ axiosClient.interceptors.response.use(
     } else if (status === 403) {
       toast.error('Bạn không có quyền thực hiện thao tác này!');
     } else {
-      toast.error(message);
+      // Chỉ tự động hiện Toast lỗi toàn cục nếu request KHÔNG cấu hình cờ skipGlobalToast
+      if (!error.config?.skipGlobalToast) {
+        toast.error(message);
+      }
     }
 
     return Promise.reject(error);

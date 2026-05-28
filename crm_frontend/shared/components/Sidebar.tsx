@@ -9,22 +9,11 @@ import {
   FileText,
   FileSignature,
   ShoppingCart,
-  BarChart3,
-  Settings,
   LogOut,
   ChevronRight,
   Briefcase
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
-// 1. Tách cấu hình menu ra một mảng riêng để dễ quản lý và phân quyền sau này
-const menuItems = [
-  { name: 'Tổng quan', path: '/dashboard', icon: LayoutDashboard },
-  { name: 'Khách hàng', path: '/crm/customers', icon: Users },
-  { name: 'Bán hàng', path: '/sales', icon: ShoppingCart },
-  { name: 'Báo cáo', path: '/reports', icon: BarChart3 },
-  { name: 'Cài đặt', path: '/settings', icon: Settings },
-];
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -89,8 +78,6 @@ const Sidebar = () => {
           ]
         },
         { name: 'Tài liệu', path: '/crm/documents', icon: FileText },
-        { name: 'Báo cáo', path: '/reports', icon: BarChart3 },
-        { name: 'Cài đặt', path: '/settings', icon: Settings },
       ];
     }
 
@@ -139,12 +126,6 @@ const Sidebar = () => {
       items.push({ name: 'Tài liệu', path: '/crm/documents', icon: FileText });
     }
 
-    // Quyền của riêng Manager
-    if (currentUser.role === 'manager') {
-      items.push({ name: 'Báo cáo', path: '/reports', icon: BarChart3 });
-      items.push({ name: 'Cài đặt', path: '/settings', icon: Settings });
-    }
-
     return items;
   };
 
@@ -167,7 +148,7 @@ const Sidebar = () => {
       </div>
 
       {/* --- Phần Menu Navigation --- */}
-      <div className="flex-1 overflow-y-auto py-6 px-4 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto py-6 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <div className="mb-4 text-xs font-semibold text-slate-500 uppercase tracking-wider px-2">
           Menu chính
         </div>

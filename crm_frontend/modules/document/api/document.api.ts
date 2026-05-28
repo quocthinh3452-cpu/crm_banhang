@@ -15,7 +15,8 @@ export const documentApi = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    });
+      skipGlobalToast: true,
+    } as any);
   },
 
   update: async (id: number, formData: FormData): Promise<Document> => {
@@ -23,7 +24,8 @@ export const documentApi = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    });
+      skipGlobalToast: true,
+    } as any);
   },
 
   delete: async (id: number): Promise<void> => {

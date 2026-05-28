@@ -418,7 +418,7 @@ export default function QuoteDetailModal({ quoteId, onClose }: QuoteDetailModalP
                     <tbody className="divide-y divide-slate-100">
                       {quoteData.items && quoteData.items.length > 0 ? (
                         quoteData.items.map((item: any, idx: number) => (
-                          <tr key={item.id} className="hover:bg-slate-50/50">
+                          <tr key={item.id || item.productId || idx} className="hover:bg-slate-50/50">
                             <td className="p-3 text-slate-400 text-center font-medium">{idx + 1}</td>
                             <td className="p-3 font-medium text-slate-800">{item.productName || `Sản phẩm #${item.productId}`}</td>
                             <td className="p-3 text-slate-800 text-center font-semibold">{item.quantity}</td>

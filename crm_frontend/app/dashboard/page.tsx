@@ -149,7 +149,7 @@ export default function DashboardPage() {
             CRM Bán Hàng Dự Án IT
           </div>
           <h1 className="text-3xl font-extrabold text-white tracking-tight">
-            Chào mừng trở lại, {currentUser?.name || 'Thành viên'} 👋
+            Chào mừng trở lại, {currentUser?.name || 'Thành viên'}
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             Dưới đây là tổng quan hiệu suất bán hàng và quản lý khách hàng của bạn hôm nay.

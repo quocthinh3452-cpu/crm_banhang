@@ -11,6 +11,10 @@ import { formatCurrency, formatDateTime } from '@/shared/utils/formatters';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog';
+import { EmptyState } from '@/shared/components/ui/EmptyState';
+import { PackageOpen } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { productApi } from '../../../modules/product/api/product.api';
 import { productTypeApi } from '../../../modules/product/api/productType.api';
@@ -48,8 +52,11 @@ export default function ProductsPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
-    const [successMsg, setSuccessMsg] = useState<string | null>(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    // State Confirm Dialog Xóa
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+    const [deleteTargetName, setDeleteTargetName] = useState<string>('');
+    const [confirmLoading, setConfirmLoading] = useState(false);
 
     const [products, setProducts] = useState<Product[]>([]);
     const [types, setTypes] = useState<ProductTypeResponse[]>([]);
@@ -69,18 +76,8 @@ export default function ProductsPage() {
     });
 
     const { register, handleSubmit, formState: { errors }, reset, setError } = useForm({
-    resolver: zodResolver(productSchema),
-});
-
-    useEffect(() => {
-        if (successMsg || errorMsg) {
-            const timer = setTimeout(() => {
-                setSuccessMsg(null);
-                setErrorMsg(null);
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [successMsg, errorMsg]);
+        resolver: zodResolver(productSchema),
+    });
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -96,7 +93,7 @@ export default function ProductsPage() {
             setTypes(typesData || []);
         } catch (err) {
             console.error('Lỗi fetch data:', err);
-            setErrorMsg("Không thể tải dữ liệu sản phẩm.");
+            toast.error("Không thể tải dữ liệu sản phẩm.");
         } finally {
             setIsLoading(false);
         }
@@ -132,8 +129,6 @@ export default function ProductsPage() {
 
     const onSubmit = async (data: ProductFormValues) => {
         setIsSaving(true);
-        setErrorMsg(null);
-        setSuccessMsg(null);
 
         try {
             const formData = new FormData();
@@ -146,7 +141,6 @@ export default function ProductsPage() {
                 price: data.price,
             };
 
-            // BỔ SUNG: Thêm 'data.json' làm tên file giả lập để Tomcat parse mượt mà hơn
             formData.append('data', new Blob([JSON.stringify(requestData)], { type: 'application/json' }), 'data.json');
 
             if (data.image && data.image.length > 0) {
@@ -155,10 +149,10 @@ export default function ProductsPage() {
 
             if (editingProduct) {
                 await productApi.updateProduct(editingProduct.id, formData);
-                setSuccessMsg("Cập nhật sản phẩm thành công!");
+                toast.success("Cập nhật sản phẩm thành công!");
             } else {
                 await productApi.createProduct(formData);
-                setSuccessMsg("Thêm sản phẩm mới thành công!");
+                toast.success("Thêm sản phẩm mới thành công!");
             }
             setIsModalOpen(false);
             fetchData();
@@ -173,7 +167,6 @@ export default function ProductsPage() {
                 msg = error.message;
             }
 
-            // Hiển thị lỗi trực tiếp tại ô nhập liệu nếu trùng mã
             const lowerMsg = msg.toLowerCase();
             if (
                 lowerMsg.includes("đã tồn tại") || 
@@ -186,7 +179,7 @@ export default function ProductsPage() {
                     message: "Mã đã tồn tại vui lòng chọn mã khác"
                 });
             } else {
-                setErrorMsg(msg);
+                toast.error(msg);
             }
             console.error(error);
         } finally {
@@ -194,18 +187,27 @@ export default function ProductsPage() {
         }
     };
 
-    const handleDelete = async (id: number) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?')) {
-            setErrorMsg(null);
-            setSuccessMsg(null);
-            try {
-                await productApi.deleteProduct(id);
-                setSuccessMsg("Xóa sản phẩm thành công!");
-                fetchData();
-            } catch (error: any) {
-                const backendError = error.response?.data;
-                setErrorMsg(typeof backendError === 'string' ? backendError : 'Lỗi khi xóa sản phẩm.');
-            }
+    const handleOpenDelete = (product: Product) => {
+        setDeleteTargetId(product.id);
+        setDeleteTargetName(product.name);
+        setIsConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (deleteTargetId === null) return;
+        setConfirmLoading(true);
+        try {
+            await productApi.deleteProduct(deleteTargetId);
+            toast.success("Xóa sản phẩm thành công!");
+            fetchData();
+        } catch (error: any) {
+            const backendError = error.response?.data;
+            const msg = typeof backendError === 'string' ? backendError : 'Lỗi khi xóa sản phẩm.';
+            toast.error(msg);
+        } finally {
+            setConfirmLoading(false);
+            setIsConfirmOpen(false);
+            setDeleteTargetId(null);
         }
     };
 
@@ -240,7 +242,7 @@ export default function ProductsPage() {
                                 setFilters({ ...filters, keyword: searchTerm, page: 1 });
                             }
                         }}
-                        className="w-full pl-10 pr-10 py-2 bg-gray-50 border border-gray-200 text-sm rounded-lg outline-none focus:bg-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all text-gray-700 placeholder-gray-400"
+                        className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-250 text-sm rounded-lg outline-none focus:bg-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all text-gray-750 placeholder-gray-400 h-11"
                     />
                     {searchTerm && (
                         <button
@@ -248,7 +250,7 @@ export default function ProductsPage() {
                                 setSearchTerm('');
                                 setFilters({ ...filters, keyword: '', page: 1 });
                             }}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-605"
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -262,7 +264,7 @@ export default function ProductsPage() {
                     <select
                         value={filters.typeId || ''}
                         onChange={(e) => setFilters({ ...filters, typeId: e.target.value ? Number(e.target.value) : undefined, page: 1 })}
-                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-40 cursor-pointer transition-colors"
+                        className="bg-white border border-gray-250 text-gray-750 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full md:w-auto shrink-0 cursor-pointer h-11 transition-colors"
                     >
                         <option value="">Tất cả danh mục</option>
                         {types.map(t => (
@@ -270,7 +272,6 @@ export default function ProductsPage() {
                         ))}
                     </select>
 
-                    {/* Sắp xếp theo Giá */}
                     <select
                         value={filters.sortField === 'price' ? filters.sortDir : ''}
                         onChange={(e) => {
@@ -281,14 +282,13 @@ export default function ProductsPage() {
                                 setFilters({ ...filters, sortField: 'createdAt', sortDir: 'desc', page: 1 });
                             }
                         }}
-                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-36 cursor-pointer transition-colors"
+                        className="bg-white border border-gray-250 text-gray-750 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full md:w-auto shrink-0 cursor-pointer h-11 transition-colors"
                     >
                         <option value="">Sắp xếp: Giá</option>
                         <option value="asc">Giá: Thấp đến Cao</option>
                         <option value="desc">Giá: Cao đến Thấp</option>
                     </select>
 
-                    {/* Sắp xếp theo Ngày tạo */}
                     <select
                         value={filters.sortField === 'createdAt' ? filters.sortDir : ''}
                         onChange={(e) => {
@@ -299,14 +299,13 @@ export default function ProductsPage() {
                                 setFilters({ ...filters, sortField: 'createdAt', sortDir: 'desc', page: 1 });
                             }
                         }}
-                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-40 cursor-pointer transition-colors"
+                        className="bg-white border border-gray-250 text-gray-750 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full md:w-auto shrink-0 cursor-pointer h-11 transition-colors"
                     >
                         <option value="">Sắp xếp: Ngày tạo</option>
                         <option value="desc">Ngày tạo: Mới nhất</option>
                         <option value="asc">Ngày tạo: Cũ nhất</option>
                     </select>
 
-                    {/* Sắp xếp theo Ngày cập nhật */}
                     <select
                         value={filters.sortField === 'updatedAt' ? filters.sortDir : ''}
                         onChange={(e) => {
@@ -317,7 +316,7 @@ export default function ProductsPage() {
                                 setFilters({ ...filters, sortField: 'createdAt', sortDir: 'desc', page: 1 });
                             }
                         }}
-                        className="bg-white border border-gray-200 text-gray-700 text-sm rounded-lg px-3 py-2 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full sm:w-44 cursor-pointer transition-colors"
+                        className="bg-white border border-gray-250 text-gray-750 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 w-full md:w-auto shrink-0 cursor-pointer h-11 transition-colors"
                     >
                         <option value="">Sắp xếp: Ngày cập nhật</option>
                         <option value="desc">Cập nhật: Mới nhất</option>
@@ -326,35 +325,23 @@ export default function ProductsPage() {
                 </div>
             </div>
 
-            {successMsg && (
-                <div className="p-4 rounded-lg bg-green-50 border border-green-200 text-green-700 flex items-center transition-all duration-300">
-                    <span className="font-medium">{successMsg}</span>
-                </div>
-            )}
-
-            {errorMsg && (
-                <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-center transition-all duration-300">
-                    <span className="font-medium">{errorMsg}</span>
-                </div>
-            )}
-
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-white rounded-lg shadow border border-slate-100 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[1200px]">
                         <thead className="bg-gray-50 border-b">
                             <tr>
-                                <th className="p-4 font-semibold text-gray-600">Hình ảnh</th>
-                                <th className="p-4 font-semibold text-gray-600">Mã SP</th>
-                                <th className="p-4 font-semibold text-gray-600">Tên sản phẩm</th>
-                                <th className="p-4 font-semibold text-gray-600">Mô tả</th>
-                                <th className="p-4 font-semibold text-gray-600">Loại sản phẩm</th>
-                                <th className="p-4 font-semibold text-gray-600">Giá bán</th>
-                                <th className="p-4 font-semibold text-gray-600">Ngày tạo</th>
-                                <th className="p-4 font-semibold text-gray-600">Ngày cập nhật</th>
-                                <th className="p-4 font-semibold text-gray-600 text-center">Thao tác</th>
+                                <th className="p-4 font-semibold text-gray-650">Hình ảnh</th>
+                                <th className="p-4 font-semibold text-gray-650">Mã SP</th>
+                                <th className="p-4 font-semibold text-gray-650">Tên sản phẩm</th>
+                                <th className="p-4 font-semibold text-gray-650">Mô tả</th>
+                                <th className="p-4 font-semibold text-gray-650">Loại sản phẩm</th>
+                                <th className="p-4 font-semibold text-gray-650">Giá bán</th>
+                                <th className="p-4 font-semibold text-gray-650">Ngày tạo</th>
+                                <th className="p-4 font-semibold text-gray-650">Ngày cập nhật</th>
+                                <th className="p-4 font-semibold text-gray-650 text-center">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className="divide-y divide-slate-100 bg-white">
                             {isLoading ? (
                                 [1, 2, 3, 4, 5].map((i) => (
                                     <tr key={i} className="border-b">
@@ -392,7 +379,7 @@ export default function ProductsPage() {
                                         <td className="p-4 font-mono text-sm text-gray-600">{item.productCode}</td>
                                         <td className="p-4 font-medium text-gray-900">{item.name}</td>
 
-                                        <td className="p-4 text-sm text-gray-600 max-w-[200px] truncate">
+                                        <td className="p-4 text-sm text-gray-600 max-w-[200px] truncate font-medium">
                                             {item.description || <span className="text-gray-400 italic">Không có mô tả</span>}
                                         </td>
 
@@ -402,7 +389,7 @@ export default function ProductsPage() {
                                             </span>
                                         </td>
 
-                                        <td className="p-4 text-emerald-600 font-semibold">
+                                        <td className="p-4 text-emerald-600 font-bold">
                                             {formatCurrency(item.price)}
                                         </td>
 
@@ -416,16 +403,20 @@ export default function ProductsPage() {
 
                                         <td className="p-4">
                                             <div className="flex justify-center gap-2">
-                                                <Button variant="outline" className="text-xs px-3 h-8" onClick={() => handleOpenEdit(item)}>Sửa</Button>
-                                                <Button variant="outline" className="text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200" onClick={() => handleDelete(item.id)}>Xóa</Button>
+                                                <Button variant="outline" className="text-xs px-3 h-8 shadow-sm rounded-lg" onClick={() => handleOpenEdit(item)}>Sửa</Button>
+                                                <Button variant="outline" className="text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200 hover:text-red-700 shadow-sm rounded-lg" onClick={() => handleOpenDelete(item)}>Xóa</Button>
                                             </div>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={9} className="p-10 text-center text-gray-500">
-                                        Không tìm thấy sản phẩm nào
+                                    <td colSpan={9} className="p-6 bg-white">
+                                        <EmptyState
+                                            icon={PackageOpen}
+                                            title="Không tìm thấy sản phẩm"
+                                            description="Không tìm thấy sản phẩm nào phù hợp với bộ lọc tìm kiếm của bạn."
+                                        />
                                     </td>
                                 </tr>
                             )}
@@ -502,7 +493,6 @@ export default function ProductsPage() {
                                 Hình ảnh sản phẩm (Tùy chọn)
                             </label>
                             <input
-                                // BỔ SUNG: Ép React reset input file khi đóng mở form
                                 key={isModalOpen ? 'open' : 'closed'}
                                 type="file"
                                 accept="image/*"
@@ -528,6 +518,17 @@ export default function ProductsPage() {
                     </div>
                 </form>
             </Modal>
+
+            <ConfirmDialog
+                isOpen={isConfirmOpen}
+                title="Xác nhận xóa sản phẩm"
+                message={`Bạn có chắc chắn muốn xóa sản phẩm ${deleteTargetName}? Hành động này sẽ loại bỏ sản phẩm khỏi kho hàng.`}
+                itemName={deleteTargetName}
+                onCancel={() => setIsConfirmOpen(false)}
+                onConfirm={handleConfirmDelete}
+                loading={confirmLoading}
+                confirmText="Xác nhận xóa"
+            />
         </div>
     );
 }

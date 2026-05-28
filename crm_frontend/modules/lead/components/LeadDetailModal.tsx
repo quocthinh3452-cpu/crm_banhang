@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '@/shared/components/ui/Modal';
 import { Button } from '@/shared/components/ui/Button';
+import { ConfirmDialog } from '@/shared/components/ui/ConfirmDialog';
 import { Lead, leadApi, LeadLog } from '../services/leadApi';
 import { lookupApi, LookupItem } from '../services/lookupApi';
+import toast from 'react-hot-toast';
 
 interface LeadDetailModalProps {
   isOpen: boolean;
@@ -28,6 +30,11 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
   const [editActionType, setEditActionType] = useState('CALL');
   const [editNote, setEditNote] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
+
+  // State Confirm Dialog Xóa Log
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [deleteLogId, setDeleteLogId] = useState<number | null>(null);
+  const [confirmDeleteLoading, setConfirmDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -107,17 +114,27 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
     }
   };
 
-  // --- HÀM XÓA LOG ---
-  const handleDeleteLog = async (logId: number) => {
-    if (!lead.id) return;
-    if (!window.confirm('Bạn có chắc chắn muốn xóa lịch sử tương tác này không?')) return;
-    
+  // --- HÀM MỞ CONFIRM DIALOG XÓA LOG ---
+  const handleOpenDeleteLog = (logId: number) => {
+    setDeleteLogId(logId);
+    setIsConfirmDeleteOpen(true);
+  };
+
+  // --- HÀM XÁC NHẬN XÓA LOG ---
+  const handleConfirmDeleteLog = async () => {
+    if (!lead.id || deleteLogId === null) return;
+    setConfirmDeleteLoading(true);
     try {
-      await leadApi.deleteLeadLog(lead.id, logId);
-      loadLogs(); // Load lại bảng sau khi xóa
+      await leadApi.deleteLeadLog(lead.id, deleteLogId);
+      toast.success('Xóa lịch sử tương tác thành công!');
+      loadLogs();
     } catch (error) {
       console.error("Lỗi khi xóa log:", error);
-      alert("Lỗi khi xóa! Vui lòng thử lại.");
+      toast.error('Lỗi khi xóa! Vui lòng thử lại.');
+    } finally {
+      setConfirmDeleteLoading(false);
+      setIsConfirmDeleteOpen(false);
+      setDeleteLogId(null);
     }
   };
 
@@ -138,7 +155,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
       loadLogs(); // Load lại data mới
     } catch (error) {
       console.error("Lỗi khi cập nhật log:", error);
-      alert("Lỗi khi cập nhật! Vui lòng thử lại.");
+      toast.error('Lỗi khi cập nhật! Vui lòng thử lại.');
     } finally {
       setSavingEdit(false);
     }
@@ -255,7 +272,7 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
                           {/* Nút Sửa / Xóa ẩn đi, chỉ hiện khi hover */}
                           <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 bg-white pl-2">
                             <button onClick={() => handleStartEdit(log)} className="text-gray-400 hover:text-blue-600" title="Sửa">✏️</button>
-                            <button onClick={() => handleDeleteLog(log.id!)} className="text-gray-400 hover:text-red-600" title="Xóa">🗑️</button>
+                            <button onClick={() => handleOpenDeleteLog(log.id!)} className="text-gray-400 hover:text-red-600" title="Xóa">🗑️</button>
                           </div>
 
                           <div className="flex justify-between items-start mb-2 pr-12">
@@ -280,6 +297,17 @@ export const LeadDetailModal: React.FC<LeadDetailModalProps> = ({ isOpen, onClos
         <div className="flex justify-end pt-4 border-t border-gray-200 mt-2 shrink-0">
           <Button variant="secondary" onClick={onClose} className="px-6">Đóng lại</Button>
         </div>
+
+        {/* Confirm Dialog Xóa Log */}
+        <ConfirmDialog
+          isOpen={isConfirmDeleteOpen}
+          title="Xác nhận xóa lịch sử tương tác"
+          message="Bạn có chắc chắn muốn xóa lịch sử tương tác này không? Hành động này không thể hoàn tác."
+          onCancel={() => setIsConfirmDeleteOpen(false)}
+          onConfirm={handleConfirmDeleteLog}
+          loading={confirmDeleteLoading}
+          confirmText="Xác nhận xóa"
+        />
 
       </div>
     </Modal>
