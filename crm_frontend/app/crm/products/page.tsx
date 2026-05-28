@@ -436,8 +436,6 @@ export default function ProductsPage() {
                                                     <line x1="10" x2="10" y1="11" y2="17" />
                                                     <line x1="14" x2="14" y1="11" y2="17" />
                                                 </svg></Button>
-                                                <Button variant="outline" className="text-xs px-3 h-8 shadow-sm rounded-lg" onClick={() => handleOpenEdit(item)}>Sửa</Button>
-                                                <Button variant="outline" className="text-xs px-3 h-8 text-red-600 hover:bg-red-50 hover:border-red-200 hover:text-red-700 shadow-sm rounded-lg" onClick={() => handleOpenDelete(item)}>Xóa</Button>
                                             </div>
                                         </td>
                                     </tr>
